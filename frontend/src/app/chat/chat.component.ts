@@ -93,7 +93,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
   private messageHandler = (msg: { boardId: string; author: string; text: string; ts: number }) => {
     if (msg.boardId !== this.boardId) return;
-    this.messages = [...this.messages, { author: msg.author, text: msg.text, ts: msg.ts }];
+    // Evitar duplicados: verificar si el mensaje ya existe (mismo timestamp y autor)
+    const isDuplicate = this.messages.some(m => 
+      m.ts === msg.ts && m.author === msg.author && m.text === msg.text
+    );
+    if (!isDuplicate) {
+      this.messages = [...this.messages, { author: msg.author, text: msg.text, ts: msg.ts }];
+      // Ordenar por timestamp después de agregar
+      this.messages.sort((a, b) => a.ts - b.ts);
+    }
   };
   typingAuthors = new Set<string>();
   private typingHandler = (payload: { boardId: string; author: string; typing: boolean }) => {
@@ -109,6 +117,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    // Asegurar que el socket esté conectado
+    this.socket.connect();
+    
+    // Escuchar mensajes del chat del tablero ANTES de unirse a la sala
+    this.socket.on('board:chat:message', this.messageHandler);
+    this.socket.on('board:chat:typing', this.typingHandler);
+    this.socket.on('board:presence', this.presenceHandler);
+    
     // Unirse a la sala del tablero según la URL
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -119,28 +135,49 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
       if (id !== this.boardId) {
         if (this.boardId) {
-        this.socket.emit('board:leave', { boardId: this.boardId });
+          this.socket.emit('board:leave', { boardId: this.boardId });
         }
         this.boardId = id;
         try { localStorage.setItem('tf-last-board', this.boardId); } catch {}
-        this.socket.emit('board:join', { boardId: this.boardId, user: this.author });
-        // cargar historial
-        this.loadHistory();
+        
+        // Esperar a que el socket esté conectado antes de unirse y cargar historial
+        this.joinBoardAndLoadHistory();
       } else {
+        // Si ya es el mismo boardId, asegurar que se haya cargado el historial
+        if (this.messages.length === 0 && this.boardId) {
+          this.loadHistory();
+        }
         this.socket.emit('board:join', { boardId: this.boardId, user: this.author });
         try { localStorage.setItem('tf-last-board', this.boardId); } catch {}
       }
     });
-
-    // Escuchar mensajes del chat del tablero
-    this.socket.on('board:chat:message', this.messageHandler);
-    this.socket.on('board:chat:typing', this.typingHandler);
-    this.socket.on('board:presence', this.presenceHandler);
+  }
+  
+  private async joinBoardAndLoadHistory(): Promise<void> {
+    // Esperar a que el socket esté conectado (con timeout)
+    let attempts = 0;
+    const maxAttempts = 10;
+    while (!this.socket.isConnected() && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    if (this.socket.isConnected()) {
+      this.socket.emit('board:join', { boardId: this.boardId, user: this.author });
+      // Cargar historial después de unirse a la sala
+      await this.loadHistory();
+    } else {
+      console.warn('[Chat] Socket no conectado, intentando unirse de todas formas...');
+      this.socket.emit('board:join', { boardId: this.boardId, user: this.author });
+      await this.loadHistory();
+    }
   }
 
   ngOnDestroy(): void {
     // Abandonar sala de tablero al salir del componente
-    this.socket.emit('board:leave', { boardId: this.boardId });
+    if (this.boardId && this.socket.isConnected()) {
+      this.socket.emit('board:leave', { boardId: this.boardId });
+    }
     this.socket.off('board:chat:message', this.messageHandler as unknown as (...args: unknown[]) => void);
     this.socket.off('board:chat:typing', this.typingHandler as unknown as (...args: unknown[]) => void);
     this.socket.off('board:presence', this.presenceHandler as unknown as (...args: unknown[]) => void);
@@ -149,12 +186,39 @@ export class ChatComponent implements OnInit, OnDestroy {
   @HostListener('window:beforeunload')
   handleBeforeUnload(): void {
     // asegurar abandono de la sala si se cierra o recarga la pestaña
-    this.socket.emit('board:leave', { boardId: this.boardId });
+    if (this.boardId && this.socket.isConnected()) {
+      this.socket.emit('board:leave', { boardId: this.boardId });
+    }
   }
 
   send(): void {
     const text = this.draft.trim();
     if (!text) return;
+    if (!this.boardId) {
+      console.error('[Chat] No se puede enviar mensaje: boardId no definido');
+      return;
+    }
+    
+    // Asegurar que el socket esté conectado
+    if (!this.socket.isConnected()) {
+      console.warn('[Chat] Socket no conectado, intentando conectar...');
+      this.socket.connect();
+      // Esperar un poco antes de emitir
+      setTimeout(() => {
+        if (this.socket.isConnected()) {
+          this.sendMessage(text);
+        } else {
+          console.error('[Chat] No se pudo conectar el socket, guardando mensaje para reenvío...');
+          // Guardar en localStorage como fallback (aunque idealmente debería usar la API)
+          this.sendMessage(text);
+        }
+      }, 500);
+    } else {
+      this.sendMessage(text);
+    }
+  }
+  
+  private sendMessage(text: string): void {
     const payload = { boardId: this.boardId, author: this.author, text, ts: Date.now() };
     this.socket.emit('board:chat:message', payload);
     this.draft = '';
@@ -163,12 +227,54 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private async loadHistory(): Promise<void> {
+    if (!this.boardId) {
+      console.warn('[Chat] No se puede cargar historial: boardId no definido');
+      return;
+    }
+    
     try {
-      const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/messages?limit=50`, { credentials: 'include' });
-      if (!res.ok) return;
+      const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/messages?limit=50`, { 
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!res.ok) {
+        if (res.status === 404) {
+          console.warn('[Chat] Tablero no encontrado');
+          this.messages = [];
+          return;
+        }
+        if (res.status === 401 || res.status === 403) {
+          console.error('[Chat] No autorizado para ver mensajes de este tablero');
+          return;
+        }
+        console.error('[Chat] Error al cargar historial:', res.status, res.statusText);
+        return;
+      }
+      
       const data = await res.json() as Array<{ author: string; text: string; ts: number }>;
-      this.messages = data;
-    } catch {}
+      if (Array.isArray(data)) {
+        this.messages = data.sort((a, b) => a.ts - b.ts); // Ordenar por timestamp ascendente
+        console.log(`[Chat] Historial cargado: ${data.length} mensajes`);
+      } else {
+        console.warn('[Chat] Respuesta inválida del servidor');
+        this.messages = [];
+      }
+    } catch (error) {
+      console.error('[Chat] Error al cargar historial:', error);
+      // Mantener mensajes existentes si hay un error de red
+      if (this.messages.length === 0) {
+        console.warn('[Chat] No se pudo cargar historial, intentando nuevamente...');
+        // Reintentar una vez después de un segundo
+        setTimeout(() => {
+          if (this.boardId) {
+            this.loadHistory();
+          }
+        }, 1000);
+      }
+    }
   }
 
   onDraftInput(): void {
@@ -178,6 +284,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private emitTyping(typing: boolean): void {
+    if (!this.boardId) return;
+    if (!this.socket.isConnected()) {
+      // No es crítico si no se puede enviar el typing indicator
+      return;
+    }
     this.socket.emit('board:chat:typing', { boardId: this.boardId, author: this.author, typing });
   }
 

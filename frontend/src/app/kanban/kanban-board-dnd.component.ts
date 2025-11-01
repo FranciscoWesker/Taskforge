@@ -1090,31 +1090,10 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     wipLimits: { todo: number; doing: number; done: number } = { todo: 99, doing: 3, done: 99 };
 
     ngOnInit(): void {
+        // Asegurar que el socket esté conectado
         this.socket.connect();
-        this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            if (!id) {
-                // Si no hay ID, redirigir a la lista de tableros
-                this.router.navigate(['/app/boards']);
-                return;
-            }
-            if (id !== this.boardId) {
-                if (this.boardId) {
-                // abandonar room anterior
-                this.socket.emit('board:leave', { boardId: this.boardId });
-                }
-                this.boardId = id;
-                try { localStorage.setItem('tf-last-board', this.boardId); } catch {}
-                // unirse a nueva room
-                this.socket.emit('board:join', { boardId: this.boardId });
-                // cargar estado inicial desde API
-                this.loadInitial();
-            } else {
-                // primera vez
-                this.socket.emit('board:join', { boardId: this.boardId });
-                try { localStorage.setItem('tf-last-board', this.boardId); } catch {}
-            }
-        });
+        
+        // Escuchar actualizaciones del kanban ANTES de unirse a la sala
         this.socket.on<{ boardId: string; todo: KanbanCard[]; doing: KanbanCard[]; done: KanbanCard[] }>(
             'kanban:update',
             (state) => {
@@ -1149,13 +1128,77 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck(); // Notificar cambio para OnPush
             }
         );
+        
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            if (!id) {
+                // Si no hay ID, redirigir a la lista de tableros
+                this.router.navigate(['/app/boards']);
+                return;
+            }
+            if (id !== this.boardId) {
+                if (this.boardId) {
+                    // abandonar room anterior
+                    this.socket.emit('board:leave', { boardId: this.boardId });
+                }
+                this.boardId = id;
+                try { localStorage.setItem('tf-last-board', this.boardId); } catch {}
+                // Unirse a la sala y cargar estado inicial
+                this.joinBoardAndLoadInitial();
+            } else {
+                // Si ya es el mismo boardId, asegurar que se haya cargado el estado
+                if (this.todo.length === 0 && this.doing.length === 0 && this.done.length === 0 && this.boardId) {
+                    this.loadInitial();
+                }
+                this.joinBoard();
+            }
+        });
+    }
+    
+    private async joinBoard(): Promise<void> {
+        // Esperar a que el socket esté conectado
+        let attempts = 0;
+        const maxAttempts = 10;
+        while (!this.socket.isConnected() && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (this.socket.isConnected()) {
+            this.socket.emit('board:join', { boardId: this.boardId });
+        } else {
+            console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
+            this.socket.emit('board:join', { boardId: this.boardId });
+        }
+    }
+    
+    private async joinBoardAndLoadInitial(): Promise<void> {
+        // Esperar a que el socket esté conectado
+        let attempts = 0;
+        const maxAttempts = 10;
+        while (!this.socket.isConnected() && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (this.socket.isConnected()) {
+            this.socket.emit('board:join', { boardId: this.boardId });
+        } else {
+            console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
+            this.socket.emit('board:join', { boardId: this.boardId });
+        }
+        
+        // Cargar estado inicial después de unirse a la sala
+        await this.loadInitial();
     }
 
 
     @HostListener('window:beforeunload')
     handleBeforeUnload(): void {
         // asegurar abandono de la sala si se cierra o recarga la pestaña
-        this.socket.emit('board:leave', { boardId: this.boardId });
+        if (this.boardId && this.socket.isConnected()) {
+            this.socket.emit('board:leave', { boardId: this.boardId });
+        }
     }
 
     async drop(event: CdkDragDrop<KanbanCard[]>) {
@@ -1285,13 +1328,26 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 };
             }
             
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards`, {
                 method: 'POST',
                 headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(payload)
             });
-        } catch {}
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al crear la tarjeta' }));
+                throw new Error(error.message || 'Error al crear la tarjeta');
+            }
+        } catch (error: any) {
+            console.error('[Kanban] Error al crear tarjeta:', error);
+            this.alerts.open(error.message || 'Error al crear la tarjeta. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
+            // No cerrar el modal si hay error para que el usuario pueda intentar nuevamente
+            return;
+        }
         this.addOpen = false;
         this.addGitUrl = '';
     }
@@ -1302,12 +1358,23 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         const ok = confirm(`¿Eliminar "${card.title}"?`);
         if (!ok) return;
         try {
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(card.id)}?list=${encodeURIComponent(list)}`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(card.id)}?list=${encodeURIComponent(list)}`, {
                 method: 'DELETE',
                 headers: this.getAuthHeaders(),
                 credentials: 'include'
             });
-        } catch {}
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al eliminar la tarjeta' }));
+                throw new Error(error.message || 'Error al eliminar la tarjeta');
+            }
+        } catch (error: any) {
+            console.error('[Kanban] Error al eliminar tarjeta:', error);
+            this.alerts.open(error.message || 'Error al eliminar la tarjeta. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
+        }
     }
 
     async editCard(list: 'todo' | 'doing' | 'done', index: number) {
@@ -1386,13 +1453,26 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         }
         
         try {
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(this.editCardId)}`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(this.editCardId)}`, {
                 method: 'PATCH',
                 headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(payload)
             });
-        } catch {}
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al actualizar la tarjeta' }));
+                throw new Error(error.message || 'Error al actualizar la tarjeta');
+            }
+        } catch (error: any) {
+            console.error('[Kanban] Error al editar tarjeta:', error);
+            this.alerts.open(error.message || 'Error al actualizar la tarjeta. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
+            // No cerrar el modal si hay error para que el usuario pueda intentar nuevamente
+            return;
+        }
         this.editOpen = false;
         this.editCardId = null;
         this.editGitUrl = '';
@@ -1459,6 +1539,11 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     }
 
     private async loadInitial(): Promise<void> {
+        if (!this.boardId) {
+            console.warn('[Kanban] No se puede cargar estado inicial: boardId no definido');
+            return;
+        }
+        
         try {
             const userEmail = this.auth.getEmail();
             if (!userEmail) {
@@ -1466,26 +1551,66 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/login']);
                 return;
             }
+            
             const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/kanban`, {
                 credentials: 'include',
-                headers: this.getAuthHeaders()
+                headers: {
+                    ...this.getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                }
             });
+            
             if (!res.ok) {
                 if (res.status === 401) {
                     this.alerts.open('No estás autenticado. Por favor, inicia sesión.', { label: 'Error', appearance: 'negative' }).subscribe();
                     this.router.navigate(['/login']);
+                    return;
                 } else if (res.status === 403) {
                     this.alerts.open('No tienes acceso a este tablero.', { label: 'Acceso denegado', appearance: 'negative' }).subscribe();
                     this.router.navigate(['/app/boards']);
+                    return;
+                } else if (res.status === 404) {
+                    console.warn('[Kanban] Tablero no encontrado, usando estado vacío');
+                    // Usar estado vacío si el tablero no existe
+                    this.boardName = null;
+                    this.todo = [];
+                    this.doing = [];
+                    this.done = [];
+                    this.wipLimits = { todo: 99, doing: 3, done: 99 };
+                    this.cdr.markForCheck();
+                    return;
                 }
+                console.error('[Kanban] Error al cargar estado inicial:', res.status, res.statusText);
+                this.alerts.open(`Error al cargar el tablero: ${res.statusText}`, { label: 'Error', appearance: 'negative' }).subscribe();
                 return;
             }
+            
             const data = await res.json() as { name?: string; todo?: KanbanCard[]; doing?: KanbanCard[]; done?: KanbanCard[]; wipLimits?: { todo?: number; doing?: number; done?: number } };
+            
+            // Validar y actualizar datos
             this.boardName = typeof data.name === 'string' ? data.name : this.boardName;
-            this.todo = data.todo ?? this.todo;
-            this.doing = data.doing ?? this.doing;
-            this.done = data.done ?? this.done;
+            
+            if (Array.isArray(data.todo)) {
+                this.todo = data.todo;
+            } else if (data.todo === undefined) {
+                // Si no viene todo, mantener el estado actual o usar array vacío
+                this.todo = this.todo.length > 0 ? this.todo : [];
+            }
+            
+            if (Array.isArray(data.doing)) {
+                this.doing = data.doing;
+            } else if (data.doing === undefined) {
+                this.doing = this.doing.length > 0 ? this.doing : [];
+            }
+            
+            if (Array.isArray(data.done)) {
+                this.done = data.done;
+            } else if (data.done === undefined) {
+                this.done = this.done.length > 0 ? this.done : [];
+            }
+            
             this.cdr.markForCheck(); // Notificar cambio para OnPush
+            
             if (data.wipLimits) {
                 this.wipLimits = {
                     todo: typeof data.wipLimits.todo === 'number' ? data.wipLimits.todo : this.wipLimits.todo,
@@ -1493,7 +1618,22 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                     done: typeof data.wipLimits.done === 'number' ? data.wipLimits.done : this.wipLimits.done,
                 };
             }
-        } catch {}
+            
+            console.log(`[Kanban] Estado inicial cargado: ${this.todo.length + this.doing.length + this.done.length} tarjetas`);
+        } catch (error) {
+            console.error('[Kanban] Error al cargar estado inicial:', error);
+            this.alerts.open('Error al cargar el tablero. Por favor, recarga la página.', { label: 'Error', appearance: 'negative' }).subscribe();
+            
+            // Reintentar una vez después de un segundo si no hay datos
+            if (this.todo.length === 0 && this.doing.length === 0 && this.done.length === 0) {
+                console.warn('[Kanban] Reintentando cargar estado inicial...');
+                setTimeout(() => {
+                    if (this.boardId) {
+                        this.loadInitial();
+                    }
+                }, 1000);
+            }
+        }
     }
     // Indicadores de guardado
     wipSaving = false;
@@ -1552,7 +1692,19 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     openDeploymentPanel(): void {
         this.deploymentPanelOpen = true;
         // Suscribirse a logs de deployment
-        this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+        if (this.boardId) {
+            if (!this.socket.isConnected()) {
+                this.socket.connect();
+                // Esperar un poco antes de suscribirse
+                setTimeout(() => {
+                    if (this.socket.isConnected()) {
+                        this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+                    }
+                }, 300);
+            } else {
+                this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+            }
+        }
         
         // Escuchar logs en tiempo real
         this.socket.on<{ level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }>('deployment:log', (log) => {
@@ -1590,9 +1742,13 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         // salir de la sala actual (se mantiene la conexión global del socket)
-        this.socket.emit('board:leave', { boardId: this.boardId });
+        if (this.boardId && this.socket.isConnected()) {
+            this.socket.emit('board:leave', { boardId: this.boardId });
+        }
         // Cancelar suscripción a logs de deployment
-        this.socket.emit('deployment:unsubscribe', { boardId: this.boardId });
+        if (this.boardId && this.socket.isConnected()) {
+            this.socket.emit('deployment:unsubscribe', { boardId: this.boardId });
+        }
         this.socket.off('deployment:log');
         this.socket.off('deployment:status');
     }
