@@ -1,0 +1,90 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+/dist/
+**/dist/
+backend/dist/
+frontend/dist/
+
+# Caches
+**/.cache/
+**/.angular/
+**/.vite/
+**/.turbo/
+.angular/
+.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+lerna-debug.log*
+
+# Env files
+*.env
+**/.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Configuración con credenciales (no commitar)
+**/firebase.config.ts
+**/firebase.config.js
+frontend/src/app/core/firebase.config.ts
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Test outputs
+.nyc_output/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Package manager locks (opcional, algunos proyectos los commitean)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Misc
+*.pem
+*.key
+*.cert
+*.crt
+
+# Documentación y guías (archivos internos de desarrollo)
+UX_UI_DESIGN_GUIDE.md
+IMPLEMENTATION_SUMMARY.md
+*.md.guide
+*.md.summary
