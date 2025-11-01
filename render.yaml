@@ -37,13 +37,11 @@ services:
           connect-src 'self' https://*.onrender.com wss://*.onrender.com https://*.firebaseapp.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;
           frame-ancestors 'self';
     # Redirecciones para SPA (Single Page Application)
-    # Todas las rutas deben redirigir a index.html para que Angular maneje el routing
+    # Render automáticamente excluye archivos estáticos del catch-all
+    # Una sola regla catch-all es suficiente: todas las rutas van a index.html
+    # Status 200 permite que Angular maneje el routing del lado del cliente
     redirects:
       - source: /*
-        destination: /index.html
-        status: 200
-      # Redirección específica para rutas de boards
-      - source: /app/boards/*
         destination: /index.html
         status: 200
 

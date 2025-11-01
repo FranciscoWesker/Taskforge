@@ -7,7 +7,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TuiButton, TuiTextfield, TuiIcon, TuiDialogService, TuiAlertService } from '@taiga-ui/core';
-import { TuiAvatar } from '@taiga-ui/kit';
 import { AuthService } from '../core/auth.service';
 import { API_BASE } from '../core/env';
 
@@ -35,7 +34,6 @@ interface Board {
     TuiButton,
     TuiTextfield,
     TuiIcon,
-    TuiAvatar,
   ],
   template: `
   <div class="space-y-6 animate-in">

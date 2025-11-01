@@ -1493,17 +1493,33 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         const next = { ...this.wipLimits, [list]: Math.floor(num) } as { todo: number; doing: number; done: number };
         try {
             this.wipSaving = true; this.wipJustSaved = false;
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/wip`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/wip`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(next)
             });
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al actualizar límites WIP' }));
+                throw new Error(error.message || 'Error al actualizar límites WIP');
+            }
+            
             // el servidor emitirá kanban:update con wipLimits
             this.wipJustSaved = true;
             setTimeout(() => { this.wipJustSaved = false; }, 1500);
-        } catch {}
-        this.wipSaving = false;
+        } catch (error: any) {
+            console.error('[Kanban] Error al actualizar WIP:', error);
+            this.alerts.open(error.message || 'Error al actualizar límites WIP. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
+            // Revertir al valor anterior en caso de error
+            this.wipLimits = { todo: current, doing: this.wipLimits.doing, done: this.wipLimits.done };
+            this.cdr.markForCheck();
+        } finally {
+            this.wipSaving = false;
+        }
     }
     wipFlash: { todo: boolean; doing: boolean; done: boolean } = { todo: false, doing: false, done: false };
     private lastToastKey = '';
@@ -1643,17 +1659,30 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         const defaults = { todo: 99, doing: 3, done: 99 };
         try {
             this.wipSaving = true; this.wipJustSaved = false;
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/wip`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/wip`, {
                 method: 'PATCH',
                 headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(defaults)
             });
-            this.alerts.open('Límites restablecidos', { label: 'WIP' }).subscribe();
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al restablecer límites WIP' }));
+                throw new Error(error.message || 'Error al restablecer límites WIP');
+            }
+            
+            this.alerts.open('Límites restablecidos', { label: 'WIP', appearance: 'success' }).subscribe();
             this.wipJustSaved = true;
             setTimeout(() => { this.wipJustSaved = false; }, 1500);
-        } catch {}
-        this.wipSaving = false;
+        } catch (error: any) {
+            console.error('[Kanban] Error al restablecer WIP:', error);
+            this.alerts.open(error.message || 'Error al restablecer límites WIP. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
+        } finally {
+            this.wipSaving = false;
+        }
     }
     async renameBoard() {
         const current = this.boardName ?? '';
@@ -1669,16 +1698,26 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             return;
         }
         try {
-            await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}`, {
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}`, {
                 method: 'PUT',
                 headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ name: trimmed })
             });
+            
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al actualizar el nombre del tablero' }));
+                throw new Error(error.message || 'Error al actualizar el nombre del tablero');
+            }
+            
             // el servidor emitirá kanban:update con name actualizado
             this.alerts.open('Nombre actualizado', { label: 'Tablero', appearance: 'success' }).subscribe();
-        } catch {
-            this.alerts.open('No se pudo actualizar el nombre', { label: 'Error', appearance: 'negative' }).subscribe();
+        } catch (error: any) {
+            console.error('[Kanban] Error al renombrar tablero:', error);
+            this.alerts.open(error.message || 'No se pudo actualizar el nombre. Por favor, intenta nuevamente.', { 
+                label: 'Error', 
+                appearance: 'negative' 
+            }).subscribe();
         }
     }
     // Deployment panel state
