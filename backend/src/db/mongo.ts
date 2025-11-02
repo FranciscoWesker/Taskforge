@@ -17,10 +17,10 @@ export async function connectMongo(uri: string): Promise<void> {
   let effectiveUri = uri;
   const useMemory = process.env.USE_MEM_MONGO === 'true';
   if (useMemory) {
-    // eslint-disable-next-line no-console
-    console.log('⚠️  ADVERTENCIA: Usando MongoDB en memoria. Los datos se perderán al reiniciar el servidor.');
-    // eslint-disable-next-line no-console
-    console.log('Iniciando MongoDB en memoria...');
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log('⚠️  ADVERTENCIA: Usando MongoDB en memoria. Los datos se perderán al reiniciar el servidor.');
+    }
     try {
       memoryServer = await MongoMemoryServer.create({
         instance: {
@@ -28,62 +28,46 @@ export async function connectMongo(uri: string): Promise<void> {
         },
       });
       effectiveUri = memoryServer.getUri();
-      // eslint-disable-next-line no-console
-      console.log(`MongoDB en memoria iniciado: ${effectiveUri}`);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error iniciando MongoDB en memoria:', err);
       throw err;
     }
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(`Conectando a MongoDB real: ${effectiveUri.replace(/\/\/.*@/, '//***:***@')}`); // Ocultar credenciales en logs
   }
-  // eslint-disable-next-line no-console
-  console.log(`Conectando a MongoDB...`);
+  
   try {
     await mongoose.connect(effectiveUri, {
-      serverSelectionTimeoutMS: 30000, // Timeout aumentado a 30 segundos
+      serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
     });
-    // eslint-disable-next-line no-console
-    console.log('✅ MongoDB conectado exitosamente');
   } catch (error: any) {
+    // Solo mostrar errores en producción, siempre loguear errores críticos
     // eslint-disable-next-line no-console
-    console.error('❌ Error conectando a MongoDB:', error.message || error);
-    // Si es un error de whitelist/IP, dar instrucciones específicas
+    console.error('Error conectando a MongoDB:', error.message || error);
     if (error.message && (error.message.includes('whitelist') || error.message.includes('IP') || error.message.includes('could not connect'))) {
       // eslint-disable-next-line no-console
-      console.error('');
-      // eslint-disable-next-line no-console
-      console.error('⚠️  IMPORTANTE: Configura la whitelist de MongoDB Atlas:');
-      // eslint-disable-next-line no-console
-      console.error('   1. Ve a MongoDB Atlas → Network Access → Add IP Address');
-      // eslint-disable-next-line no-console
-      console.error('   2. Agrega 0.0.0.0/0 (todas las IPs) para permitir conexiones desde Render');
-      // eslint-disable-next-line no-console
-      console.error('   3. O agrega la IP específica de Render si lo prefieres');
-      // eslint-disable-next-line no-console
-      console.error('');
+      console.error('Configura la whitelist de MongoDB Atlas en Network Access');
     }
     throw error;
   }
   
-  // Configurar listeners de eventos de conexión
-  mongoose.connection.on('error', (err) => {
-    // eslint-disable-next-line no-console
-    console.error('❌ Error de conexión MongoDB:', err);
-  });
-  
-  mongoose.connection.on('disconnected', () => {
-    // eslint-disable-next-line no-console
-    console.warn('⚠️  MongoDB desconectado');
-  });
-  
-  mongoose.connection.on('reconnected', () => {
-    // eslint-disable-next-line no-console
-    console.log('✅ MongoDB reconectado');
-  });
+  // Solo mostrar eventos de conexión en desarrollo
+  if (process.env.NODE_ENV !== 'production') {
+    mongoose.connection.on('error', (err) => {
+      // eslint-disable-next-line no-console
+      console.error('Error de conexión MongoDB:', err);
+    });
+    
+    mongoose.connection.on('disconnected', () => {
+      // eslint-disable-next-line no-console
+      console.warn('MongoDB desconectado');
+    });
+    
+    mongoose.connection.on('reconnected', () => {
+      // eslint-disable-next-line no-console
+      console.log('MongoDB reconectado');
+    });
+  }
 }
 
 

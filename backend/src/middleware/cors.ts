@@ -13,16 +13,12 @@ export function corsMiddleware(req: Request, res: Response, next: NextFunction):
   const origin = req.headers.origin;
   const corsOrigin = getCorsOrigin(origin);
 
-  // Logging para debug (útil tanto en desarrollo como producción)
-  if (!corsOrigin && origin) {
-    const allowedOrigins = getAllowedOrigins();
-    // eslint-disable-next-line no-console
-    console.warn(`[CORS] Rechazando Origin: ${origin}; Permitidos: [${allowedOrigins.join(', ')}]; Method: ${req.method}; Path: ${req.path}`);
-  } else if (corsOrigin) {
-    // Logging solo en desarrollo para no saturar logs en producción
-    if (process.env.NODE_ENV !== 'production') {
+  // Logging solo en desarrollo para no saturar logs en producción
+  if (process.env.NODE_ENV !== 'production') {
+    if (!corsOrigin && origin) {
+      const allowedOrigins = getAllowedOrigins();
       // eslint-disable-next-line no-console
-      console.log(`[CORS] Permitido: ${corsOrigin}; Method: ${req.method}; Path: ${req.path}`);
+      console.warn(`[CORS] Rechazando Origin: ${origin}; Permitidos: [${allowedOrigins.join(', ')}]; Method: ${req.method}; Path: ${req.path}`);
     }
   }
 

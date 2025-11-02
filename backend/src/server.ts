@@ -18,17 +18,17 @@ async function bootstrap(): Promise<void> {
   
   // Conectar a MongoDB (no bloquear inicio del servidor)
   connectMongo(mongoUri).catch((err) => {
+    // Solo mostrar en producción si hay error
     // eslint-disable-next-line no-console
-    console.error('Error conectando a MongoDB (el servidor seguirá funcionando):', err);
+    console.error('Error conectando a MongoDB:', err.message || err);
   });
 
   server.listen(port, '0.0.0.0', () => {
-    // eslint-disable-next-line no-console
-    console.log(`API escuchando en http://0.0.0.0:${port}`);
-    // eslint-disable-next-line no-console
-    console.log(`CLIENT_ORIGIN: ${process.env.CLIENT_ORIGIN || 'no configurado'}`);
-    // eslint-disable-next-line no-console
-    console.log(`USE_MEM_MONGO: ${process.env.USE_MEM_MONGO || 'false'}`);
+    // Solo mostrar logs de inicio en desarrollo
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log(`API escuchando en http://0.0.0.0:${port}`);
+    }
   });
 }
 

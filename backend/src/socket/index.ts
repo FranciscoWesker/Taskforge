@@ -36,8 +36,11 @@ export function createSocketServer(httpServer: HttpServer): Server {
         methods: ['GET', 'POST'],
       };
 
-  // eslint-disable-next-line no-console
-  console.log(`[Socket.io CORS] Modo: ${isDev ? 'desarrollo' : 'producción'}, Orígenes: [${allowedOrigins.join(', ') || 'ninguno'}]`);
+  // Logging solo en desarrollo
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.log(`[Socket.io CORS] Modo: ${isDev ? 'desarrollo' : 'producción'}, Orígenes: [${allowedOrigins.join(', ') || 'ninguno'}]`);
+  }
   
   const io = new Server(httpServer, {
     cors: corsConfig,
@@ -105,7 +108,11 @@ export function createSocketServer(httpServer: HttpServer): Server {
       try {
         // Verificar conexión a MongoDB antes de intentar guardar
         if (!isMongoConnected()) {
-          console.error('[Socket] MongoDB no está conectado, no se puede guardar estado del tablero:', boardId);
+          // Solo loguear errores críticos en producción
+          if (process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.error('[Socket] MongoDB no está conectado, no se puede guardar estado del tablero:', boardId);
+          }
           return;
         }
         
@@ -125,8 +132,11 @@ export function createSocketServer(httpServer: HttpServer): Server {
           { upsert: true }
         ).exec();
       } catch (err) {
-        // Log del error para debugging, pero no bloquear a los clientes
-        console.error('[Socket] Error guardando estado del tablero:', boardId, err);
+        // Solo loguear errores en desarrollo, en producción usar logger estructurado
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.error('[Socket] Error guardando estado del tablero:', boardId, err);
+        }
       }
     });
 
@@ -159,8 +169,11 @@ export function createSocketServer(httpServer: HttpServer): Server {
     socket.on('deployment:subscribe', ({ boardId }: { boardId: string }) => {
       if (!boardId) return;
       socket.join(`deployment:${boardId}`);
-      // eslint-disable-next-line no-console
-      console.log(`[Socket] Cliente suscrito a logs de deployment para board: ${boardId}`);
+      // Logging solo en desarrollo
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log(`[Socket] Cliente suscrito a logs de deployment para board: ${boardId}`);
+      }
     });
 
     socket.on('deployment:unsubscribe', ({ boardId }: { boardId: string }) => {

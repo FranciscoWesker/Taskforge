@@ -165,14 +165,16 @@ export function createApp(): Application {
   
   app.use(express.json());
   
-  // Middleware de logging estructurado
-  app.use((req, _res, next) => {
-    logger.info(`${req.method} ${req.path}`, 'HTTP', {
-      ip: req.ip,
-      userAgent: req.get('user-agent')?.substring(0, 100)
+  // Middleware de logging estructurado (solo en desarrollo)
+  if (process.env.NODE_ENV !== 'production') {
+    app.use((req, _res, next) => {
+      logger.info(`${req.method} ${req.path}`, 'HTTP', {
+        ip: req.ip,
+        userAgent: req.get('user-agent')?.substring(0, 100)
+      });
+      next();
     });
-    next();
-  });
+  }
 
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
@@ -1072,7 +1074,7 @@ export function createApp(): Application {
 
       res.json({ user });
     } catch (err) {
-      console.error('Error verificando token de GitHub', err);
+      logger.error('Error verificando token de GitHub', err as Error, 'GitHub');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1089,7 +1091,7 @@ export function createApp(): Application {
       const repos = await getGitHubUserRepos(accessToken, type || 'all');
       res.json({ repos });
     } catch (err) {
-      console.error('Error obteniendo repositorios de GitHub', err);
+      logger.error('Error obteniendo repositorios de GitHub', err as Error, 'GitHub');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1104,7 +1106,7 @@ export function createApp(): Application {
         .lean();
       res.json(integrations);
     } catch (err) {
-      console.error('Error listando integraciones', err);
+      logger.error('Error listando integraciones', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1164,10 +1166,11 @@ export function createApp(): Application {
       
       const webhookUrl = `${backendUrl}/webhooks/github`;
       
-      console.log(`[DEBUG] Creando webhook con URL: ${webhookUrl}`);
-      console.log(`[DEBUG] BACKEND_URL: ${process.env.BACKEND_URL || 'no definido'}`);
-      console.log(`[DEBUG] CLIENT_ORIGIN: ${process.env.CLIENT_ORIGIN || 'no definido'}`);
-      console.log(`[DEBUG] Request host: ${req.headers.host || 'no definido'}`);
+      // Debug logs solo en desarrollo
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log(`[DEBUG] Creando webhook con URL: ${webhookUrl}`);
+      }
 
       // Verificar permisos del token antes de crear webhook
       const user = await getGitHubUser(accessToken);
@@ -1180,7 +1183,7 @@ export function createApp(): Application {
       
       // Verificar si hubo error
       if ('error' in webhookResult) {
-        console.error('Error al crear webhook:', webhookResult.error, webhookResult.details);
+        logger.error('Error al crear webhook', new Error(webhookResult.error), 'GitHub', webhookResult.details);
         return res.status(500).json({ 
           error: 'webhook_creation_failed', 
           message: webhookResult.error,
@@ -1219,7 +1222,7 @@ export function createApp(): Application {
         createdAt: integration.createdAt
       });
     } catch (err) {
-      console.error('Error creando integración GitHub', err);
+      logger.error('Error creando integración GitHub', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1245,7 +1248,7 @@ export function createApp(): Application {
         res.json({ branches: [] });
       }
     } catch (err) {
-      console.error('Error obteniendo ramas', err);
+      logger.error('Error obteniendo ramas', err as Error, 'GitHub');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1291,7 +1294,7 @@ export function createApp(): Application {
         branchMapping: integration.branchMapping
       });
     } catch (err) {
-      console.error('Error actualizando mapeo de ramas', err);
+      logger.error('Error actualizando mapeo de ramas', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1325,7 +1328,7 @@ export function createApp(): Application {
         autoCloseCards: integration.autoCloseCards
       });
     } catch (err) {
-      console.error('Error actualizando configuración', err);
+      logger.error('Error actualizando configuración', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1353,7 +1356,7 @@ export function createApp(): Application {
       await IntegrationModel.deleteOne({ integrationId });
       res.json({ success: true });
     } catch (err) {
-      console.error('Error eliminando integración', err);
+      logger.error('Error eliminando integración', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1739,7 +1742,7 @@ export function createApp(): Application {
 
       res.status(200).json({ received: true, processed: updated });
     } catch (err) {
-      console.error('Error procesando webhook de GitHub', err);
+      logger.error('Error procesando webhook de GitHub', err as Error, 'GitHub');
       res.status(500).json({ error: 'internal_error' });
     }
   });
@@ -1761,13 +1764,18 @@ export function createApp(): Application {
               res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
             }
           } catch (error) {
-            // Si hay error obteniendo orígenes, solo loguear
-            // eslint-disable-next-line no-console
-            console.warn('[CORS] Error aplicando CORS en 404:', error);
+            // Solo loguear errores en desarrollo
+            if (process.env.NODE_ENV !== 'production') {
+              // eslint-disable-next-line no-console
+              console.warn('[CORS] Error aplicando CORS en 404:', error);
+            }
           }
         }
-        // eslint-disable-next-line no-console
-        console.log(`[404] Ruta no encontrada: ${req.method} ${req.path}`);
+        // No loguear 404s en producción para evitar saturación de logs
+        if (process.env.NODE_ENV !== 'production') {
+          // eslint-disable-next-line no-console
+          console.log(`[404] Ruta no encontrada: ${req.method} ${req.path}`);
+        }
         res.status(404).json({ error: 'not_found', message: 'Ruta no encontrada' });
       });
 
@@ -1785,12 +1793,15 @@ export function createApp(): Application {
               res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
             }
           } catch (error) {
-            // eslint-disable-next-line no-console
-            console.warn('[CORS] Error aplicando CORS en error handler:', error);
+            // Solo loguear en desarrollo
+            if (process.env.NODE_ENV !== 'production') {
+              // eslint-disable-next-line no-console
+              console.warn('[CORS] Error aplicando CORS en error handler:', error);
+            }
           }
         }
-        // eslint-disable-next-line no-console
-        console.error('Error no manejado:', err);
+        // Usar logger estructurado en lugar de console.error
+        logger.error('Error no manejado', err as Error, 'App');
         res.status(500).json({ error: 'internal_error', message: 'Error interno del servidor' });
   });
 

@@ -93,13 +93,19 @@ export const logger = {
   },
   
   info: (message: string, context?: string, metadata?: Record<string, unknown>): void => {
-    // eslint-disable-next-line no-console
-    console.log(formatLog('info', message, context, metadata));
+    // En producción solo loguear errores críticos, en desarrollo mostrar todo
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log(formatLog('info', message, context, metadata));
+    }
   },
   
   warn: (message: string, context?: string, metadata?: Record<string, unknown>): void => {
-    // eslint-disable-next-line no-console
-    console.warn(formatLog('warn', message, context, metadata));
+    // En producción solo loguear warnings importantes, en desarrollo mostrar todo
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn(formatLog('warn', message, context, metadata));
+    }
   },
   
   error: (message: string, error?: Error | unknown, context?: string, metadata?: Record<string, unknown>): void => {

@@ -95,13 +95,11 @@ export function getAllowedOrigins(): string[] {
     // eslint-disable-next-line no-console
     console.log(`[CORS] Modo desarrollo detectado. Orígenes permitidos: [${origins.join(', ')}]`);
   } else {
-    // En producción, solo usar orígenes explícitos
-    if (origins.length === 0) {
+    // En producción, solo usar orígenes explícitos (sin logging)
+    if (origins.length === 0 && process.env.NODE_ENV !== 'production') {
+      // Solo advertir en desarrollo si falta configuración
       // eslint-disable-next-line no-console
       console.warn('[CORS] Producción detectada pero CLIENT_ORIGIN no configurado. Se bloquearán todas las solicitudes CORS.');
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(`[CORS] Modo producción. Orígenes permitidos: [${origins.join(', ')}]`);
     }
   }
 
@@ -127,8 +125,11 @@ export function isOriginAllowed(origin: string | undefined): boolean {
 
   // En desarrollo, permitir localhost adicionales si pasan validación
   if (isDevelopment() && isLocalhostOrigin(origin)) {
-    // eslint-disable-next-line no-console
-    console.log(`[CORS] Permitiendo localhost en desarrollo: ${origin}`);
+    // Solo loguear en desarrollo
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log(`[CORS] Permitiendo localhost en desarrollo: ${origin}`);
+    }
     return true;
   }
 

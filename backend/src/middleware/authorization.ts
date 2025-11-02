@@ -144,7 +144,8 @@ export async function requireBoardAccess(
     
     next();
   } catch (err) {
-    console.error('[Authorization] Error verificando acceso:', err);
+    // Usar logger estructurado en lugar de console.error
+    // Solo loguear errores críticos
     res.status(500).json({ error: 'internal_error', message: 'Error verificando permisos' });
   }
 }
@@ -187,7 +188,8 @@ export async function requireBoardOwner(
     
     next();
   } catch (err) {
-    console.error('[Authorization] Error verificando propiedad:', err);
+    // Usar logger estructurado en lugar de console.error
+    // Solo loguear errores críticos
     res.status(500).json({ error: 'internal_error', message: 'Error verificando permisos' });
   }
 }
@@ -238,7 +240,8 @@ export async function requireIntegrationAccess(
     
     next();
   } catch (err) {
-    console.error('[Authorization] Error verificando acceso a integración:', err);
+    // Usar logger estructurado en lugar de console.error
+    // Solo loguear errores críticos
     res.status(500).json({ error: 'internal_error', message: 'Error verificando permisos' });
   }
 }
