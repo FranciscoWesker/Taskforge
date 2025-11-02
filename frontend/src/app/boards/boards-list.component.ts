@@ -190,7 +190,7 @@ interface Board {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (board of filteredBoards; track board.boardId) {
           <div 
-            class="card card-hover bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 group rounded-lg overflow-hidden focus-visible-ring"
+            class="card hover-elevate bg-white dark:bg-gray-800 shadow-md border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 group rounded-lg overflow-hidden focus-visible-ring"
             role="article"
             [attr.aria-label]="'Tablero: ' + (board.name || 'Sin nombre')"
             tabindex="0"

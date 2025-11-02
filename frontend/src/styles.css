@@ -49,6 +49,8 @@
   --transition-fast: 150ms ease-out;
   --transition-base: 200ms ease-out;
   --transition-slow: 300ms ease-out;
+  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Base UI refinements */
@@ -103,6 +105,62 @@
   .kanban-card:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--primary);
+  }
+
+  /* Hover elegante - Elevación suave sin scale */
+  .hover-lift {
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+    will-change: transform, box-shadow;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Hover suave para botones - Brillo sutil */
+  .hover-glow {
+    transition: box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+    position: relative;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: rgba(37, 99, 235, 0.5);
+  }
+
+  /* Hover para tarjetas - Elevación y brillo sutil */
+  .hover-elevate {
+    transition: transform var(--transition-smooth), 
+                box-shadow var(--transition-smooth),
+                border-color var(--transition-smooth);
+    will-change: transform;
+  }
+
+  .hover-elevate:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12), 
+                0 8px 16px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(37, 99, 235, 0.1);
+  }
+
+  /* Hover mínimo - Solo sombra suave */
+  .hover-subtle {
+    transition: box-shadow var(--transition-smooth);
+  }
+
+  .hover-subtle:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Hover con deslizamiento suave */
+  .hover-slide {
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+  }
+
+  .hover-slide:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 
   /* Focus visible para accesibilidad */

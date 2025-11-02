@@ -1702,7 +1702,7 @@ interface BoardLabel {
                     @for (color of predefinedColors; track color) {
                       <button
                         type="button"
-                        class="w-10 h-10 rounded-lg border-2 transition-all hover:scale-110"
+                        class="w-10 h-10 rounded-lg border-2 hover-lift"
                         [class.border-blue-600]="newLabelColor === color"
                         [class.border-gray-300]="newLabelColor !== color"
                         [style.background-color]="color"

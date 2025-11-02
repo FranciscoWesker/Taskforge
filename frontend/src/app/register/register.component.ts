@@ -27,7 +27,7 @@ import { AuthService } from '../core/auth.service';
         <div class="card-body p-8">
           <!-- Logo y header -->
           <div class="flex flex-col items-center mb-6 space-y-3">
-            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg transform transition-transform hover:scale-110 duration-300">
+            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg hover-lift">
               TF
             </div>
             <div class="text-center">

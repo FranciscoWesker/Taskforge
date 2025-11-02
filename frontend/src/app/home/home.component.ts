@@ -22,14 +22,14 @@ import { AuthService } from '../core/auth.service';
           </div>
           <div class="flex items-center gap-3">
             @if (!auth.isAuthenticated()) {
-              <a routerLink="/login" tuiButton appearance="flat" size="s" class="transition-all duration-200 hover:scale-105">
+              <a routerLink="/login" tuiButton appearance="flat" size="s" class="hover-lift">
                 Iniciar sesión
               </a>
-              <a routerLink="/register" tuiButton appearance="primary" size="s" class="shadow-md transition-all duration-200 hover:shadow-lg hover:scale-105">
+              <a routerLink="/register" tuiButton appearance="primary" size="s" class="hover-glow">
                 Crear cuenta
               </a>
             } @else {
-              <a routerLink="/app" tuiButton appearance="primary" size="s" class="shadow-md transition-all duration-200 hover:shadow-lg hover:scale-105">
+              <a routerLink="/app" tuiButton appearance="primary" size="s" class="hover-glow">
                 Ir a la app
               </a>
             }
@@ -53,14 +53,14 @@ import { AuthService } from '../core/auth.service';
           </p>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             @if (!auth.isAuthenticated()) {
-              <a routerLink="/register" tuiButton appearance="primary" size="l" class="shadow-xl transition-all duration-200 hover:shadow-2xl hover:scale-105 animate-scale-in">
+              <a routerLink="/register" tuiButton appearance="primary" size="l" class="shadow-xl hover-glow animate-scale-in">
                 Comenzar gratis
               </a>
-              <a routerLink="/login" tuiButton appearance="outline" size="l" class="transition-all duration-200 hover:scale-105">
+              <a routerLink="/login" tuiButton appearance="outline" size="l" class="hover-lift">
                 Ya tengo cuenta
               </a>
             } @else {
-              <a routerLink="/app" tuiButton appearance="primary" size="l" class="shadow-xl transition-all duration-200 hover:shadow-2xl hover:scale-105">
+              <a routerLink="/app" tuiButton appearance="primary" size="l" class="shadow-xl hover-glow">
                 Ir a la aplicación
               </a>
             }
@@ -81,7 +81,7 @@ import { AuthService } from '../core/auth.service';
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Feature 1: Kanban -->
-          <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ import { AuthService } from '../core/auth.service';
           </div>
 
           <!-- Feature 2: Chat -->
-          <div class="card bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-purple-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@ import { AuthService } from '../core/auth.service';
           </div>
 
           <!-- Feature 3: GitHub Integration -->
-          <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-orange-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@ import { AuthService } from '../core/auth.service';
           </div>
 
           <!-- Feature 4: Colaboración -->
-          <div class="card bg-gradient-to-br from-green-50 to-green-100 border border-green-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-green-50 to-green-100 border border-green-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-green-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@ import { AuthService } from '../core/auth.service';
           </div>
 
           <!-- Feature 5: Firebase Auth -->
-          <div class="card bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@ import { AuthService } from '../core/auth.service';
           </div>
 
           <!-- Feature 6: UI Moderna -->
-          <div class="card bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up">
+          <div class="card bg-gradient-to-br from-pink-50 to-pink-100 border border-pink-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
               <div class="h-12 w-12 rounded-xl bg-pink-600 text-white flex items-center justify-center mb-4 shadow-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,15 +182,15 @@ import { AuthService } from '../core/auth.service';
         </p>
         @if (!auth.isAuthenticated()) {
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a routerLink="/register" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+            <a routerLink="/register" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
               Crear cuenta gratis
             </a>
-            <a routerLink="/login" tuiButton appearance="outline" size="l" class="border-2 border-white text-white hover:bg-white hover:text-blue-600 transition-all duration-200">
+            <a routerLink="/login" tuiButton appearance="outline" size="l" class="border-2 border-white text-white hover:bg-white hover:text-blue-600 hover-lift">
               Iniciar sesión
             </a>
           </div>
         } @else {
-          <a routerLink="/app" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+          <a routerLink="/app" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
             Ir a la aplicación
           </a>
         }
@@ -207,7 +207,7 @@ import { AuthService } from '../core/auth.service';
             </div>
             <span class="text-lg font-bold text-white">TaskForge</span>
           </div>
-          <p class="text-sm">© 2024 TaskForge. Organiza tu trabajo, colabora mejor.</p>
+          <p class="text-sm">© 2025 TaskForge. Organiza tu trabajo, colabora mejor.</p>
         </div>
       </div>
     </footer>
