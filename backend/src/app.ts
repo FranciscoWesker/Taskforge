@@ -101,7 +101,11 @@ const generalApiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_requests', message: 'Demasiadas solicitudes. Intenta más tarde.' },
-  skip: (req) => req.path === '/health' || req.path === '/' // No limitar health check y root
+  skip: (req) => req.path === '/health' || req.path === '/', // No limitar health check y root
+  // Deshabilitar validación estricta de trust proxy (Render es un proxy confiable)
+  validate: {
+    trustProxy: false
+  }
 });
 
 // Rate limiter estricto para endpoints de escritura (POST, PUT, DELETE, PATCH)
@@ -110,7 +114,11 @@ const writeApiLimiter = rateLimit({
   max: 50, // 50 requests por 15 minutos por IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'too_many_requests', message: 'Demasiadas solicitudes de escritura. Intenta más tarde.' }
+  message: { error: 'too_many_requests', message: 'Demasiadas solicitudes de escritura. Intenta más tarde.' },
+  // Deshabilitar validación estricta de trust proxy (Render es un proxy confiable)
+  validate: {
+    trustProxy: false
+  }
 });
 
 // Rate limiter para endpoints de autenticación/integraciones (más estricto)
@@ -119,7 +127,11 @@ const authLimiter = rateLimit({
   max: 20, // 20 requests por 15 minutos por IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'too_many_requests', message: 'Demasiados intentos. Intenta más tarde.' }
+  message: { error: 'too_many_requests', message: 'Demasiados intentos. Intenta más tarde.' },
+  // Deshabilitar validación estricta de trust proxy (Render es un proxy confiable)
+  validate: {
+    trustProxy: false
+  }
 });
 
 // Rate limiter para webhooks (ya existente, más permisivo para webhooks legítimos)
@@ -129,7 +141,11 @@ const githubWebhookRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_requests', message: 'Rate limit exceeded for webhook endpoint' },
-  skipSuccessfulRequests: true // No contar requests exitosos para webhooks
+  skipSuccessfulRequests: true, // No contar requests exitosos para webhooks
+  // Deshabilitar validación estricta de trust proxy (Render es un proxy confiable)
+  validate: {
+    trustProxy: false
+  }
 });
 
 export function createApp(): Application {
