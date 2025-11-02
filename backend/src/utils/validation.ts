@@ -225,3 +225,38 @@ export function validateBranchMapping(branchMapping: unknown): boolean {
   });
 }
 
+/**
+ * Valida y sanitiza el nombre de un label.
+ * @param name - Nombre del label
+ * @returns Nombre sanitizado o null si es inválido
+ */
+export function validateLabelName(name: unknown): string | null {
+  if (typeof name !== 'string') {
+    return null;
+  }
+  
+  const sanitized = sanitizeString(name, 50);
+  
+  // Validar longitud mínima y máxima
+  if (sanitized.length < 1 || sanitized.length > 50) {
+    return null;
+  }
+  
+  return sanitized;
+}
+
+/**
+ * Valida un color hexadecimal (#rrggbb).
+ * @param color - Color en formato hex
+ * @returns true si es válido, false en caso contrario
+ */
+export function isValidColor(color: unknown): boolean {
+  if (typeof color !== 'string') {
+    return false;
+  }
+  
+  // Formato hex: #rrggbb (6 dígitos hexadecimales)
+  const colorRegex = /^#[0-9A-Fa-f]{6}$/;
+  return colorRegex.test(color);
+}
+

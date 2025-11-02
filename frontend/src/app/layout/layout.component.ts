@@ -20,15 +20,15 @@ import { SocketService } from '../core/socket.service';
   <div class="min-h-screen flex">
     <!-- Sidebar Desktop (persistente en pantallas grandes) -->
     @if (auth.isAuthenticated()) {
-      <aside class="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 sticky top-0 h-screen">
+      <aside class="hidden lg:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 sticky top-0 h-screen">
         <div class="flex flex-col h-full">
           <!-- Logo -->
-          <div class="p-4 border-b border-gray-200">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-3">
               <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-lg font-bold shadow-lg">
                 TF
               </div>
-              <span class="text-xl font-bold text-gray-900">TaskForge</span>
+              <span class="text-xl font-bold text-gray-900 dark:text-gray-100">TaskForge</span>
             </div>
           </div>
           
@@ -36,17 +36,18 @@ import { SocketService } from '../core/socket.service';
           <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
             <a 
               routerLink="/app/boards" 
-              routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
-              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-900 font-medium transition-colors"
+              routerLinkActive="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-l-4 border-blue-600 dark:border-blue-500"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium transition-colors"
               [class.bg-blue-50]="isActiveRoute('/app/boards')"
+              [class.dark:bg-blue-900]="isActiveRoute('/app/boards')"
             >
               <tui-icon icon="tuiIconGridLarge" class="text-lg"></tui-icon>
               <span>Tableros</span>
             </a>
             <a 
               routerLink="/app/settings/integrations" 
-              routerLinkActive="bg-blue-50 text-blue-700 border-l-4 border-blue-600"
-              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-gray-900 font-medium transition-colors"
+              routerLinkActive="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-l-4 border-blue-600 dark:border-blue-500"
+              class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium transition-colors"
             >
               <tui-icon icon="tuiIconCode" class="text-lg"></tui-icon>
               <span>Integraciones</span>
@@ -54,12 +55,12 @@ import { SocketService } from '../core/socket.service';
           </nav>
           
           <!-- Usuario y acciones -->
-          <div class="p-4 border-t border-gray-200 space-y-3">
+          <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
             <div class="flex items-center gap-3 p-2 rounded-lg">
               <tui-avatar size="s">{{ userInitials }}</tui-avatar>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ userName }}</p>
-                <p class="text-xs text-gray-600 truncate">{{ userEmail }}</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ userName }}</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ userEmail }}</p>
               </div>
             </div>
             <button
@@ -81,7 +82,7 @@ import { SocketService } from '../core/socket.service';
     <!-- Contenido principal -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Header móvil -->
-      <header class="sticky top-0 z-10 border-b bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-gray-200">
+      <header class="sticky top-0 z-10 border-b bg-white/90 dark:bg-gray-800/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-800/80 border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between px-4 py-2">
           <div class="flex items-center gap-2">
             <button
@@ -93,7 +94,7 @@ import { SocketService } from '../core/socket.service';
               (click)="toggleSidebar()"
               class="lg:hidden"
             ></button>
-            <a routerLink="/app" class="font-semibold px-2 flex items-center gap-2">
+            <a routerLink="/app" class="font-semibold px-2 flex items-center gap-2 text-gray-900 dark:text-gray-100">
               <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-sm font-bold lg:hidden">
                 TF
               </div>
@@ -113,7 +114,7 @@ import { SocketService } from '../core/socket.service';
             ></button>
             @if (auth.isAuthenticated()) {
               <div class="hidden md:flex items-center gap-2">
-                <span class="text-sm text-gray-800 font-medium">{{ userName }}</span>
+                <span class="text-sm text-gray-800 dark:text-gray-200 font-medium">{{ userName }}</span>
                 <tui-avatar size="s">{{ userInitials }}</tui-avatar>
               </div>
               <button
@@ -146,31 +147,31 @@ import { SocketService } from '../core/socket.service';
 
       <!-- Sidebar móvil (overlay) -->
       @if (sidebarVisible()) {
-        <div class="fixed inset-0 z-50 lg:hidden" (click)="sidebarVisible.set(false)">
-          <div class="fixed left-0 top-0 bottom-0 w-72 bg-white shadow-xl p-4 space-y-2 animate-in border-r border-gray-200" (click)="$event.stopPropagation()">
-            <div class="mb-4 pb-4 border-b border-gray-200">
+        <div class="fixed inset-0 z-50 lg:hidden bg-black/50 dark:bg-black/70" (click)="sidebarVisible.set(false)">
+          <div class="fixed left-0 top-0 bottom-0 w-72 bg-white dark:bg-gray-800 shadow-xl p-4 space-y-2 animate-in border-r border-gray-200 dark:border-gray-700" (click)="$event.stopPropagation()">
+            <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
               <div class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-lg font-bold shadow-lg">
                   TF
                 </div>
-                <span class="text-xl font-bold text-gray-900">TaskForge</span>
+                <span class="text-xl font-bold text-gray-900 dark:text-gray-100">TaskForge</span>
               </div>
             </div>
             @if (auth.isAuthenticated()) {
-              <a routerLink="/app/boards" class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-gray-900 font-medium" (click)="sidebarVisible.set(false)">
+              <a routerLink="/app/boards" class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium" (click)="sidebarVisible.set(false)">
                 <tui-icon icon="tuiIconGridLarge"></tui-icon>
                 <span>Tableros</span>
               </a>
-              <a routerLink="/app/settings/integrations" class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 text-gray-900 font-medium" (click)="sidebarVisible.set(false)">
+              <a routerLink="/app/settings/integrations" class="flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium" (click)="sidebarVisible.set(false)">
                 <tui-icon icon="tuiIconCode"></tui-icon>
                 <span>Integraciones</span>
               </a>
-              <div class="pt-4 mt-4 border-t border-gray-200">
+              <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-2 p-2 rounded-lg mb-2">
                   <tui-avatar size="s">{{ userInitials }}</tui-avatar>
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate">{{ userName }}</p>
-                    <p class="text-xs text-gray-600 truncate">{{ userEmail }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ userName }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ userEmail }}</p>
                   </div>
                 </div>
                 <button
@@ -186,9 +187,9 @@ import { SocketService } from '../core/socket.service';
                 </button>
               </div>
             } @else {
-              <div class="text-sm text-gray-700">
+              <div class="text-sm text-gray-700 dark:text-gray-300">
                 <p>Inicia sesión para acceder al menú.</p>
-                <a routerLink="/login" class="mt-2 inline-flex items-center gap-2 p-2 rounded hover:bg-gray-100" (click)="sidebarVisible.set(false)">
+                <a routerLink="/login" class="mt-2 inline-flex items-center gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" (click)="sidebarVisible.set(false)">
                   <tui-icon icon="tuiIconLogIn"></tui-icon>
                   <span>Ir a login</span>
                 </a>
