@@ -95,10 +95,10 @@ interface BoardLabel {
     <div class="mb-6 space-y-4 animate-in">
       <!-- Header del tablero -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <tui-icon icon="tuiIconGridLarge" class="text-blue-600"></tui-icon>
-            <span>{{ boardName || 'Tablero Kanban' }}</span>
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 min-w-0">
+            <tui-icon icon="tuiIconGridLarge" class="text-blue-600 dark:text-blue-400 flex-shrink-0"></tui-icon>
+            <span class="truncate">{{ boardName || 'Tablero Kanban' }}</span>
           </h1>
           <button 
             tuiButton 
@@ -107,9 +107,11 @@ interface BoardLabel {
             size="s" 
             iconStart="tuiIconEdit"
             (click)="renameBoard()"
-            class="text-gray-600"
+            class="text-gray-600 dark:text-gray-400 flex-shrink-0"
+            title="Renombrar tablero"
           >
-            Renombrar
+            <span class="hidden sm:inline">Renombrar</span>
+            <span class="sm:hidden">Editar</span>
           </button>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -120,10 +122,10 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconSearch"
             (click)="searchOpen = !searchOpen"
-            class="text-gray-700 dark:text-gray-300"
+            class="text-gray-700 dark:text-gray-300 flex-shrink-0"
             title="Buscar tarjetas (Ctrl+F o Cmd+F)"
           >
-            Buscar
+            <span class="hidden sm:inline">Buscar</span>
           </button>
           <button 
             tuiButton 
@@ -132,10 +134,10 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconHistory"
             (click)="openActivityHistory()"
-            class="text-gray-700 dark:text-gray-300"
+            class="text-gray-700 dark:text-gray-300 flex-shrink-0"
             title="Ver historial de actividad"
           >
-            Historial
+            <span class="hidden sm:inline">Historial</span>
           </button>
           <button 
             tuiButton 
@@ -144,8 +146,10 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconPlus"
             (click)="openAdd('todo')"
+            class="flex-shrink-0"
           >
-            Añadir a Por hacer
+            <span class="hidden sm:inline">Añadir a Por hacer</span>
+            <span class="sm:hidden">Por hacer</span>
           </button>
           <button 
             tuiButton 
@@ -154,8 +158,10 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconPlus"
             (click)="openAdd('doing')"
+            class="flex-shrink-0"
           >
-            Añadir a En progreso
+            <span class="hidden sm:inline">Añadir a En progreso</span>
+            <span class="sm:hidden">En progreso</span>
           </button>
           <button 
             tuiButton 
@@ -164,17 +170,19 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconPlus"
             (click)="openAdd('done')"
+            class="flex-shrink-0"
           >
-            Añadir a Hecho
+            <span class="hidden sm:inline">Añadir a Hecho</span>
+            <span class="sm:hidden">Hecho</span>
           </button>
         </div>
       </div>
 
       <!-- Estadísticas y controles WIP -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg border border-gray-300">
-        <div class="flex items-center gap-4 text-sm">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-300 dark:border-gray-700">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
           <div class="flex items-center gap-2">
-            <span class="text-gray-600">Total:</span>
+            <span class="text-gray-600 dark:text-gray-400">Total:</span>
             <span tuiBadge class="font-semibold">{{ todo.length + doing.length + done.length }}</span>
           </div>
           <div class="flex items-center gap-2">
@@ -267,13 +275,13 @@ interface BoardLabel {
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
       <!-- Columna: Por hacer -->
-      <div class="flex flex-col space-y-3">
-        <div class="flex items-center justify-between p-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+      <div class="flex flex-col space-y-2 sm:space-y-3 min-w-0">
+        <div class="flex items-center justify-between p-2 sm:p-2.5 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-blue-500"></div>
-            <h2 class="font-semibold text-gray-900">
+            <h2 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
               Por hacer
               <span class="ml-2 text-sm font-normal" [class.text-red-600]="isExceeded('todo')" [class.text-gray-600]="!isExceeded('todo')">
                 {{ todo.length }}/{{ wipLimits.todo }}
@@ -297,7 +305,7 @@ interface BoardLabel {
           [cdkDropListData]="todo" 
           [cdkDropListConnectedTo]="['doing-list', 'done-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50 rounded-lg p-3 min-h-64 space-y-3 transition-all duration-200 border border-gray-200"
+          class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 sm:p-3 min-h-64 space-y-2 sm:space-y-3 transition-all duration-200 border border-gray-200 dark:border-gray-700"
           [ngClass]="{
             'border-2 border-red-400 bg-red-50': wipFlash.todo,
             'border-2 border-blue-300': !wipFlash.todo
@@ -311,7 +319,7 @@ interface BoardLabel {
           }
           @for (c of todo; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group focus-visible-ring"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group focus-visible-ring rounded-lg p-3 sm:p-4"
               [class.border-gray-200]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
               [class.hover:border-blue-300]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
               [class.border-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
@@ -326,7 +334,7 @@ interface BoardLabel {
               (keydown.space)="editCard('todo', i); selectedCardIndex = { list: 'todo', index: i };"
               (click)="selectedCardIndex = { list: 'todo', index: i }"
             >
-              <div class="card-body p-4">
+              <div class="card-body p-3 sm:p-4">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
                   <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -629,11 +637,11 @@ interface BoardLabel {
       </div>
 
       <!-- Columna: En progreso -->
-      <div class="flex flex-col space-y-3">
-        <div class="flex items-center justify-between p-2 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+      <div class="flex flex-col space-y-2 sm:space-y-3 min-w-0">
+        <div class="flex items-center justify-between p-2 sm:p-2.5 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <h2 class="font-semibold text-gray-900">
+            <h2 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
               En progreso
               <span class="ml-2 text-sm font-normal" [class.text-red-600]="isExceeded('doing')" [class.text-gray-600]="!isExceeded('doing')">
                 {{ doing.length }}/{{ wipLimits.doing }}
@@ -657,7 +665,7 @@ interface BoardLabel {
           [cdkDropListData]="doing" 
           [cdkDropListConnectedTo]="['todo-list', 'done-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50 rounded-lg p-3 min-h-64 space-y-3 transition-all duration-200 border border-gray-200"
+          class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 sm:p-3 min-h-64 space-y-2 sm:space-y-3 transition-all duration-200 border border-gray-200 dark:border-gray-700"
           [ngClass]="{
             'border-2 border-red-400 bg-red-50': wipFlash.doing,
             'border-2 border-yellow-300': !wipFlash.doing
@@ -671,7 +679,7 @@ interface BoardLabel {
           }
           @for (c of doing; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group focus-visible-ring"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group focus-visible-ring rounded-lg p-3 sm:p-4"
               [class.border-gray-200]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
               [class.hover:border-yellow-300]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
               [class.border-blue-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
@@ -686,7 +694,7 @@ interface BoardLabel {
               (keydown.space)="editCard('doing', i); selectedCardIndex = { list: 'doing', index: i };"
               (click)="selectedCardIndex = { list: 'doing', index: i }"
             >
-              <div class="card-body p-4">
+              <div class="card-body p-3 sm:p-4">
                 <div class="flex justify-between items-start gap-2 mb-2">
                   <div class="font-semibold text-gray-900 flex-1 flex items-center gap-2">
                     @if (c.metadata?.type === 'commit') {
@@ -838,11 +846,11 @@ interface BoardLabel {
       </div>
 
       <!-- Columna: Hecho -->
-      <div class="flex flex-col space-y-3">
-        <div class="flex items-center justify-between p-2 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
+      <div class="flex flex-col space-y-2 sm:space-y-3 min-w-0">
+        <div class="flex items-center justify-between p-2 sm:p-2.5 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg border border-green-200 dark:border-green-800">
           <div class="flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            <h2 class="font-semibold text-gray-900">
+            <h2 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
               Hecho
               <span class="ml-2 text-sm font-normal" [class.text-red-600]="isExceeded('done')" [class.text-gray-600]="!isExceeded('done')">
                 {{ done.length }}/{{ wipLimits.done }}
@@ -866,7 +874,7 @@ interface BoardLabel {
           [cdkDropListData]="done" 
           [cdkDropListConnectedTo]="['todo-list', 'doing-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50 rounded-lg p-3 min-h-64 space-y-3 transition-all duration-200 border border-gray-200"
+          class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 sm:p-3 min-h-64 space-y-2 sm:space-y-3 transition-all duration-200 border border-gray-200 dark:border-gray-700"
           [ngClass]="{
             'border-2 border-red-400 bg-red-50': wipFlash.done,
             'border-2 border-green-300': !wipFlash.done
@@ -895,7 +903,7 @@ interface BoardLabel {
               (keydown.space)="editCard('done', i); selectedCardIndex = { list: 'done', index: i };"
               (click)="selectedCardIndex = { list: 'done', index: i }"
             >
-              <div class="card-body p-4">
+              <div class="card-body p-3 sm:p-4">
                 <div class="flex justify-between items-start gap-2 mb-2">
                   <div class="font-semibold text-gray-900 flex-1 flex items-center gap-2 line-through">
                     @if (c.metadata?.type === 'commit') {
@@ -999,13 +1007,13 @@ interface BoardLabel {
     </div>
 
     @if (editOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="editOpen=false; editCardId=null">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
-          <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconEdit" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Editar tarjeta</h3>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="editOpen=false; editCardId=null">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto mx-2 sm:mx-4 animate-scale-in" (click)="$event.stopPropagation()">
+          <div class="flex items-center gap-2 mb-3 sm:mb-4 flex-shrink-0">
+            <tui-icon icon="tuiIconEdit" class="text-blue-600 dark:text-blue-400 flex-shrink-0"></tui-icon>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Editar tarjeta</h3>
           </div>
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-3 sm:gap-4">
             <div class="flex flex-col gap-2">
               <tui-textfield>
                 <label tuiLabel>Título</label>
@@ -1205,7 +1213,7 @@ interface BoardLabel {
               </div>
             </div>
             
-            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
                 <button 
                 tuiButton 
                 type="button" 
@@ -1234,13 +1242,13 @@ interface BoardLabel {
     }
 
     @if (addOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="addOpen=false">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
-          <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconPlus" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Nueva tarjeta</h3>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="addOpen=false">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto mx-2 sm:mx-4 animate-scale-in" (click)="$event.stopPropagation()">
+          <div class="flex items-center gap-2 mb-3 sm:mb-4 flex-shrink-0">
+            <tui-icon icon="tuiIconPlus" class="text-blue-600 dark:text-blue-400 flex-shrink-0"></tui-icon>
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Nueva tarjeta</h3>
           </div>
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-3 sm:gap-4">
             <div class="flex flex-col gap-2">
               <tui-textfield>
                 <label tuiLabel>Título</label>
@@ -1409,7 +1417,7 @@ interface BoardLabel {
               </div>
             </div>
             
-            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
               <button 
                 tuiButton 
                 type="button" 
@@ -1544,10 +1552,10 @@ interface BoardLabel {
 
     <!-- Modal de Comentarios -->
     @if (commentsOpen && commentsCardId) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="commentsOpen = false; commentsCardId = null">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="commentsOpen = false; commentsCardId = null">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconComment" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Comentarios</h3>
@@ -1567,7 +1575,7 @@ interface BoardLabel {
           </div>
 
           <!-- Lista de comentarios -->
-          <div class="flex-1 overflow-y-auto p-6 space-y-4">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             @if (!comments.has(commentsCardId) || comments.get(commentsCardId)!.length === 0) {
               <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                 <tui-icon icon="tuiIconComment" class="text-4xl mb-2 opacity-40"></tui-icon>
@@ -1633,10 +1641,10 @@ interface BoardLabel {
 
     <!-- Modal de Gestión de Labels -->
     @if (labelsModalOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="labelsModalOpen = false; editingLabel = null; newLabelName = ''; newLabelColor = '#3B82F6'">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="labelsModalOpen = false; editingLabel = null; newLabelName = ''; newLabelColor = '#3B82F6'">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconTag" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Gestionar Etiquetas</h3>
@@ -1653,7 +1661,7 @@ interface BoardLabel {
           </div>
 
           <!-- Contenido -->
-          <div class="flex-1 overflow-y-auto p-6 space-y-6">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
             <!-- Formulario para crear/editar label -->
             <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
               <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
@@ -1807,10 +1815,10 @@ interface BoardLabel {
     
     <!-- Modal de Checklist -->
     @if (checklistOpen && checklistCardId && checklistCard) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="checklistOpen = false; checklistCardId = null; checklistCard = null">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="checklistOpen = false; checklistCardId = null; checklistCard = null">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconCheckCircle" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Checklist</h3>
@@ -1832,7 +1840,7 @@ interface BoardLabel {
           </div>
 
           <!-- Lista de items -->
-          <div class="flex-1 overflow-y-auto p-6 space-y-2">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-2">
             @if (!checklistCard.checklist || checklistCard.checklist.length === 0) {
               <div class="text-center py-8 text-gray-500 dark:text-gray-400">
                 <tui-icon icon="tuiIconCheckCircle" class="text-4xl mb-2 opacity-40"></tui-icon>
@@ -1904,10 +1912,10 @@ interface BoardLabel {
     
     <!-- Modal de Ayuda de Atajos de Teclado -->
     @if (shortcutsHelpOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="shortcutsHelpOpen = false">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl mx-4 max-h-[85vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="shortcutsHelpOpen = false">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconKeyboard" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Atajos de Teclado</h3>
@@ -1924,8 +1932,8 @@ interface BoardLabel {
           </div>
 
           <!-- Contenido -->
-          <div class="flex-1 overflow-y-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <!-- Atajos de Navegación -->
               <div class="space-y-4">
                 <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wide">Navegación</h4>
@@ -2012,10 +2020,10 @@ interface BoardLabel {
     
     <!-- Modal de Búsqueda Avanzada -->
     @if (searchOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="searchOpen = false">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="searchOpen = false">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconSearch" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Búsqueda Avanzada</h3>
@@ -2035,7 +2043,7 @@ interface BoardLabel {
           </div>
 
           <!-- Filtros -->
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 space-y-4">
+          <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 space-y-4 flex-shrink-0">
             <!-- Búsqueda de texto -->
             <div class="flex flex-col gap-2">
               <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Buscar en título y descripción</label>
@@ -2049,7 +2057,7 @@ interface BoardLabel {
             </div>
 
             <!-- Filtros avanzados -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <!-- Filtro por columna -->
               <div class="flex flex-col gap-2">
                 <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Columna</label>
@@ -2155,7 +2163,7 @@ interface BoardLabel {
           </div>
 
           <!-- Resultados -->
-          <div class="flex-1 overflow-y-auto p-6">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6">
             @if (getSearchResults().length === 0) {
               <div class="text-center py-12 text-gray-500 dark:text-gray-400">
                 <tui-icon icon="tuiIconSearch" class="text-4xl mb-2 opacity-40"></tui-icon>
@@ -2243,10 +2251,10 @@ interface BoardLabel {
     
     <!-- Modal de Historial de Actividad -->
     @if (activityOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in" (click)="activityOpen = false">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col animate-scale-in" (click)="$event.stopPropagation()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="activityOpen = false">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
           <!-- Header -->
-          <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
             <div class="flex items-center gap-3">
               <tui-icon icon="tuiIconHistory" class="text-blue-600 dark:text-blue-400"></tui-icon>
               <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Historial de Actividad</h3>
@@ -2308,7 +2316,7 @@ interface BoardLabel {
           </div>
 
           <!-- Lista de actividades -->
-          <div class="flex-1 overflow-y-auto p-6">
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6">
             @if (loadingActivities) {
               <div class="flex items-center justify-center py-12">
                 <div class="text-center space-y-3">
