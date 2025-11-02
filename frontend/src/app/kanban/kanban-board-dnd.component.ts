@@ -4763,9 +4763,10 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Maneja el evento keydown en el textarea de comentarios.
      * Permite Enter para enviar, Shift+Enter para nueva línea.
      */
-    handleCommentKeydown(event: KeyboardEvent): void {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
+    handleCommentKeydown(event: Event): void {
+        const keyboardEvent = event as KeyboardEvent;
+        if (keyboardEvent.key === 'Enter' && !keyboardEvent.shiftKey) {
+            keyboardEvent.preventDefault();
             this.addComment();
         }
     }
