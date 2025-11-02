@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiAvatar } from '@taiga-ui/kit';
@@ -200,7 +200,7 @@ import { SocketService } from '../core/socket.service';
       }
 
       <!-- Contenido -->
-      <main class="flex-1 overflow-y-auto">
+      <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 py-6">
           <router-outlet />
         </div>
@@ -209,12 +209,18 @@ import { SocketService } from '../core/socket.service';
   </div>
   `
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   protected readonly sidebarVisible = signal(false);
   protected readonly auth = inject(AuthService);
   protected readonly router = inject(Router);
   protected readonly socket = inject(SocketService);
-  protected readonly isDark = signal(this.getInitialTheme());
+  protected readonly isDark = signal(false);
+
+  ngOnInit() {
+    // Inicializar tema antes de renderizar
+    const isDarkMode = this.getInitialTheme();
+    this.isDark.set(isDarkMode);
+  }
   protected readonly lastBoardId = signal<string>(
     (() => { try { return localStorage.getItem('tf-last-board') || 'demo'; } catch { return 'demo'; } })()
   );

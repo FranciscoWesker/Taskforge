@@ -40,11 +40,11 @@ interface Board {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <tui-icon icon="tuiIconGridLarge" class="text-blue-600"></tui-icon>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <tui-icon icon="tuiIconGridLarge" class="text-blue-600 dark:text-blue-400"></tui-icon>
           <span>Mis Tableros</span>
         </h1>
-        <p class="text-sm text-gray-700 mt-1">Gestiona tus tableros Kanban</p>
+        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">Gestiona tus tableros Kanban</p>
       </div>
         <button
         tuiButton
@@ -62,7 +62,7 @@ interface Board {
 
     <!-- Búsqueda y Filtros -->
     @if (!loading && boards.length > 0) {
-      <div class="flex flex-col sm:flex-row gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div class="flex flex-col sm:flex-row gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <!-- Búsqueda -->
         <div class="flex-1">
           <tui-textfield class="w-full">
@@ -82,7 +82,7 @@ interface Board {
           <select 
             [(ngModel)]="filterBy"
             (ngModelChange)="applyFilters()"
-            class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">Todos</option>
             <option value="owned">Mis tableros</option>
@@ -92,7 +92,7 @@ interface Board {
           <select 
             [(ngModel)]="sortBy"
             (ngModelChange)="applyFilters()"
-            class="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="updated">Recientes</option>
             <option value="name">Nombre (A-Z)</option>
@@ -106,7 +106,7 @@ interface Board {
               appearance="flat"
               size="s"
               (click)="clearFilters()"
-              class="text-gray-700"
+              class="text-gray-700 dark:text-gray-300"
             >
               Limpiar
             </button>
@@ -120,7 +120,7 @@ interface Board {
       <div class="flex items-center justify-center py-12">
         <div class="text-center space-y-3">
           <div class="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p class="text-sm text-gray-700">Cargando tableros...</p>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Cargando tableros...</p>
         </div>
       </div>
     }
@@ -148,10 +148,10 @@ interface Board {
     @if (!loading && !error && boards.length > 0 && filteredBoards.length === 0) {
       <div class="text-center py-12">
         <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 mx-auto flex items-center justify-center mb-4">
-          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-gray-400"></tui-icon>
+          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-gray-400 dark:text-gray-500"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 mb-2">No se encontraron tableros</h2>
-        <p class="text-gray-700 mb-6">Intenta ajustar tus filtros de búsqueda</p>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">No se encontraron tableros</h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Intenta ajustar tus filtros de búsqueda</p>
         <button
           tuiButton
           type="button"
@@ -168,10 +168,10 @@ interface Board {
     @if (!loading && !error && boards.length === 0) {
       <div class="text-center py-12">
         <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 mx-auto flex items-center justify-center mb-4">
-          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-blue-600"></tui-icon>
+          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-blue-600 dark:text-blue-400"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 mb-2">No tienes tableros aún</h2>
-        <p class="text-gray-700 mb-6">Crea tu primer tablero para empezar a organizar tus tareas</p>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">No tienes tableros aún</h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Crea tu primer tablero para empezar a organizar tus tareas</p>
         <button
           tuiButton
           type="button"
@@ -190,20 +190,20 @@ interface Board {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (board of filteredBoards; track board.boardId) {
           <div 
-            class="card card-hover bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-gray-300 hover:border-blue-500 group rounded-lg overflow-hidden focus-visible-ring"
+            class="card card-hover bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 group rounded-lg overflow-hidden focus-visible-ring"
             role="article"
             [attr.aria-label]="'Tablero: ' + (board.name || 'Sin nombre')"
             tabindex="0"
             (keydown.enter)="router.navigate(['/app/boards', board.boardId])"
             (keydown.space)="router.navigate(['/app/boards', board.boardId])"
           >
-            <div class="card-body p-5 bg-gradient-to-br from-white to-gray-50">
+            <div class="card-body p-5 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
               <div class="flex items-start justify-between gap-2 mb-3">
                 <div class="flex-1 min-w-0">
-                  <h3 class="font-bold text-gray-900 truncate mb-1 text-lg">
+                  <h3 class="font-bold text-gray-900 dark:text-gray-100 truncate mb-1 text-lg">
                     {{ board.name || 'Sin nombre' }}
                   </h3>
-                  <p class="text-xs text-gray-700 font-medium">
+                  <p class="text-xs text-gray-700 dark:text-gray-400 font-medium">
                     Actualizado {{ formatDate(board.updatedAt) }}
                   </p>
                 </div>
@@ -242,18 +242,18 @@ interface Board {
               </div>
               
               @if (board.todoCount !== undefined || board.doingCount !== undefined || board.doneCount !== undefined) {
-                <div class="flex items-center gap-4 text-sm font-semibold mb-3 p-2 bg-gray-100 rounded-lg">
+                <div class="flex items-center gap-4 text-sm font-semibold mb-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                   <span class="flex items-center gap-1.5 text-blue-700">
                     <span class="w-3 h-3 rounded-full bg-blue-500 shadow-sm"></span>
-                    <span class="text-gray-900">{{ board.todoCount || 0 }}</span>
+                    <span class="text-gray-900 dark:text-gray-100">{{ board.todoCount || 0 }}</span>
                   </span>
                   <span class="flex items-center gap-1.5 text-yellow-700">
                     <span class="w-3 h-3 rounded-full bg-yellow-500 shadow-sm"></span>
-                    <span class="text-gray-900">{{ board.doingCount || 0 }}</span>
+                    <span class="text-gray-900 dark:text-gray-100">{{ board.doingCount || 0 }}</span>
                   </span>
                   <span class="flex items-center gap-1.5 text-green-700">
                     <span class="w-3 h-3 rounded-full bg-green-500 shadow-sm"></span>
-                    <span class="text-gray-900">{{ board.doneCount || 0 }}</span>
+                    <span class="text-gray-900 dark:text-gray-100">{{ board.doneCount || 0 }}</span>
                   </span>
                 </div>
               }
@@ -306,10 +306,10 @@ interface Board {
     <!-- Create Board Dialog -->
     @if (createDialogOpen) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="createDialogOpen = false">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconPlus" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Nuevo Tablero</h3>
+            <tui-icon icon="tuiIconPlus" class="text-blue-600 dark:text-blue-400"></tui-icon>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Nuevo Tablero</h3>
           </div>
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
@@ -319,20 +319,20 @@ interface Board {
                   tuiTextfield
                   [(ngModel)]="newBoardName"
                   placeholder="Mi proyecto..."
-                  class="w-full bg-white text-gray-900"
+                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   (keydown.enter)="createBoard()"
                   autofocus
                 />
               </tui-textfield>
             </div>
-            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200">
+            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 tuiButton
                 type="button"
                 appearance="flat"
                 size="m"
                 (click)="createDialogOpen = false; newBoardName = ''"
-                class="text-gray-700"
+                class="text-gray-700 dark:text-gray-300"
               >
                 Cancelar
               </button>
@@ -356,14 +356,14 @@ interface Board {
     <!-- Share Board Dialog -->
     @if (shareDialogOpen && selectedBoard) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="shareDialogOpen = false">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconSettings" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Compartir Tablero</h3>
+            <tui-icon icon="tuiIconSettings" class="text-blue-600 dark:text-blue-400"></tui-icon>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Compartir Tablero</h3>
           </div>
           <div class="space-y-4">
             <div>
-              <p class="text-sm font-medium text-gray-700 mb-2">Tablero: {{ selectedBoard.name || 'Sin nombre' }}</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tablero: {{ selectedBoard.name || 'Sin nombre' }}</p>
             </div>
             <div class="flex flex-col gap-2">
               <tui-textfield>
@@ -373,18 +373,18 @@ interface Board {
                   type="email"
                   [(ngModel)]="shareEmail"
                   placeholder="usuario@example.com"
-                  class="w-full bg-white text-gray-900"
+                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   (keydown.enter)="addMember()"
                 />
               </tui-textfield>
             </div>
             @if (selectedBoard.members && selectedBoard.members.length > 0) {
               <div>
-                <p class="text-sm font-medium text-gray-700 mb-2">Miembros compartidos:</p>
+                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Miembros compartidos:</p>
                 <div class="space-y-2">
                   @for (member of selectedBoard.members; track member) {
-                    <div class="flex items-center justify-between p-2 bg-gray-100 rounded border border-gray-200">
-                      <span class="text-sm text-gray-900 font-medium">{{ member }}</span>
+                    <div class="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                      <span class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ member }}</span>
                       <button
                         tuiButton
                         type="button"
@@ -399,14 +399,14 @@ interface Board {
                 </div>
               </div>
             }
-            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200">
+            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 tuiButton
                 type="button"
                 appearance="flat"
                 size="m"
                 (click)="shareDialogOpen = false; shareEmail = ''"
-                class="text-gray-700"
+                class="text-gray-700 dark:text-gray-300"
               >
                 Cerrar
               </button>
@@ -430,10 +430,10 @@ interface Board {
     <!-- Rename Board Dialog -->
     @if (renameDialogOpen && renameBoardData) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="renameDialogOpen = false">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4 animate-scale-in" (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconEdit" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Renombrar Tablero</h3>
+            <tui-icon icon="tuiIconEdit" class="text-blue-600 dark:text-blue-400"></tui-icon>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Renombrar Tablero</h3>
           </div>
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-2">
@@ -443,20 +443,20 @@ interface Board {
                   tuiTextfield
                   [(ngModel)]="renameName"
                   placeholder="Nombre del tablero..."
-                  class="w-full bg-white text-gray-900"
+                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   (keydown.enter)="saveRename()"
                   autofocus
                 />
               </tui-textfield>
             </div>
-            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200">
+            <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 tuiButton
                 type="button"
                 appearance="flat"
                 size="m"
                 (click)="renameDialogOpen = false; renameName = ''"
-                class="text-gray-700"
+                class="text-gray-700 dark:text-gray-300"
               >
                 Cancelar
               </button>

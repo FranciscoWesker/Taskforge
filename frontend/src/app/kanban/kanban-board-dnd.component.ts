@@ -132,6 +132,18 @@ interface BoardLabel {
             type="button" 
             appearance="flat" 
             size="s"
+            iconStart="tuiIconBarChart"
+            (click)="openStatistics()"
+            class="text-gray-700 dark:text-gray-300 flex-shrink-0"
+            title="Ver estadísticas del tablero"
+          >
+            <span class="hidden sm:inline">Estadísticas</span>
+          </button>
+          <button 
+            tuiButton 
+            type="button" 
+            appearance="flat" 
+            size="s"
             iconStart="tuiIconHistory"
             (click)="openActivityHistory()"
             class="text-gray-700 dark:text-gray-300 flex-shrink-0"
@@ -2391,6 +2403,217 @@ interface BoardLabel {
         </div>
       </div>
     }
+    
+    <!-- Modal de Estadísticas -->
+    @if (statisticsPanelOpen) {
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 dark:bg-black/70 backdrop-blur-sm animate-in p-2 sm:p-4" (click)="statisticsPanelOpen = false">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col animate-scale-in mx-2 sm:mx-4" (click)="$event.stopPropagation()">
+          <!-- Header -->
+          <div class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+            <div class="flex items-center gap-3">
+              <tui-icon icon="tuiIconBarChart" class="text-blue-600 dark:text-blue-400"></tui-icon>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Estadísticas del Tablero</h3>
+            </div>
+            <button 
+              tuiButton 
+              type="button" 
+              appearance="flat" 
+              size="xs"
+              iconStart="tuiIconClose"
+              (click)="statisticsPanelOpen = false"
+              class="text-gray-600 dark:text-gray-400"
+            ></button>
+          </div>
+
+          <!-- Contenido -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+            @if (loadingStatistics) {
+              <div class="flex items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+              </div>
+            } @else if (!statistics) {
+              <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+                <tui-icon icon="tuiIconBarChart" class="text-4xl mb-2 opacity-40"></tui-icon>
+                <p class="text-sm">No se pudieron cargar las estadísticas</p>
+              </div>
+            } @else {
+              <div class="space-y-6">
+                <!-- Métricas principales -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 sm:p-4 border border-blue-200 dark:border-blue-800">
+                    <div class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium">Por hacer</div>
+                    <div class="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100 mt-1">{{ statistics.columnStats?.todo || 0 }}</div>
+                  </div>
+                  <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3 sm:p-4 border border-yellow-200 dark:border-yellow-800">
+                    <div class="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400 font-medium">En progreso</div>
+                    <div class="text-xl sm:text-2xl font-bold text-yellow-900 dark:text-yellow-100 mt-1">{{ statistics.columnStats?.doing || 0 }}</div>
+                  </div>
+                  <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 sm:p-4 border border-green-200 dark:border-green-800">
+                    <div class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium">Completadas</div>
+                    <div class="text-xl sm:text-2xl font-bold text-green-900 dark:text-green-100 mt-1">{{ statistics.columnStats?.done || 0 }}</div>
+                  </div>
+                  <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
+                    <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Total</div>
+                    <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{{ statistics.columnStats?.total || 0 }}</div>
+                  </div>
+                </div>
+
+                <!-- Gráfico de distribución por columna -->
+                <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+                  <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Distribución por Columna</h4>
+                  <div class="space-y-3">
+                    @for (col of [
+                      { name: 'Por hacer', value: statistics.columnStats?.todo || 0, color: 'bg-blue-500', max: statistics.columnStats?.total || 1 },
+                      { name: 'En progreso', value: statistics.columnStats?.doing || 0, color: 'bg-yellow-500', max: statistics.columnStats?.total || 1 },
+                      { name: 'Completadas', value: statistics.columnStats?.done || 0, color: 'bg-green-500', max: statistics.columnStats?.total || 1 }
+                    ]; track col.name) {
+                      <div>
+                        <div class="flex justify-between items-center mb-1">
+                          <span class="text-xs sm:text-sm text-gray-700 dark:text-gray-300">{{ col.name }}</span>
+                          <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">{{ col.value }}</span>
+                        </div>
+                        <div class="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div 
+                            class="h-full {{ col.color }} transition-all duration-300"
+                            [style.width.%]="(col.value / col.max) * 100"
+                          ></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Grid de métricas adicionales -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <!-- Distribución por prioridad -->
+                  <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Por Prioridad</h4>
+                    <div class="space-y-2">
+                      @for (priority of [
+                        { name: 'Urgente', value: statistics.priorityStats?.urgent || 0, color: 'text-red-600 dark:text-red-400' },
+                        { name: 'Alta', value: statistics.priorityStats?.high || 0, color: 'text-orange-600 dark:text-orange-400' },
+                        { name: 'Media', value: statistics.priorityStats?.medium || 0, color: 'text-yellow-600 dark:text-yellow-400' },
+                        { name: 'Baja', value: statistics.priorityStats?.low || 0, color: 'text-blue-600 dark:text-blue-400' },
+                        { name: 'Sin prioridad', value: statistics.priorityStats?.none || 0, color: 'text-gray-600 dark:text-gray-400' }
+                      ]; track priority.name) {
+                        <div class="flex justify-between items-center">
+                          <span class="text-xs sm:text-sm {{ priority.color }}">{{ priority.name }}</span>
+                          <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">{{ priority.value }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Tiempo promedio por columna -->
+                  <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Tiempo Promedio</h4>
+                    <div class="space-y-2">
+                      @for (col of [
+                        { name: 'Por hacer', hours: statistics.avgTimeInColumn?.todo || 0 },
+                        { name: 'En progreso', hours: statistics.avgTimeInColumn?.doing || 0 },
+                        { name: 'Completadas', hours: statistics.avgTimeInColumn?.done || 0 }
+                      ]; track col.name) {
+                        <div class="flex justify-between items-center">
+                          <span class="text-xs sm:text-sm text-gray-700 dark:text-gray-300">{{ col.name }}</span>
+                          <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">
+                            @if (col.hours > 0) {
+                              {{ col.hours }}h
+                            } @else {
+                              -
+                            }
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Velocidad de flujo y completadas -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                  <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
+                    <div class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium">Velocidad de flujo</div>
+                    <div class="text-lg sm:text-xl font-bold text-blue-900 dark:text-blue-100 mt-1">
+                      {{ statistics.throughput7Days || 0 }} / día
+                    </div>
+                    <div class="text-xs text-blue-600 dark:text-blue-400 mt-1">últimos 7 días</div>
+                  </div>
+                  <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 sm:p-6 border border-green-200 dark:border-green-800">
+                    <div class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium">Completadas (7 días)</div>
+                    <div class="text-lg sm:text-xl font-bold text-green-900 dark:text-green-100 mt-1">
+                      {{ statistics.completedLast7Days || 0 }}
+                    </div>
+                  </div>
+                  <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
+                    <div class="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-medium">Completadas (30 días)</div>
+                    <div class="text-lg sm:text-xl font-bold text-purple-900 dark:text-purple-100 mt-1">
+                      {{ statistics.completedLast30Days || 0 }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tarjetas vencidas y próximas a vencer -->
+                @if (statistics.overdueCards && statistics.overdueCards.length > 0) {
+                  <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 sm:p-6 border border-red-200 dark:border-red-800">
+                    <div class="flex items-center gap-2 mb-3">
+                      <tui-icon icon="tuiIconAlertCircle" class="text-red-600 dark:text-red-400"></tui-icon>
+                      <h4 class="text-sm sm:text-base font-semibold text-red-900 dark:text-red-100">Tarjetas Vencidas ({{ statistics.overdueCards.length }})</h4>
+                    </div>
+                    <div class="space-y-2">
+                      @for (card of statistics.overdueCards.slice(0, 5); track card.id) {
+                        <div class="text-xs sm:text-sm text-red-900 dark:text-red-100">
+                          • {{ card.title }}
+                        </div>
+                      }
+                      @if (statistics.overdueCards.length > 5) {
+                        <div class="text-xs text-red-600 dark:text-red-400">
+                          +{{ statistics.overdueCards.length - 5 }} más
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (statistics.dueSoonCards && statistics.dueSoonCards.length > 0) {
+                  <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 sm:p-6 border border-orange-200 dark:border-orange-800">
+                    <div class="flex items-center gap-2 mb-3">
+                      <tui-icon icon="tuiIconClock" class="text-orange-600 dark:text-orange-400"></tui-icon>
+                      <h4 class="text-sm sm:text-base font-semibold text-orange-900 dark:text-orange-100">Próximas a Vencer ({{ statistics.dueSoonCards.length }})</h4>
+                    </div>
+                    <div class="space-y-2">
+                      @for (card of statistics.dueSoonCards.slice(0, 5); track card.id) {
+                        <div class="text-xs sm:text-sm text-orange-900 dark:text-orange-100">
+                          • {{ card.title }}
+                        </div>
+                      }
+                      @if (statistics.dueSoonCards.length > 5) {
+                        <div class="text-xs text-orange-600 dark:text-orange-400">
+                          +{{ statistics.dueSoonCards.length - 5 }} más
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Distribución por asignado -->
+                @if (statistics.assigneeStats && Object.keys(statistics.assigneeStats).length > 0) {
+                  <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+                    <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Por Asignado</h4>
+                    <div class="space-y-2">
+                      @for (assignee of Object.entries(statistics.assigneeStats || {}).sort((a, b) => b[1] - a[1]); track assignee[0]) {
+                        <div class="flex justify-between items-center">
+                          <span class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{ assignee[0] }}</span>
+                          <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 ml-2">{{ assignee[1] }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
     `
 })
 export class KanbanBoardDndComponent implements OnInit, OnDestroy {
@@ -3795,6 +4018,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
 
     // Statistics panel state
     statisticsPanelOpen = false;
+    statistics: any = null;
+    loadingStatistics = false;
 
     openDeploymentPanel(): void {
         this.deploymentPanelOpen = true;
@@ -4370,6 +4595,58 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         if (!checklist || checklist.length === 0) return 0;
         const completed = this.getChecklistProgress(checklist);
         return Math.round((completed / checklist.length) * 100);
+    }
+
+    /**
+     * Abre el modal de estadísticas y carga las estadísticas.
+     */
+    async openStatistics(): Promise<void> {
+        this.statisticsPanelOpen = true;
+        await this.loadStatistics();
+    }
+
+    /**
+     * Carga las estadísticas del tablero desde el API.
+     */
+    async loadStatistics(): Promise<void> {
+        if (!this.boardId) return;
+        
+        this.loadingStatistics = true;
+        this.cdr.markForCheck();
+        
+        try {
+            const userEmail = this.auth.getEmail();
+            if (!userEmail) {
+                this.alerts.open('No estás autenticado', { label: 'Error', appearance: 'negative' }).subscribe();
+                return;
+            }
+
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/statistics`, {
+                credentials: 'include',
+                headers: {
+                    ...this.getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) {
+                    this.alerts.open('No tienes acceso a este tablero', { label: 'Error', appearance: 'negative' }).subscribe();
+                    return;
+                }
+                const error = await res.json().catch(() => ({ message: 'Error al cargar estadísticas' }));
+                throw new Error(error.message || `Error ${res.status}`);
+            }
+
+            this.statistics = await res.json();
+        } catch (err: any) {
+            console.error('[Kanban] Error cargando estadísticas:', err);
+            this.alerts.open(err.message || 'Error al cargar estadísticas', { label: 'Error', appearance: 'negative' }).subscribe();
+            this.statistics = null;
+        } finally {
+            this.loadingStatistics = false;
+            this.cdr.markForCheck();
+        }
     }
 
     /**

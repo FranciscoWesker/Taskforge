@@ -61,21 +61,15 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
-    color: #171717; /* gray-900 para mejor legibilidad */
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
     font-size: 1rem; /* 16px base */
     line-height: 1.5;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   a {
-    @apply text-blue-700 hover:text-blue-800 underline-offset-2 hover:underline;
+    @apply text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline-offset-2 hover:underline;
     transition: color var(--transition-fast);
-  }
-
-  /* Dark mode ready (activado por clase .dark en <html> o <body>) */
-  .dark body {
-    @apply bg-gray-900 text-gray-100;
-    color: #f9fafb; /* Texto claro en modo oscuro */
   }
 }
 

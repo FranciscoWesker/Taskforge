@@ -13,18 +13,55 @@ export function isDevelopment(): boolean {
     return false;
   }
 
-  // Si CLIENT_ORIGIN contiene onrender.com, probablemente es producción
-  const clientOrigin = process.env.CLIENT_ORIGIN || '';
-  if (clientOrigin.includes('onrender.com') || clientOrigin.includes('https://')) {
-    // A menos que sea explícitamente localhost
-    if (!clientOrigin.includes('localhost') && !clientOrigin.includes('127.0.0.1')) {
-      return false;
+  // Parsear y validar CLIENT_ORIGIN de forma segura
+  const clientOriginEnv = process.env.CLIENT_ORIGIN || '';
+  if (clientOriginEnv) {
+    // Parsear orígenes separados por comas
+    const origins = clientOriginEnv.split(',').map(o => o.trim()).filter(Boolean);
+    
+    // Lista explícita de hosts permitidos que indican producción
+    const productionHosts = [
+      'taskforge-ufzf.onrender.com',
+      'taskforge-21m4.onrender.com',
+      // Agregar otros hosts de producción aquí
+    ];
+    
+    // Verificar si algún origen tiene un hostname de producción
+    for (const origin of origins) {
+      try {
+        const url = new URL(origin);
+        const hostname = url.hostname.toLowerCase();
+        
+        // Lista explícita de hosts de localhost válidos (para comparación exacta)
+        const localhostHosts = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]'];
+        const isLocalhost = localhostHosts.some(lh => hostname === lh || hostname === `${lh}:443` || hostname === `${lh}:80`);
+        
+        // Verificar contra lista explícita de hosts de producción
+        if (productionHosts.some(prodHost => hostname === prodHost || hostname.endsWith('.' + prodHost))) {
+          // Si encontramos un host de producción y NO es localhost, es producción
+          if (!isLocalhost) {
+            return false;
+          }
+        }
+        
+        // Si el hostname termina con .onrender.com y no es localhost, es producción
+        if (hostname.endsWith('.onrender.com')) {
+          // Validar que el hostname tenga el formato correcto (.onrender.com al final)
+          const renderPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.onrender\.com$/;
+          if (renderPattern.test(hostname) && !isLocalhost) {
+            return false;
+          }
+        }
+      } catch {
+        // Si no es una URL válida, ignorar
+        continue;
+      }
     }
   }
 
   // Si el puerto es el predeterminado de desarrollo (4000) y no hay CLIENT_ORIGIN configurado
   const port = Number(process.env.PORT || 4000);
-  if (port === 4000 && !clientOrigin) {
+  if (port === 4000 && !clientOriginEnv) {
     return true;
   }
 

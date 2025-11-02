@@ -501,6 +501,226 @@ export function createApp(): Application {
   });
 
   /**
+   * Obtener estadísticas del tablero.
+   * GET /api/boards/:boardId/statistics
+   * 
+   * Requisitos:
+   * - boardId: UUID válido (requerido)
+   * - Usuario debe tener acceso al tablero (owner o member)
+   * - Retorna métricas del tablero: distribución por columna, prioridad, asignado, tiempo promedio, etc.
+   */
+  app.get('/api/boards/:boardId/statistics', generalApiLimiter, requireBoardAccess, async (req, res) => {
+    try {
+      const { boardId } = req.params as { boardId: string };
+      
+      if (!isValidBoardId(boardId)) {
+        return res.status(400).json({ error: 'bad_request', message: 'boardId inválido' });
+      }
+      
+      if (!isMongoConnected()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de base de datos no disponible' });
+      }
+      
+      // Obtener estado del tablero
+      const state = await BoardStateModel.findOne({ boardId }).lean();
+      if (!state) {
+        return res.status(404).json({ error: 'not_found', message: 'Tablero no encontrado' });
+      }
+      
+      const now = Date.now();
+      const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAgo = now - (30 * 24 * 60 * 60 * 1000);
+      
+      // Estadísticas básicas por columna
+      const columnStats = {
+        todo: (state.todo || []).length,
+        doing: (state.doing || []).length,
+        done: (state.done || []).length,
+        total: ((state.todo || []).length + (state.doing || []).length + (state.done || []).length)
+      };
+      
+      // Distribución por prioridad
+      const priorityStats = {
+        urgent: 0,
+        high: 0,
+        medium: 0,
+        low: 0,
+        none: 0
+      };
+      
+      // Distribución por asignado
+      const assigneeStats: Record<string, number> = {};
+      
+      // Tarjetas vencidas y próximas a vencer
+      const overdueCards: Array<{ id: string; title: string; dueDate: number; list: string }> = [];
+      const dueSoonCards: Array<{ id: string; title: string; dueDate: number; list: string }> = [];
+      const dueSoonThreshold = now + (3 * 24 * 60 * 60 * 1000); // 3 días
+      
+      // Procesar todas las tarjetas
+      for (const list of ['todo', 'doing', 'done'] as const) {
+        const cards = (state[list] || []) as any[];
+        for (const card of cards) {
+          // Prioridad
+          if (card.priority) {
+            priorityStats[card.priority as keyof typeof priorityStats]++;
+          } else {
+            priorityStats.none++;
+          }
+          
+          // Asignado
+          if (card.assignee) {
+            assigneeStats[card.assignee] = (assigneeStats[card.assignee] || 0) + 1;
+          }
+          
+          // Fechas de vencimiento
+          if (card.dueDate) {
+            const dueDate = card.dueDate as number;
+            if (dueDate < now) {
+              overdueCards.push({ id: card.id, title: card.title || 'Sin título', dueDate, list });
+            } else if (dueDate <= dueSoonThreshold) {
+              dueSoonCards.push({ id: card.id, title: card.title || 'Sin título', dueDate, list });
+            }
+          }
+        }
+      }
+      
+      // Tarjetas completadas en los últimos 7 y 30 días (usando activity logs)
+      const completedActivities = await ActivityLogModel.find({
+        boardId,
+        action: 'card_moved',
+        'details.toList': 'done',
+        timestamp: { $gte: thirtyDaysAgo }
+      }).sort({ timestamp: -1 }).lean();
+      
+      const completedLast7Days = completedActivities.filter(a => a.timestamp >= sevenDaysAgo).length;
+      const completedLast30Days = completedActivities.length;
+      
+      // Calcular tiempo promedio en cada columna
+      // Para esto, necesitamos rastrear cuándo entró una tarjeta a una columna y cuándo salió
+      const timeInColumn: Record<string, Array<number>> = {
+        todo: [],
+        doing: [],
+        done: []
+      };
+      
+      // Agrupar movimientos por tarjeta
+      const cardMovements: Record<string, Array<{ fromList?: string; toList?: string; timestamp: number }>> = {};
+      
+      // Obtener todos los movimientos de tarjetas
+      const allMovements = await ActivityLogModel.find({
+        boardId,
+        action: 'card_moved',
+        entityType: 'card'
+      }).sort({ timestamp: 1 }).lean();
+      
+      // También obtener creaciones de tarjetas
+      const cardCreations = await ActivityLogModel.find({
+        boardId,
+        action: 'card_created',
+        entityType: 'card'
+      }).sort({ timestamp: 1 }).lean();
+      
+      // Procesar creaciones
+      for (const creation of cardCreations) {
+        const cardId = creation.entityId || '';
+        const details = creation.details as any;
+        // Las tarjetas se crean generalmente en 'todo'
+        const initialList = details.toList || 'todo';
+        if (!cardMovements[cardId]) {
+          cardMovements[cardId] = [];
+        }
+        cardMovements[cardId].push({
+          toList: initialList,
+          timestamp: creation.timestamp
+        });
+      }
+      
+      // Procesar movimientos
+      for (const movement of allMovements) {
+        const cardId = movement.entityId || '';
+        const details = movement.details as any;
+        if (!cardMovements[cardId]) {
+          cardMovements[cardId] = [];
+        }
+        cardMovements[cardId].push({
+          fromList: details.fromList,
+          toList: details.toList,
+          timestamp: movement.timestamp
+        });
+      }
+      
+      // Calcular tiempo en cada columna
+      for (const cardId in cardMovements) {
+        const movements = cardMovements[cardId].sort((a, b) => a.timestamp - b.timestamp);
+        let currentList: string | undefined = undefined;
+        let enterTime: number | undefined = undefined;
+        
+        for (const move of movements) {
+          if (move.toList && !currentList) {
+            // Primera entrada a una columna
+            currentList = move.toList;
+            enterTime = move.timestamp;
+          } else if (move.fromList && move.toList && currentList === move.fromList) {
+            // Salida de la columna actual
+            if (enterTime !== undefined && timeInColumn[move.fromList as keyof typeof timeInColumn]) {
+              const timeSpent = move.timestamp - enterTime;
+              timeInColumn[move.fromList as keyof typeof timeInColumn].push(timeSpent);
+            }
+            // Entrada a nueva columna
+            currentList = move.toList;
+            enterTime = move.timestamp;
+          }
+        }
+        
+        // Si la tarjeta aún está en una columna, calcular tiempo hasta ahora
+        if (currentList && enterTime !== undefined) {
+          const cardsInCurrentList = [
+            ...(state.todo || []),
+            ...(state.doing || []),
+            ...(state.done || [])
+          ];
+          const cardExists = cardsInCurrentList.some((c: any) => c.id === cardId);
+          if (cardExists && timeInColumn[currentList as keyof typeof timeInColumn]) {
+            const timeSpent = now - enterTime;
+            timeInColumn[currentList as keyof typeof timeInColumn].push(timeSpent);
+          }
+        }
+      }
+      
+      // Calcular promedios
+      const avgTimeInColumn: Record<string, number> = {};
+      for (const list in timeInColumn) {
+        const times = timeInColumn[list as keyof typeof timeInColumn];
+        if (times.length > 0) {
+          const avg = times.reduce((a, b) => a + b, 0) / times.length;
+          avgTimeInColumn[list] = Math.round(avg / (60 * 60 * 1000)); // Convertir a horas
+        } else {
+          avgTimeInColumn[list] = 0;
+        }
+      }
+      
+      // Velocidad de flujo (throughput) - tarjetas completadas por día en los últimos 7 días
+      const throughput7Days = completedLast7Days / 7;
+      
+      res.json({
+        columnStats,
+        priorityStats,
+        assigneeStats,
+        overdueCards: overdueCards.length > 0 ? overdueCards : undefined,
+        dueSoonCards: dueSoonCards.length > 0 ? dueSoonCards : undefined,
+        completedLast7Days,
+        completedLast30Days,
+        avgTimeInColumn,
+        throughput7Days: Math.round(throughput7Days * 10) / 10,
+        generatedAt: now
+      });
+    } catch (err) {
+      logger.error('Error obteniendo estadísticas', err, 'Statistics', { boardId: req.params.boardId });
+      res.status(500).json({ error: 'internal_error', message: 'Error interno del servidor' });
+    }
+  });
+
+  /**
    * Exportar tablero a JSON.
    * GET /api/boards/:boardId/export/json
    * 

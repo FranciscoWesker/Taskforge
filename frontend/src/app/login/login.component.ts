@@ -20,10 +20,10 @@ import { AuthService } from '../core/auth.service';
     TuiTextfield,
   ],
   template: `
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4 py-8 animate-in">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 animate-in">
     <div class="w-full max-w-md">
       <!-- Card principal con animación -->
-      <div class="card bg-white shadow-2xl border border-gray-200 animate-slide-up">
+      <div class="card bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up">
         <div class="card-body p-8">
           <!-- Logo y header -->
           <div class="flex flex-col items-center mb-6 space-y-3">
@@ -31,8 +31,8 @@ import { AuthService } from '../core/auth.service';
               TF
             </div>
             <div class="text-center">
-              <h1 class="text-2xl font-bold text-gray-900 mb-1">Bienvenido de nuevo</h1>
-              <p class="text-sm text-gray-700">Inicia sesión para continuar</p>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Bienvenido de nuevo</h1>
+              <p class="text-sm text-gray-700 dark:text-gray-300">Inicia sesión para continuar</p>
             </div>
           </div>
 

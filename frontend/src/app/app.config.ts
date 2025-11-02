@@ -72,6 +72,20 @@ const iconResolver = (icon: string): string => {
     'tuiIconCircleCheck': 'circle-check.svg', // Variante sin guión
     'tuiIconCircle-x': 'circle-x.svg', // Icono X en círculo
     'tuiIconCircleX': 'circle-x.svg', // Variante sin guión
+    'tuiIconBarChart': 'bar-chart-3.svg', // Icono gráfico de barras/estadísticas
+    'tuiIconHistory': 'history.svg', // Icono historial
+    'tuiIconSearch': 'search.svg', // Icono búsqueda
+    'tuiIconTag': 'tag.svg', // Icono etiqueta
+    'tuiIconDownload': 'download.svg', // Icono descargar
+    'tuiIconFlag': 'flag.svg', // Icono bandera/prioridad
+    'tuiIconCalendar': 'calendar.svg', // Icono calendario
+    'tuiIconUser': 'user.svg', // Icono usuario
+    'tuiIconClock': 'clock.svg', // Icono reloj
+    'tuiIconSend': 'send.svg', // Icono enviar
+    'tuiIconKeyboard': 'keyboard.svg', // Icono teclado
+    'tuiIconComment': 'message-circle.svg', // Icono comentario (reutilizar message-circle)
+    'tuiIconCheckCircle': 'circle-check.svg', // Icono check en círculo
+    'tuiIconCheck': 'check.svg', // Icono check simple
   };
   
   const fileName = iconMap[finalIcon];
