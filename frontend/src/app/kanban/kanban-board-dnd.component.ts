@@ -1611,7 +1611,7 @@ interface BoardLabel {
                 rows="3" 
                 [(ngModel)]="newCommentText"
                 placeholder="Escribe un comentario..."
-                (keydown.enter)="!($event as KeyboardEvent).shiftKey && $event.preventDefault() && addComment()"
+                (keydown.enter)="handleCommentKeydown($event)"
               ></textarea>
               <button 
                 tuiButton 
@@ -4756,6 +4756,17 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
         } catch (error) {
             console.error('[Kanban] Error cargando comentarios:', error);
+        }
+    }
+
+    /**
+     * Maneja el evento keydown en el textarea de comentarios.
+     * Permite Enter para enviar, Shift+Enter para nueva línea.
+     */
+    handleCommentKeydown(event: KeyboardEvent): void {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            this.addComment();
         }
     }
 
