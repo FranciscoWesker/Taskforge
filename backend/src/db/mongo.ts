@@ -41,9 +41,33 @@ export async function connectMongo(uri: string): Promise<void> {
   }
   // eslint-disable-next-line no-console
   console.log(`Conectando a MongoDB...`);
-  await mongoose.connect(effectiveUri);
-  // eslint-disable-next-line no-console
-  console.log('✅ MongoDB conectado exitosamente');
+  try {
+    await mongoose.connect(effectiveUri, {
+      serverSelectionTimeoutMS: 30000, // Timeout aumentado a 30 segundos
+      socketTimeoutMS: 45000,
+    });
+    // eslint-disable-next-line no-console
+    console.log('✅ MongoDB conectado exitosamente');
+  } catch (error: any) {
+    // eslint-disable-next-line no-console
+    console.error('❌ Error conectando a MongoDB:', error.message || error);
+    // Si es un error de whitelist/IP, dar instrucciones específicas
+    if (error.message && (error.message.includes('whitelist') || error.message.includes('IP') || error.message.includes('could not connect'))) {
+      // eslint-disable-next-line no-console
+      console.error('');
+      // eslint-disable-next-line no-console
+      console.error('⚠️  IMPORTANTE: Configura la whitelist de MongoDB Atlas:');
+      // eslint-disable-next-line no-console
+      console.error('   1. Ve a MongoDB Atlas → Network Access → Add IP Address');
+      // eslint-disable-next-line no-console
+      console.error('   2. Agrega 0.0.0.0/0 (todas las IPs) para permitir conexiones desde Render');
+      // eslint-disable-next-line no-console
+      console.error('   3. O agrega la IP específica de Render si lo prefieres');
+      // eslint-disable-next-line no-console
+      console.error('');
+    }
+    throw error;
+  }
   
   // Configurar listeners de eventos de conexión
   mongoose.connection.on('error', (err) => {

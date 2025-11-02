@@ -135,6 +135,11 @@ const githubWebhookRateLimiter = rateLimit({
 export function createApp(): Application {
   const app = express();
   
+  // IMPORTANTE: Configurar trust proxy para Render (está detrás de un load balancer)
+  // Esto permite que Express rate limit identifique correctamente las IPs reales de los usuarios
+  // y evita el error ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+  app.set('trust proxy', true);
+  
   // Aplicar middleware CORS personalizado ANTES de otros middlewares
   // Esto asegura que CORS se aplique incluso en rutas no manejadas
   app.use(corsMiddleware);
