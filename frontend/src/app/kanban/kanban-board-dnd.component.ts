@@ -1611,7 +1611,7 @@ interface BoardLabel {
                 rows="3" 
                 [(ngModel)]="newCommentText"
                 placeholder="Escribe un comentario..."
-                (keydown.enter)="!$event.shiftKey && $event.preventDefault() && addComment()"
+                (keydown.enter)="!($event as KeyboardEvent).shiftKey && $event.preventDefault() && addComment()"
               ></textarea>
               <button 
                 tuiButton 
@@ -4188,6 +4188,180 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             urgent: 'red'
         };
         return colors[priority] || 'gray';
+    }
+
+    /**
+     * Abre el modal de checklist para una tarjeta.
+     */
+    async openChecklist(cardId: string): Promise<void> {
+        if (!this.boardId || !cardId) return;
+        
+        // Buscar la tarjeta en todas las listas
+        const allCards = [...this.todo, ...this.doing, ...this.done];
+        const card = allCards.find(c => c.id === cardId);
+        
+        if (!card) {
+            this.alerts.open('Tarjeta no encontrada', { label: 'Error', appearance: 'negative' }).subscribe();
+            return;
+        }
+        
+        this.checklistCardId = cardId;
+        this.checklistCard = { ...card };
+        this.checklistOpen = true;
+        this.newChecklistItemText = '';
+        this.cdr.markForCheck();
+    }
+
+    /**
+     * Agrega un nuevo item al checklist.
+     */
+    async addChecklistItem(): Promise<void> {
+        if (!this.checklistCardId || !this.boardId || !this.newChecklistItemText.trim()) return;
+
+        try {
+            const userEmail = this.auth.getEmail();
+            if (!userEmail) {
+                this.alerts.open('No estás autenticado', { label: 'Error', appearance: 'negative' }).subscribe();
+                return;
+            }
+
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(this.checklistCardId)}/checklist`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    ...this.getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: this.newChecklistItemText.trim()
+                })
+            });
+
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al agregar item' }));
+                throw new Error(error.message || `Error ${res.status}`);
+            }
+
+            const data = await res.json() as { item: ChecklistItem };
+            
+            // Actualizar el checklist localmente
+            if (this.checklistCard && this.checklistCard.checklist) {
+                this.checklistCard.checklist.push(data.item);
+            } else if (this.checklistCard) {
+                this.checklistCard.checklist = [data.item];
+            }
+            
+            this.newChecklistItemText = '';
+            this.cdr.markForCheck();
+        } catch (err: any) {
+            console.error('[Kanban] Error agregando item al checklist:', err);
+            this.alerts.open(err.message || 'Error al agregar item al checklist', { label: 'Error', appearance: 'negative' }).subscribe();
+        }
+    }
+
+    /**
+     * Alterna el estado completado de un item del checklist.
+     */
+    async toggleChecklistItem(cardId: string, itemId: string, event: Event): Promise<void> {
+        if (!this.boardId || !cardId || !itemId) return;
+        
+        const checkbox = event.target as HTMLInputElement;
+        const completed = checkbox.checked;
+
+        try {
+            const userEmail = this.auth.getEmail();
+            if (!userEmail) return;
+
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(cardId)}/checklist/${encodeURIComponent(itemId)}`, {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    ...this.getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    completed
+                })
+            });
+
+            if (!res.ok) {
+                // Revertir el cambio si falla
+                checkbox.checked = !completed;
+                const error = await res.json().catch(() => ({ message: 'Error al actualizar item' }));
+                throw new Error(error.message || `Error ${res.status}`);
+            }
+
+            // Actualizar el checklist localmente
+            if (this.checklistCard && this.checklistCard.checklist) {
+                const item = this.checklistCard.checklist.find(i => i.id === itemId);
+                if (item) {
+                    item.completed = completed;
+                    item.completedAt = completed ? Date.now() : undefined;
+                }
+            }
+            
+            this.cdr.markForCheck();
+        } catch (err: any) {
+            console.error('[Kanban] Error actualizando item del checklist:', err);
+            this.alerts.open(err.message || 'Error al actualizar item', { label: 'Error', appearance: 'negative' }).subscribe();
+        }
+    }
+
+    /**
+     * Elimina un item del checklist.
+     */
+    async deleteChecklistItem(cardId: string, itemId: string): Promise<void> {
+        if (!this.boardId || !cardId || !itemId) return;
+
+        if (!confirm('¿Eliminar este item del checklist?')) {
+            return;
+        }
+
+        try {
+            const userEmail = this.auth.getEmail();
+            if (!userEmail) return;
+
+            const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards/${encodeURIComponent(cardId)}/checklist/${encodeURIComponent(itemId)}`, {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: {
+                    ...this.getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({ message: 'Error al eliminar item' }));
+                throw new Error(error.message || `Error ${res.status}`);
+            }
+
+            // Actualizar el checklist localmente
+            if (this.checklistCard && this.checklistCard.checklist) {
+                this.checklistCard.checklist = this.checklistCard.checklist.filter(i => i.id !== itemId);
+            }
+            
+            this.cdr.markForCheck();
+        } catch (err: any) {
+            console.error('[Kanban] Error eliminando item del checklist:', err);
+            this.alerts.open(err.message || 'Error al eliminar item', { label: 'Error', appearance: 'negative' }).subscribe();
+        }
+    }
+
+    /**
+     * Obtiene el número de items completados en un checklist.
+     */
+    getChecklistProgress(checklist: ChecklistItem[] | undefined): number {
+        if (!checklist || checklist.length === 0) return 0;
+        return checklist.filter(item => item.completed).length;
+    }
+
+    /**
+     * Obtiene el porcentaje de items completados en un checklist.
+     */
+    getChecklistProgressPercent(checklist: ChecklistItem[] | undefined): number {
+        if (!checklist || checklist.length === 0) return 0;
+        const completed = this.getChecklistProgress(checklist);
+        return Math.round((completed / checklist.length) * 100);
     }
 
     /**
