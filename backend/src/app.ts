@@ -544,10 +544,12 @@ export function createApp(): Application {
           ts: msg.ts
         })),
         integrations: integrations.map(int => ({
-          type: int.type,
-          repo: int.repo,
-          branch: int.branch,
-          config: int.config
+          provider: (int as any).provider,
+          repoOwner: (int as any).repoOwner,
+          repoName: (int as any).repoName,
+          branchMapping: (int as any).branchMapping || [],
+          autoCreateCards: (int as any).autoCreateCards !== false,
+          autoCloseCards: (int as any).autoCloseCards !== false
         })),
         exportedAt: new Date().toISOString(),
         version: '1.0'
@@ -793,6 +795,20 @@ export function createApp(): Application {
       }
       
       const list = typeof req.query.list === 'string' ? req.query.list : undefined;
+      
+      // Buscar la tarjeta antes de eliminarla para obtener información para el log
+      const docBefore = await BoardStateModel.findOne({ boardId }).lean();
+      let cardInfo: { title?: string; list?: string } = {};
+      if (docBefore) {
+        for (const listName of ['todo', 'doing', 'done'] as const) {
+          const card = ((docBefore[listName] as any[]) || []).find((c: any) => c.id === cardId);
+          if (card) {
+            cardInfo = { title: card.title, list: listName };
+            break;
+          }
+        }
+      }
+      
       const pullAny = list && ['todo','doing','done'].includes(list)
         ? { [list]: { id: cardId } }
         : { todo: { id: cardId }, doing: { id: cardId }, done: { id: cardId } };
@@ -1292,14 +1308,15 @@ export function createApp(): Application {
         ts: Date.now()
       });
 
-      logger.info(`Comentario creado: ${comment._id}`, 'CardComment', { boardId, cardId, commentId: comment._id });
+      const commentId = String(comment._id);
+      logger.info(`Comentario creado: ${commentId}`, 'CardComment', { boardId, cardId, commentId });
 
       // Emitir evento Socket.io para actualización en tiempo real
       emitToBoard(boardId, 'card:comment:added', {
         boardId,
         cardId,
         comment: {
-          _id: comment._id.toString(),
+          _id: commentId,
           cardId: comment.cardId,
           boardId: comment.boardId,
           author: comment.author,
@@ -1310,7 +1327,7 @@ export function createApp(): Application {
       });
 
       res.status(201).json({
-        _id: comment._id.toString(),
+        _id: commentId,
         cardId: comment.cardId,
         boardId: comment.boardId,
         author: comment.author,
@@ -1382,13 +1399,14 @@ export function createApp(): Application {
 
       logger.info(`Comentario editado: ${commentId}`, 'CardComment', { boardId, cardId, commentId });
 
+      const commentIdStr = String(comment._id);
       // Emitir evento Socket.io para actualización en tiempo real
       emitToBoard(boardId, 'card:comment:updated', {
         boardId,
         cardId,
         commentId,
         comment: {
-          _id: comment._id.toString(),
+          _id: commentIdStr,
           cardId: comment.cardId,
           boardId: comment.boardId,
           author: comment.author,
@@ -1400,7 +1418,7 @@ export function createApp(): Application {
       });
 
       res.json({
-        _id: comment._id.toString(),
+        _id: commentIdStr,
         cardId: comment.cardId,
         boardId: comment.boardId,
         author: comment.author,
