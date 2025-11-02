@@ -85,7 +85,6 @@ const iconResolver = (icon: string): string => {
     'tuiIconKeyboard': 'keyboard.svg', // Icono teclado
     'tuiIconComment': 'message-circle.svg', // Icono comentario (reutilizar message-circle)
     'tuiIconCheckCircle': 'circle-check.svg', // Icono check en círculo
-    'tuiIconCheck': 'check.svg', // Icono check simple
   };
   
   const fileName = iconMap[finalIcon];

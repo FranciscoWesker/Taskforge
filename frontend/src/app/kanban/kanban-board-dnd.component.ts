@@ -2595,11 +2595,11 @@ interface BoardLabel {
                 }
 
                 <!-- Distribución por asignado -->
-                @if (statistics.assigneeStats && Object.keys(statistics.assigneeStats).length > 0) {
+                @if (statistics.assigneeStats && getObjectKeys(statistics.assigneeStats).length > 0) {
                   <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
                     <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Por Asignado</h4>
                     <div class="space-y-2">
-                      @for (assignee of Object.entries(statistics.assigneeStats || {}).sort((a, b) => b[1] - a[1]); track assignee[0]) {
+                      @for (assignee of getObjectEntries(statistics.assigneeStats); track assignee[0]) {
                         <div class="flex justify-between items-center">
                           <span class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate flex-1">{{ assignee[0] }}</span>
                           <span class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 ml-2">{{ assignee[1] }}</span>
@@ -5140,6 +5140,26 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      */
     getCommentCount(cardId: string): number {
         return this.comments.get(cardId)?.length || 0;
+    }
+
+    /**
+     * Helper para usar Object.keys en el template.
+     */
+    protected getObjectKeys(obj: Record<string, any> | null | undefined): string[] {
+        return obj ? Object.keys(obj) : [];
+    }
+
+    /**
+     * Helper para usar Object.entries en el template.
+     */
+    protected getObjectEntries(obj: Record<string, any> | null | undefined): [string, any][] {
+        if (!obj) return [];
+        return Object.entries(obj).sort((a, b) => {
+            // Ordenar por valor descendente (número mayor primero)
+            const valA = typeof a[1] === 'number' ? a[1] : 0;
+            const valB = typeof b[1] === 'number' ? b[1] : 0;
+            return valB - valA;
+        });
     }
 
     /**
