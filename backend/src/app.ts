@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 import { MessageModel } from './db/message.model';
 import { BoardStateModel } from './db/board-state.model';
 import { IntegrationModel } from './db/integration.model';
+import { isMongoConnected } from './db/mongo';
 import { emitToBoard, emitDeploymentLog, emitDeploymentStatus } from './socket/bus';
 import { corsMiddleware } from './middleware/cors';
 import { getAllowedOrigins } from './utils/cors-config';
@@ -237,6 +238,15 @@ export function createApp(): Application {
    */
   app.post('/api/boards', writeApiLimiter, async (req, res) => {
     try {
+      // Verificar conexión a MongoDB antes de proceder
+      if (!isMongoConnected()) {
+        logger.error('MongoDB no está conectado', undefined, 'Board');
+        return res.status(503).json({ 
+          error: 'service_unavailable', 
+          message: 'Base de datos no disponible. Por favor, intenta nuevamente en unos momentos.' 
+        });
+      }
+      
       const { name, owner } = req.body as { name?: unknown; owner?: unknown };
       
       // Validar owner (email requerido)
@@ -272,7 +282,15 @@ export function createApp(): Application {
         members: doc.members || [],
         updatedAt: doc.updatedAt
       });
-    } catch (err) {
+    } catch (err: any) {
+      // Manejar errores específicos de MongoDB
+      if (err.name === 'MongoError' || err.name === 'MongooseError') {
+        logger.error('Error de MongoDB al crear tablero', err, 'Board');
+        return res.status(503).json({ 
+          error: 'database_error', 
+          message: 'Error de base de datos. Por favor, intenta nuevamente.' 
+        });
+      }
       logger.error('Error creando tablero', err, 'Board');
       res.status(500).json({ error: 'internal_error', message: 'Error interno del servidor' });
     }

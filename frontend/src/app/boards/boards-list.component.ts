@@ -677,9 +677,12 @@ export class BoardsListComponent implements OnInit, OnDestroy {
           owner: userEmail
         })
       });
+      
       if (!res.ok) {
-        throw new Error('Error al crear el tablero');
+        const error = await res.json().catch(() => ({ message: 'Error al crear el tablero' }));
+        throw new Error(error.message || `Error al crear el tablero (${res.status})`);
       }
+      
       const board = await res.json() as Board;
       this.alerts.open('Tablero creado exitosamente', { label: 'Éxito', appearance: 'success' }).subscribe();
       this.createDialogOpen = false;
@@ -688,7 +691,17 @@ export class BoardsListComponent implements OnInit, OnDestroy {
       // Navegar al nuevo tablero
       this.router.navigate(['/app/boards', board.boardId]);
     } catch (err: any) {
-      this.alerts.open(err.message || 'Error al crear el tablero', { label: 'Error', appearance: 'negative' }).subscribe();
+      console.error('[BoardsList] Error creando tablero:', err);
+      let errorMessage = err.message || 'Error al crear el tablero';
+      
+      // Mensajes más descriptivos según el tipo de error
+      if (errorMessage.includes('503') || errorMessage.includes('database') || errorMessage.includes('Base de datos')) {
+        errorMessage = 'Base de datos no disponible. Por favor, espera unos momentos e intenta nuevamente.';
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        errorMessage = 'Error de conexión. Verifica tu conexión a internet e intenta nuevamente.';
+      }
+      
+      this.alerts.open(errorMessage, { label: 'Error', appearance: 'negative' }).subscribe();
     } finally {
       this.creating = false;
     }

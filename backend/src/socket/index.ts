@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { MessageModel } from '../db/message.model';
 import { BoardStateModel } from '../db/board-state.model';
+import { isMongoConnected } from '../db/mongo';
 import type { Server as HttpServer } from 'http';
 import { getAllowedOrigins, isOriginAllowed, isDevelopment } from '../utils/cors-config';
 
@@ -102,6 +103,12 @@ export function createSocketServer(httpServer: HttpServer): Server {
       io.to(`board:${boardId}`).emit('kanban:update', payload);
       // persistir sin bloquear a los clientes (fire-and-forget)
       try {
+        // Verificar conexión a MongoDB antes de intentar guardar
+        if (!isMongoConnected()) {
+          console.error('[Socket] MongoDB no está conectado, no se puede guardar estado del tablero:', boardId);
+          return;
+        }
+        
         const update: Record<string, unknown> = { updatedAt: Date.now() };
         if (typeof payload.name === 'string') update.name = payload.name;
         if (payload.todo) update.todo = payload.todo;
@@ -117,8 +124,9 @@ export function createSocketServer(httpServer: HttpServer): Server {
           { $set: update, $setOnInsert: { boardId } },
           { upsert: true }
         ).exec();
-      } catch {
-        // noop
+      } catch (err) {
+        // Log del error para debugging, pero no bloquear a los clientes
+        console.error('[Socket] Error guardando estado del tablero:', boardId, err);
       }
     });
 
