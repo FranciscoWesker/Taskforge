@@ -20,31 +20,16 @@ services:
       # Este valor sobrescribe cualquier configuración en el dashboard de Render
       - key: USE_MEM_MONGO
         value: "false"
-  - type: static
-    name: taskforge-frontend
-    plan: free
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist/taskforge-ui/browser
-    headers:
-      - path: /*
-        name: Content-Security-Policy
-        value: >-
-          default-src 'self';
-          base-uri 'self';
-          object-src 'none';
-          img-src 'self' data: https:;
-          font-src 'self' https:;
-          script-src 'self' https://*.firebaseapp.com https://*.googleapis.com;
-          style-src 'self' 'unsafe-inline';
-          connect-src 'self' https://*.onrender.com wss://*.onrender.com https://*.firebaseapp.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;
-          frame-ancestors 'self';
-    # Redirecciones para SPA (Single Page Application)
-    # Render automáticamente excluye archivos estáticos del catch-all
-    # Una sola regla catch-all es suficiente: todas las rutas van a index.html
-    # Status 200 permite que Angular maneje el routing del lado del cliente
-    redirects:
-      - source: /*
-        destination: /index.html
-        status: 200
+
+# NOTA: Los sitios estáticos no se pueden definir en render.yaml blueprints
+# El frontend (taskforge-frontend) debe crearse manualmente en el dashboard de Render:
+# 1. Ir a Dashboard → New → Static Site
+# 2. Conectar el repositorio
+# 3. Configurar:
+#    - Name: taskforge-frontend
+#    - Root Directory: frontend
+#    - Build Command: npm install && npm run build
+#    - Publish Directory: dist/taskforge-ui/browser
+#    - Headers: Content-Security-Policy (ver configuración en frontend/public/_redirects)
+#    - Redirects: /* -> /index.html (status 200)
 
