@@ -17,10 +17,10 @@ services:
         sync: false
       # IMPORTANTE: USE_MEM_MONGO debe ser "false" en producción
       # MongoDB en memoria se pierde al reiniciar el servidor (cada 15 min en Render free tier)
-      # Configure MONGODB_URI con una URI de MongoDB Atlas o MongoDB real
-      # - key: USE_MEM_MONGO
-      #   value: "false"
-  - type: static_site
+      # Este valor sobrescribe cualquier configuración en el dashboard de Render
+      - key: USE_MEM_MONGO
+        value: "false"
+  - type: static
     name: taskforge-frontend
     plan: free
     rootDir: frontend
