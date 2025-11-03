@@ -49,13 +49,8 @@ import { AuthService } from '../core/auth.service';
             </span>
           </h1>
           <p class="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto">
-            La herramienta perfecta para gestionar proyectos con <span class="font-semibold text-purple-600">Inteligencia Artificial</span>, tableros Kanban y comunicación en tiempo real
+            La herramienta perfecta para gestionar proyectos con tableros Kanban inteligentes, comunicación en tiempo real y automatización impulsada por IA
           </p>
-          <div class="flex items-center justify-center gap-2 pt-2">
-            <span class="px-3 py-1 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-full text-sm font-semibold border border-purple-200">
-              ✨ Con IA Generativa
-            </span>
-          </div>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             @if (!auth.isAuthenticated()) {
               <a routerLink="/register" tuiButton appearance="primary" size="l" class="shadow-xl hover-glow animate-scale-in">
@@ -74,151 +69,66 @@ import { AuthService } from '../core/auth.service';
       </div>
     </section>
 
-    <!-- AI Features Highlight Section -->
-    <section class="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-purple-50 border-y border-purple-100">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12 animate-slide-up">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full mb-6 text-sm font-semibold shadow-lg">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-            NUEVO: Inteligencia Artificial Integrada
-          </div>
-          <h2 class="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Asistente IA que hace tu trabajo más inteligente
-          </h2>
-          <p class="text-xl text-gray-700 max-w-3xl mx-auto mb-8">
-            Potenciado por Google Gemini 2.0 Flash. Automatiza tareas repetitivas, detecta problemas antes de que ocurran y mejora la calidad de tus proyectos.
-          </p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <!-- AI Feature 1: Dependency Detection -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Detección de Dependencias</h3>
-            <p class="text-gray-600 text-sm">
-              La IA identifica automáticamente qué tareas dependen de otras, evitando trabajar en tareas bloqueadas.
-            </p>
-          </div>
-
-          <!-- AI Feature 2: Duplicate Detection -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Detección de Duplicados</h3>
-            <p class="text-gray-600 text-sm">
-              Encuentra tareas similares o duplicadas antes de crearlas, evitando trabajo redundante.
-            </p>
-          </div>
-
-          <!-- AI Feature 3: Intelligent Checklists -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Checklists Inteligentes</h3>
-            <p class="text-gray-600 text-sm">
-              Genera automáticamente checklists específicos basados en el tipo de tarea, asegurando que no olvides pasos importantes.
-            </p>
-          </div>
-
-          <!-- AI Feature 4: Description Improvement -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Mejora Automática de Descripciones</h3>
-            <p class="text-gray-600 text-sm">
-              La IA mejora tus descripciones identificando qué falta y agregando información crítica automáticamente.
-            </p>
-          </div>
-
-          <!-- AI Feature 5: Bottleneck Detection -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Detección de Cuellos de Botella</h3>
-            <p class="text-gray-600 text-sm">
-              Identifica automáticamente tareas estancadas y sugiere acciones específicas para desbloquearlas.
-            </p>
-          </div>
-
-          <!-- AI Feature 6: Task Analysis -->
-          <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200 hover-elevate">
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 text-white flex items-center justify-center mb-4">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Análisis Inteligente de Tareas</h3>
-            <p class="text-gray-600 text-sm">
-              Obtén análisis críticos que identifican información faltante y sugiere mejoras específicas para cada tarea.
-            </p>
-          </div>
-        </div>
-
-        <div class="text-center">
-          <p class="text-gray-600 mb-4">✨ Todo impulsado por <span class="font-semibold text-purple-600">Google Gemini 2.0 Flash</span></p>
-          <a routerLink="/app" tuiButton appearance="primary" size="m" class="hover-glow">
-            Probar funcionalidades de IA
-          </a>
-        </div>
-      </div>
-    </section>
-
     <!-- Features Section -->
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 animate-slide-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full mb-6 text-sm font-semibold shadow-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            Potenciado por IA Generativa
+          </div>
           <h2 class="text-4xl font-bold text-gray-900 mb-4">Características principales</h2>
-          <p class="text-xl text-gray-700 max-w-2xl mx-auto">
-            Todo lo que necesitas para gestionar tus proyectos eficientemente
+          <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+            Todo lo que necesitas para gestionar proyectos eficientemente. Cada funcionalidad está optimizada con inteligencia artificial para maximizar tu productividad y reducir trabajo manual.
           </p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Feature 1: Kanban -->
+          <!-- Feature 1: Kanban con IA -->
           <div class="card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
-              <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4 shadow-md">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+              <div class="flex items-start justify-between mb-3">
+                <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-semibold border border-purple-200">IA</span>
               </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-2">Tableros Kanban</h3>
-              <p class="text-gray-700">
+              <h3 class="text-xl font-bold text-gray-900 mb-2">Tableros Kanban Inteligentes</h3>
+              <p class="text-gray-700 mb-3">
                 Organiza tus tareas con tableros Kanban interactivos. Drag & drop intuitivo, límites WIP configurables, compartir tableros y sincronización en tiempo real.
               </p>
+              <div class="mt-3 pt-3 border-t border-blue-200">
+                <p class="text-sm text-gray-600">
+                  <span class="font-semibold">Con IA:</span> Detecta dependencias entre tareas, identifica duplicados, genera checklists automáticos y analiza cuellos de botella para optimizar tu flujo de trabajo.
+                </p>
+              </div>
             </div>
           </div>
 
-          <!-- Feature 2: Chat -->
+          <!-- Feature 2: Chat con IA -->
           <div class="card bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
-              <div class="h-12 w-12 rounded-xl bg-purple-600 text-white flex items-center justify-center mb-4 shadow-md">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+              <div class="flex items-start justify-between mb-3">
+                <div class="h-12 w-12 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-md">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-semibold border border-purple-200">IA</span>
               </div>
               <h3 class="text-xl font-bold text-gray-900 mb-2">Chat en tiempo real</h3>
-              <p class="text-gray-700">
+              <p class="text-gray-700 mb-3">
                 Comunícate con tu equipo mediante chat por tablero. Historial persistente, presencia de usuarios e indicadores de escritura en vivo.
               </p>
+              <div class="mt-3 pt-3 border-t border-purple-200">
+                <p class="text-sm text-gray-600">
+                  <span class="font-semibold">Con IA:</span> Resumen automático de conversaciones largas para mantenerte actualizado sin leer cientos de mensajes.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -280,6 +190,102 @@ import { AuthService } from '../core/auth.service';
                 Interfaz construida con Taiga UI y Tailwind CSS. Diseño responsive, animaciones suaves y microinteracciones para una experiencia de usuario excepcional.
               </p>
             </div>
+          </div>
+        </div>
+        
+        <!-- Subsección: Funcionalidades de IA Avanzadas -->
+        <div class="mt-16 pt-16 border-t border-gray-200">
+          <div class="text-center mb-12">
+            <h3 class="text-2xl font-bold text-gray-900 mb-3">Automatización Inteligente</h3>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+              Funcionalidades de IA que trabajan en segundo plano para aumentar la eficiencia de tu equipo
+            </p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- IA Feature 1: Dependencies -->
+            <div class="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Detección de Dependencias</h4>
+              <p class="text-sm text-gray-600">
+                Ahorra horas analizando qué tareas bloquean otras. La IA identifica dependencias automáticamente al crear tareas nuevas.
+              </p>
+            </div>
+
+            <!-- IA Feature 2: Duplicates -->
+            <div class="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Detección de Duplicados</h4>
+              <p class="text-sm text-gray-600">
+                Previene trabajo duplicado. La IA compara automáticamente nuevas tareas con las existentes y alerta sobre posibles duplicados.
+              </p>
+            </div>
+
+            <!-- IA Feature 3: Checklists -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Checklists Inteligentes</h4>
+              <p class="text-sm text-gray-600">
+                Genera automáticamente listas de verificación específicas según el tipo de tarea, eliminando la necesidad de planificar manualmente cada checklist.
+              </p>
+            </div>
+
+            <!-- IA Feature 4: Description Improvement -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Mejora Automática</h4>
+              <p class="text-sm text-gray-600">
+                Acelera la creación de tareas completas. La IA analiza descripciones e identifica información faltante, completándola automáticamente.
+              </p>
+            </div>
+
+            <!-- IA Feature 5: Bottlenecks -->
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Detección de Cuellos de Botella</h4>
+              <p class="text-sm text-gray-600">
+                Optimiza el flujo de trabajo identificando proactivamente tareas estancadas y sugiriendo acciones específicas para desbloquearlas.
+              </p>
+            </div>
+
+            <!-- IA Feature 6: Task Analysis -->
+            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6 shadow-md hover-elevate">
+              <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 text-white flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <h4 class="text-lg font-bold text-gray-900 mb-2">Análisis Inteligente</h4>
+              <p class="text-sm text-gray-600">
+                Mejora la calidad sin esfuerzo adicional. La IA analiza tareas, identifica información faltante, estima tiempos y sugiere mejoras específicas.
+              </p>
+            </div>
+          </div>
+          
+          <div class="text-center mt-12">
+            <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+              Impulsado por <span class="font-semibold text-purple-600">Google Gemini 2.0 Flash</span>. Todas estas funcionalidades trabajan automáticamente, analizando cientos de tareas en segundos para optimizar tu flujo de trabajo de forma que sería imposible hacer manualmente.
+            </p>
           </div>
         </div>
       </div>
