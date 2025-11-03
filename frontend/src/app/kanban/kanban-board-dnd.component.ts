@@ -1290,8 +1290,8 @@ interface BoardLabel {
             </div>
             <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between">
-                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
-                @if (aiAvailable && addTitle?.trim()) {
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                @if (aiAvailable && addTitle.trim()) {
                   <button
                     type="button"
                     tuiButton
@@ -1316,7 +1316,7 @@ interface BoardLabel {
             </div>
             
             <!-- Funcionalidades de IA -->
-            @if (aiAvailable && addTitle?.trim()) {
+            @if (aiAvailable && addTitle.trim()) {
               <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-2 mb-2">
                   <tui-icon icon="tuiIconMagic" class="text-purple-600 dark:text-purple-400"></tui-icon>
@@ -5385,7 +5385,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Detecta dependencias entre la nueva tarjeta y las existentes.
      */
     async detectCardDependencies(): Promise<void> {
-        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        if (!this.aiAvailable || !this.addTitle.trim()) return;
         
         this.detectingDependencies = true;
         this.detectedDependencies = [];
@@ -5397,7 +5397,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 id: c.id,
                 title: c.title,
                 description: c.description,
-                list: this.getListName(c) as 'todo' | 'doing' | 'done'
+                list: this.getListNameForCard(c) as 'todo' | 'doing' | 'done'
             }));
             
             const dependencies = await this.ai.detectDependencies({
@@ -5424,7 +5424,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Detecta tareas duplicadas.
      */
     async detectCardDuplicates(): Promise<void> {
-        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        if (!this.aiAvailable || !this.addTitle.trim()) return;
         
         this.detectingDuplicates = true;
         this.detectedDuplicates = [];
@@ -5464,7 +5464,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Analiza la tarea y sugiere mejoras.
      */
     async analyzeCardTask(): Promise<void> {
-        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        if (!this.aiAvailable || !this.addTitle.trim()) return;
         
         this.analyzingTask = true;
         this.taskAnalysis = null;
@@ -5505,7 +5505,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Mejora la descripción de la tarjeta.
      */
     async improveCardDescription(): Promise<void> {
-        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        if (!this.aiAvailable || !this.addTitle.trim()) return;
         
         this.improvingDescription = true;
         this.cdr.markForCheck();
@@ -5536,7 +5536,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Genera un checklist inteligente para la tarjeta.
      */
     async generateCardChecklist(): Promise<void> {
-        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        if (!this.aiAvailable || !this.addTitle.trim()) return;
         
         this.generatingChecklist = true;
         this.cdr.markForCheck();
@@ -5582,7 +5582,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             const cards = allCards.map(c => ({
                 id: c.id,
                 title: c.title,
-                list: this.getListName(c) as 'todo' | 'doing' | 'done',
+                list: this.getListNameForCard(c) as 'todo' | 'doing' | 'done',
                 createdAt: c.createdAt,
                 updatedAt: c.updatedAt
             }));
@@ -5608,9 +5608,9 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Helper para obtener el nombre de la lista de una tarjeta.
+     * Helper para obtener el nombre de la lista de una tarjeta individual.
      */
-    private getListName(card: KanbanCard): 'todo' | 'doing' | 'done' | null {
+    private getListNameForCard(card: KanbanCard): 'todo' | 'doing' | 'done' | null {
         if (this.todo.includes(card)) return 'todo';
         if (this.doing.includes(card)) return 'doing';
         if (this.done.includes(card)) return 'done';
