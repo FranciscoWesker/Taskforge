@@ -193,6 +193,41 @@ import { AuthService } from '../core/auth.service';
           </div>
         </div>
         
+<<<<<<< HEAD
+        <div class="text-center mt-12">
+          <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
+            Impulsado por <span class="font-semibold text-purple-600">Google Gemini 2.0 Flash</span>. Las funcionalidades de IA trabajan automáticamente, analizando cientos de tareas en segundos para optimizar tu flujo de trabajo de forma que sería imposible hacer manualmente.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white animate-slide-up">
+        <h2 class="text-4xl font-bold mb-4">¿Listo para comenzar?</h2>
+        <p class="text-xl mb-8 text-blue-100">
+          Únete a TaskForge hoy y transforma la forma en que gestionas tus proyectos
+        </p>
+        @if (!auth.isAuthenticated()) {
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a routerLink="/register" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
+              Crear cuenta gratis
+            </a>
+            <a routerLink="/login" tuiButton appearance="outline" size="l" class="border-2 border-white text-white hover:bg-white hover:text-blue-600 hover-lift">
+              Iniciar sesión
+            </a>
+          </div>
+        } @else {
+          <a routerLink="/app" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
+            Ir a la aplicación
+          </a>
+        }
+      </div>
+    </section>
+
+=======
+>>>>>>> efaa01da6c8929a9cd93e49245b7cdf076d82f2e
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
