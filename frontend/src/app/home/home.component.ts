@@ -226,8 +226,8 @@ import { AuthService } from '../core/auth.service';
       </div>
     </section>
 
-=======
->>>>>>> efaa01da6c8929a9cd93e49245b7cdf076d82f2e
+
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
