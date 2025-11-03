@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiAvatar } from '@taiga-ui/kit';
 import { TuiBadge } from '@taiga-ui/kit';
-import { TuiButton } from '@taiga-ui/core';
+import { TuiButton, TuiAlertService } from '@taiga-ui/core';
 import { TuiTextfield } from '@taiga-ui/core';
+import { TuiIcon } from '@taiga-ui/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../core/socket.service';
 import { AuthService } from '../core/auth.service';
+import { AIService } from '../core/ai.service';
 import { API_BASE } from '../core/env';
 
 @Component({
@@ -15,12 +17,28 @@ import { API_BASE } from '../core/env';
   standalone: true,
   template: `
   <div class="space-y-3">
-    <h1 class="text-lg font-semibold flex items-center gap-2">
-      <span>Chat del tablero</span>
-      @if (presence.length > 0) {
-        <span tuiBadge>{{ presence.length }}</span>
+    <div class="flex items-center justify-between gap-2">
+      <h1 class="text-lg font-semibold flex items-center gap-2">
+        <span>Chat del tablero</span>
+        @if (presence.length > 0) {
+          <span tuiBadge>{{ presence.length }}</span>
+        }
+      </h1>
+      @if (messages.length > 5) {
+        <button
+          tuiButton
+          type="button"
+          appearance="flat"
+          size="s"
+          iconStart="tuiIconHistory"
+          (click)="summarizeChat()"
+          [disabled]="summarizing"
+          title="Resumir conversación con IA"
+        >
+          {{ summarizing ? 'Resumiendo...' : 'Resumir' }}
+        </button>
       }
-    </h1>
+    </div>
     @if (presence.length > 0) {
       <div class="flex items-center gap-1">
         @for (u of presence.slice(0,5); track u) {
@@ -53,6 +71,27 @@ import { API_BASE } from '../core/env';
       @if (messages.length === 0) {
         <div class="text-xs text-gray-600">Aún no hay mensajes.</div>
       }
+      @if (chatSummary) {
+        <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <tui-icon icon="tuiIconHistory" class="text-blue-600 dark:text-blue-400"></tui-icon>
+              <span class="text-sm font-semibold text-blue-900 dark:text-blue-100">Resumen de la conversación</span>
+            </div>
+            <button
+              tuiButton
+              type="button"
+              appearance="flat"
+              size="xs"
+              iconStart="tuiIconX"
+              (click)="chatSummary = ''"
+              class="!p-1 !min-h-0 !h-5 !w-5"
+              title="Cerrar resumen"
+            ></button>
+          </div>
+          <p class="text-sm text-blue-800 dark:text-blue-200">{{ chatSummary }}</p>
+        </div>
+      }
     </div>
     <form (ngSubmit)="send()" class="flex gap-2">
       <tui-textfield class="flex-1">
@@ -77,16 +116,20 @@ import { API_BASE } from '../core/env';
     </form>
   </div>
   `,
-  imports: [CommonModule, FormsModule, TuiAvatar, TuiBadge, TuiButton, TuiTextfield]
+  imports: [CommonModule, FormsModule, TuiAvatar, TuiBadge, TuiButton, TuiTextfield, TuiIcon]
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private readonly socket = inject(SocketService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly ai = inject(AIService);
+  private readonly alerts = inject(TuiAlertService);
   private boardId: string = '';
   messages: { author: string; text: string; ts: number }[] = [];
   draft = '';
+  summarizing = false;
+  chatSummary = '';
   
   get author(): string {
     return this.auth.getDisplayName() || this.auth.getEmail() || 'Anónimo';
@@ -303,6 +346,45 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   getTypingAuthors(): string {
     return Array.from(this.typingAuthors).slice(0, 3).join(', ');
+  }
+
+  /**
+   * Genera un resumen de la conversación usando IA.
+   */
+  async summarizeChat(): Promise<void> {
+    if (this.messages.length < 5 || this.summarizing) return;
+    
+    this.summarizing = true;
+    this.chatSummary = '';
+    
+    try {
+      const available = await this.ai.checkAvailability();
+      if (!available) {
+        this.alerts.open('Servicio de IA no disponible', { label: 'IA no disponible', appearance: 'warning' }).subscribe();
+        return;
+      }
+
+      const formattedMessages = this.messages.map(msg => ({
+        user: msg.author,
+        text: msg.text,
+        timestamp: new Date(msg.ts).toISOString()
+      }));
+
+      const summary = await this.ai.summarizeChat({
+        messages: formattedMessages,
+        maxLength: 300
+      });
+      
+      this.chatSummary = summary;
+    } catch (error: any) {
+      console.error('Error resumiendo chat:', error);
+      this.alerts.open(
+        error.message || 'Error al generar resumen',
+        { label: 'Error IA', appearance: 'negative' }
+      ).subscribe();
+    } finally {
+      this.summarizing = false;
+    }
   }
 }
 

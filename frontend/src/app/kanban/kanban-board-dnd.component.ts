@@ -9,6 +9,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { SocketService } from '../core/socket.service';
 import { AuthService } from '../core/auth.service';
+import { AIService } from '../core/ai.service';
 import { API_BASE } from '../core/env';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiTextfield } from '@taiga-ui/core';
@@ -151,6 +152,21 @@ interface BoardLabel {
           >
             <span class="hidden sm:inline">Historial</span>
           </button>
+          @if (aiAvailable) {
+            <button 
+              tuiButton 
+              type="button" 
+              appearance="flat" 
+              size="s"
+              iconStart="tuiIconAlertCircle"
+              (click)="detectBottlenecks()"
+              class="text-orange-600 dark:text-orange-400 flex-shrink-0"
+              title="Detectar cuellos de botella"
+            >
+              <span class="hidden sm:inline">Cuellos de botella</span>
+              <span class="sm:hidden">Cuellos</span>
+            </button>
+          }
           <button 
             tuiButton 
             type="button" 
@@ -1273,7 +1289,24 @@ interface BoardLabel {
               </tui-textfield>
             </div>
             <div class="flex flex-col gap-2">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+              <div class="flex items-center justify-between">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                @if (aiAvailable && addTitle?.trim()) {
+                  <button
+                    type="button"
+                    tuiButton
+                    appearance="flat"
+                    size="xs"
+                    iconStart="tuiIconMagic"
+                    (click)="improveCardDescription()"
+                    [disabled]="improvingDescription"
+                    class="text-purple-600 dark:text-purple-400"
+                    title="Mejorar descripción con IA"
+                  >
+                    {{ improvingDescription ? 'Mejorando...' : 'Mejorar' }}
+                  </button>
+                }
+              </div>
               <textarea 
                 class="textarea w-full resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md p-3 focus:border-blue-500 focus:outline-none" 
                 rows="4" 
@@ -1281,6 +1314,107 @@ interface BoardLabel {
                 placeholder="Descripción opcional..."
               ></textarea>
             </div>
+            
+            <!-- Funcionalidades de IA -->
+            @if (aiAvailable && addTitle?.trim()) {
+              <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 mb-2">
+                  <tui-icon icon="tuiIconMagic" class="text-purple-600 dark:text-purple-400"></tui-icon>
+                  <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Asistente IA</label>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    tuiButton
+                    appearance="flat"
+                    size="s"
+                    iconStart="tuiIconSearch"
+                    (click)="detectCardDuplicates()"
+                    [disabled]="detectingDuplicates"
+                    class="text-orange-600 dark:text-orange-400"
+                    title="Detectar tareas duplicadas"
+                  >
+                    {{ detectingDuplicates ? '...' : 'Duplicados' }}
+                  </button>
+                  <button
+                    type="button"
+                    tuiButton
+                    appearance="flat"
+                    size="s"
+                    iconStart="tuiIconLink"
+                    (click)="detectCardDependencies()"
+                    [disabled]="detectingDependencies"
+                    class="text-blue-600 dark:text-blue-400"
+                    title="Detectar dependencias"
+                  >
+                    {{ detectingDependencies ? '...' : 'Dependencias' }}
+                  </button>
+                  <button
+                    type="button"
+                    tuiButton
+                    appearance="flat"
+                    size="s"
+                    iconStart="tuiIconBarChart"
+                    (click)="analyzeCardTask()"
+                    [disabled]="analyzingTask"
+                    class="text-green-600 dark:text-green-400"
+                    title="Analizar tarea"
+                  >
+                    {{ analyzingTask ? '...' : 'Analizar' }}
+                  </button>
+                  <button
+                    type="button"
+                    tuiButton
+                    appearance="flat"
+                    size="s"
+                    iconStart="tuiIconCheck"
+                    (click)="generateCardChecklist()"
+                    [disabled]="generatingChecklist"
+                    class="text-indigo-600 dark:text-indigo-400"
+                    title="Generar checklist"
+                  >
+                    {{ generatingChecklist ? '...' : 'Checklist' }}
+                  </button>
+                </div>
+                
+                <!-- Mostrar resultados de análisis -->
+                @if (taskAnalysis) {
+                  <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div class="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">Análisis:</div>
+                    @if (taskAnalysis.missingInfo.length > 0) {
+                      <div class="text-xs text-blue-800 dark:text-blue-200 mb-1">
+                        <strong>Falta:</strong> {{ taskAnalysis.missingInfo.join(', ') }}
+                      </div>
+                    }
+                    @if (taskAnalysis.improvementSuggestions.length > 0) {
+                      <div class="text-xs text-blue-800 dark:text-blue-200">
+                        <strong>Sugerencias:</strong> {{ taskAnalysis.improvementSuggestions.join('; ') }}
+                      </div>
+                    }
+                  </div>
+                }
+                
+                <!-- Mostrar dependencias detectadas -->
+                @if (detectedDependencies.length > 0) {
+                  <div class="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
+                    <div class="text-xs font-semibold text-yellow-900 dark:text-yellow-100 mb-1">Dependencias:</div>
+                    @for (dep of detectedDependencies; track dep.taskId) {
+                      <div class="text-xs text-yellow-800 dark:text-yellow-200">• {{ dep.title }} ({{ dep.relationship }})</div>
+                    }
+                  </div>
+                }
+                
+                <!-- Mostrar duplicados detectados -->
+                @if (detectedDuplicates.length > 0) {
+                  <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border border-red-200 dark:border-red-800">
+                    <div class="text-xs font-semibold text-red-900 dark:text-red-100 mb-1">Duplicados:</div>
+                    @for (dup of detectedDuplicates; track dup.taskId) {
+                      <div class="text-xs text-red-800 dark:text-red-200">• {{ dup.title }} ({{ dup.similarity }})</div>
+                    }
+                  </div>
+                }
+              </div>
+            }
             
             <!-- Fecha de vencimiento -->
             <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -2619,6 +2753,7 @@ interface BoardLabel {
 export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     private readonly socket = inject(SocketService);
     protected readonly auth = inject(AuthService); // Protected para acceso desde template
+    private readonly ai = inject(AIService);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly alerts = inject(TuiAlertService);
@@ -2725,6 +2860,18 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     boardMembers: string[] = []; // Lista de emails de usuarios disponibles para asignar
 
     // Estado de gestión de labels
+    
+    // Estado de IA
+    aiAvailable = false;
+    detectingDependencies = false;
+    detectingDuplicates = false;
+    analyzingTask = false;
+    improvingDescription = false;
+    generatingChecklist = false;
+    detectedDependencies: Array<{ taskId: string; title: string; relationship: string; confidence: string; reason: string }> = [];
+    detectedDuplicates: Array<{ taskId: string; title: string; similarity: string; reason: string }> = [];
+    taskAnalysis: { priority: string; estimatedTime?: string; improvementSuggestions: string[]; missingInfo: string[]; recommendedLabels?: string[] } | null = null;
+    bottlenecks: Array<{ cardId: string; title: string; list: string; daysStuck: number; severity: string; suggestion?: string }> = [];
     labelsModalOpen = false;
     editingLabel: BoardLabel | null = null;
     newLabelName = '';
@@ -2869,6 +3016,9 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 }
             }
         );
+        
+        // Verificar disponibilidad de IA
+        this.checkAIAvailability();
         
         this.route.paramMap.subscribe(params => {
             const id = params.get('id');
@@ -3252,6 +3402,12 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.addGitUrl = '';
         this.addPriority = null;
         this.addOpen = true;
+        // Resetear estado de IA
+        this.detectedDependencies = [];
+        this.detectedDuplicates = [];
+        this.taskAnalysis = null;
+        (this as any).aiGeneratedChecklist = null;
+        this.cdr.markForCheck();
     }
 
     async saveAdd() {
@@ -3313,6 +3469,12 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 };
             }
             
+            // Agregar checklist generado por IA si existe
+            const aiChecklist = (this as any).aiGeneratedChecklist;
+            if (aiChecklist && Array.isArray(aiChecklist) && aiChecklist.length > 0) {
+                payload.checklist = aiChecklist;
+            }
+            
             const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards`, {
                 method: 'POST',
                 headers: { ...this.getAuthHeaders(), 'Content-Type': 'application/json' },
@@ -3340,6 +3502,12 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.addPriority = null;
         this.addDueDate = null;
         this.addAssignee = null;
+        // Resetear estado de IA
+        this.detectedDependencies = [];
+        this.detectedDuplicates = [];
+        this.taskAnalysis = null;
+        (this as any).aiGeneratedChecklist = null;
+        this.cdr.markForCheck();
     }
 
     async removeCard(list: 'todo' | 'doing' | 'done', index: number) {
@@ -5197,6 +5365,256 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             withLabels,
             withoutLabels: total - withLabels
         };
+    }
+
+    // ============ Métodos de IA ============
+
+    /**
+     * Verifica la disponibilidad del servicio de IA.
+     */
+    private async checkAIAvailability(): Promise<void> {
+        try {
+            this.aiAvailable = await this.ai.checkAvailability();
+        } catch (error) {
+            console.warn('[AI] Error verificando disponibilidad:', error);
+            this.aiAvailable = false;
+        }
+    }
+
+    /**
+     * Detecta dependencias entre la nueva tarjeta y las existentes.
+     */
+    async detectCardDependencies(): Promise<void> {
+        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        
+        this.detectingDependencies = true;
+        this.detectedDependencies = [];
+        this.cdr.markForCheck();
+        
+        try {
+            const allCards = [...this.todo, ...this.doing, ...this.done];
+            const existingTasks = allCards.map(c => ({
+                id: c.id,
+                title: c.title,
+                description: c.description,
+                list: this.getListName(c) as 'todo' | 'doing' | 'done'
+            }));
+            
+            const dependencies = await this.ai.detectDependencies({
+                newTask: { title: this.addTitle, description: this.addDescription || undefined },
+                existingTasks
+            });
+            
+            this.detectedDependencies = dependencies;
+            
+            if (dependencies.length > 0) {
+                const msg = `Se encontraron ${dependencies.length} dependencia(s) con otras tareas.`;
+                this.alerts.open(msg, { label: 'Dependencias detectadas', appearance: 'info' }).subscribe();
+            }
+        } catch (error: any) {
+            console.error('[AI] Error detectando dependencias:', error);
+            this.alerts.open('Error al detectar dependencias', { label: 'Error', appearance: 'negative' }).subscribe();
+        } finally {
+            this.detectingDependencies = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    /**
+     * Detecta tareas duplicadas.
+     */
+    async detectCardDuplicates(): Promise<void> {
+        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        
+        this.detectingDuplicates = true;
+        this.detectedDuplicates = [];
+        this.cdr.markForCheck();
+        
+        try {
+            const allCards = [...this.todo, ...this.doing, ...this.done];
+            const existingTasks = allCards.map(c => ({
+                id: c.id,
+                title: c.title,
+                description: c.description
+            }));
+            
+            const duplicates = await this.ai.detectDuplicates({
+                newTask: { title: this.addTitle, description: this.addDescription || undefined },
+                existingTasks
+            });
+            
+            this.detectedDuplicates = duplicates;
+            
+            if (duplicates.length > 0) {
+                const msg = `Se encontraron ${duplicates.length} tarea(s) similar(es) o duplicada(s).`;
+                this.alerts.open(msg, { label: 'Duplicados detectados', appearance: 'warning' }).subscribe();
+            } else {
+                this.alerts.open('No se encontraron tareas duplicadas', { label: 'Sin duplicados', appearance: 'success' }).subscribe();
+            }
+        } catch (error: any) {
+            console.error('[AI] Error detectando duplicados:', error);
+            this.alerts.open('Error al detectar duplicados', { label: 'Error', appearance: 'negative' }).subscribe();
+        } finally {
+            this.detectingDuplicates = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    /**
+     * Analiza la tarea y sugiere mejoras.
+     */
+    async analyzeCardTask(): Promise<void> {
+        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        
+        this.analyzingTask = true;
+        this.taskAnalysis = null;
+        this.cdr.markForCheck();
+        
+        try {
+            const allCards = [...this.todo, ...this.doing, ...this.done];
+            const existingTasks = allCards.slice(0, 5).map(c => ({
+                title: c.title,
+                description: c.description
+            }));
+            
+            const analysis = await this.ai.analyzeTask({
+                title: this.addTitle,
+                description: this.addDescription || undefined,
+                context: `Tablero: ${this.boardName || 'Sin nombre'}`,
+                existingTasks
+            });
+            
+            this.taskAnalysis = analysis;
+            
+            // Aplicar prioridad sugerida si no hay una definida
+            if (!this.addPriority && analysis.priority) {
+                this.addPriority = analysis.priority as 'low' | 'medium' | 'high' | 'urgent';
+            }
+            
+            this.alerts.open('Análisis completado', { label: 'Análisis de tarea', appearance: 'success' }).subscribe();
+        } catch (error: any) {
+            console.error('[AI] Error analizando tarea:', error);
+            this.alerts.open('Error al analizar la tarea', { label: 'Error', appearance: 'negative' }).subscribe();
+        } finally {
+            this.analyzingTask = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    /**
+     * Mejora la descripción de la tarjeta.
+     */
+    async improveCardDescription(): Promise<void> {
+        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        
+        this.improvingDescription = true;
+        this.cdr.markForCheck();
+        
+        try {
+            const improvement = await this.ai.improveDescription({
+                title: this.addTitle,
+                currentDescription: this.addDescription || undefined,
+                context: `Tablero: ${this.boardName || 'Sin nombre'}`
+            });
+            
+            this.addDescription = improvement.improvedDescription;
+            
+            if (improvement.missingElements.length > 0) {
+                const msg = `Se agregaron: ${improvement.missingElements.join(', ')}`;
+                this.alerts.open(msg, { label: 'Descripción mejorada', appearance: 'success' }).subscribe();
+            }
+        } catch (error: any) {
+            console.error('[AI] Error mejorando descripción:', error);
+            this.alerts.open('Error al mejorar la descripción', { label: 'Error', appearance: 'negative' }).subscribe();
+        } finally {
+            this.improvingDescription = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    /**
+     * Genera un checklist inteligente para la tarjeta.
+     */
+    async generateCardChecklist(): Promise<void> {
+        if (!this.aiAvailable || !this.addTitle?.trim()) return;
+        
+        this.generatingChecklist = true;
+        this.cdr.markForCheck();
+        
+        try {
+            const checklist = await this.ai.generateChecklist({
+                title: this.addTitle,
+                description: this.addDescription || undefined
+            });
+            
+            // Convertir a formato de ChecklistItem y mostrar sugerencia
+            const checklistItems = checklist.map((item, idx) => ({
+                id: `ai-${Date.now()}-${idx}`,
+                text: item.text,
+                completed: false,
+                createdAt: Date.now()
+            }));
+            
+            // Guardar en una variable temporal para usar al crear la tarjeta
+            (this as any).aiGeneratedChecklist = checklistItems;
+            
+            this.alerts.open(`Se generaron ${checklist.length} elementos de checklist`, { 
+                label: 'Checklist generado', 
+                appearance: 'success' 
+            }).subscribe();
+        } catch (error: any) {
+            console.error('[AI] Error generando checklist:', error);
+            this.alerts.open('Error al generar el checklist', { label: 'Error', appearance: 'negative' }).subscribe();
+        } finally {
+            this.generatingChecklist = false;
+            this.cdr.markForCheck();
+        }
+    }
+
+    /**
+     * Detecta cuellos de botella en el tablero.
+     */
+    async detectBottlenecks(): Promise<void> {
+        if (!this.aiAvailable) return;
+        
+        try {
+            const allCards = [...this.todo, ...this.doing, ...this.done];
+            const cards = allCards.map(c => ({
+                id: c.id,
+                title: c.title,
+                list: this.getListName(c) as 'todo' | 'doing' | 'done',
+                createdAt: c.createdAt,
+                updatedAt: c.updatedAt
+            }));
+            
+            const bottlenecks = await this.ai.detectBottlenecks({
+                cards,
+                thresholdDays: 7 // 7 días por defecto
+            });
+            
+            this.bottlenecks = bottlenecks;
+            
+            if (bottlenecks.length > 0) {
+                const critical = bottlenecks.filter(b => b.severity === 'critical').length;
+                const msg = `Se detectaron ${bottlenecks.length} cuello(s) de botella (${critical} crítico(s)).`;
+                this.alerts.open(msg, { label: 'Cuellos de botella', appearance: 'warning' }).subscribe();
+            } else {
+                this.alerts.open('No se detectaron cuellos de botella', { label: 'Todo bien', appearance: 'success' }).subscribe();
+            }
+        } catch (error: any) {
+            console.error('[AI] Error detectando cuellos de botella:', error);
+            this.alerts.open('Error al detectar cuellos de botella', { label: 'Error', appearance: 'negative' }).subscribe();
+        }
+    }
+
+    /**
+     * Helper para obtener el nombre de la lista de una tarjeta.
+     */
+    private getListName(card: KanbanCard): 'todo' | 'doing' | 'done' | null {
+        if (this.todo.includes(card)) return 'todo';
+        if (this.doing.includes(card)) return 'doing';
+        if (this.done.includes(card)) return 'done';
+        return null;
     }
 }
 

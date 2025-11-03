@@ -24,6 +24,16 @@ import {
   getGitHubUserRepos,
   getGitHubUser
 } from './services/github.service';
+import {
+  isAIServiceAvailable,
+  summarizeChat,
+  analyzeTask,
+  improveDescription,
+  detectTaskDependencies,
+  detectBottlenecks,
+  generateChecklist,
+  detectDuplicateTasks
+} from './services/ai.service';
 import { randomBytes } from 'crypto';
 import { logger } from './utils/logger';
 import {
@@ -2977,6 +2987,260 @@ export function createApp(): Application {
     } catch (err) {
       logger.error('Error eliminando integración', err as Error, 'Integration');
       res.status(500).json({ error: 'internal_error' });
+    }
+  });
+
+  // ============ Rutas de IA Generativa ============
+  
+  /**
+   * Verificar disponibilidad del servicio de IA.
+   * GET /api/ai/status
+   */
+  app.get('/api/ai/status', generalApiLimiter, (_req, res) => {
+    res.json({ available: isAIServiceAvailable() });
+  });
+
+  /**
+   * Resumir conversación de chat (útil para conversaciones largas).
+   * POST /api/ai/summarize-chat
+   * Body: { messages: Array<{ user: string, text: string, timestamp?: string }>, maxLength?: number }
+   */
+  app.post('/api/ai/summarize-chat', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { messages, maxLength } = req.body as {
+        messages?: Array<{ user: string; text: string; timestamp?: string }>;
+        maxLength?: number;
+      };
+
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ error: 'bad_request', message: 'messages es requerido y debe ser un array no vacío' });
+      }
+
+      const formattedMessages = messages.map(msg => ({
+        user: msg.user || 'Usuario',
+        text: msg.text || '',
+        timestamp: msg.timestamp ? new Date(msg.timestamp) : undefined
+      }));
+
+      const summary = await summarizeChat({
+        messages: formattedMessages,
+        maxLength
+      });
+
+      res.json({ summary });
+    } catch (err: any) {
+      logger.error('Error resumiendo chat', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error generando resumen' });
+    }
+  });
+
+  /**
+   * Analizar tarea mejorado - identifica información faltante y sugiere mejoras específicas.
+   * POST /api/ai/analyze-task
+   * Body: { title: string, description?: string, context?: string, existingTasks?: Array<{ title: string, description?: string }> }
+   */
+  app.post('/api/ai/analyze-task', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { title, description, context, existingTasks } = req.body as {
+        title?: string;
+        description?: string;
+        context?: string;
+        existingTasks?: Array<{ title: string; description?: string }>;
+      };
+
+      if (!title || typeof title !== 'string') {
+        return res.status(400).json({ error: 'bad_request', message: 'title es requerido' });
+      }
+
+      const analysis = await analyzeTask({ title, description, context, existingTasks });
+
+      res.json(analysis);
+    } catch (err: any) {
+      logger.error('Error analizando tarea', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error analizando tarea' });
+    }
+  });
+
+  /**
+   * Mejorar descripción de una tarea identificando qué falta.
+   * POST /api/ai/improve-description
+   * Body: { title: string, currentDescription?: string, context?: string }
+   */
+  app.post('/api/ai/improve-description', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { title, currentDescription, context } = req.body as {
+        title?: string;
+        currentDescription?: string;
+        context?: string;
+      };
+
+      if (!title || typeof title !== 'string') {
+        return res.status(400).json({ error: 'bad_request', message: 'title es requerido' });
+      }
+
+      const improvement = await improveDescription({ title, currentDescription, context });
+
+      res.json(improvement);
+    } catch (err: any) {
+      logger.error('Error mejorando descripción', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error mejorando descripción' });
+    }
+  });
+
+  /**
+   * Detectar dependencias entre tareas.
+   * POST /api/ai/detect-dependencies
+   * Body: { newTask: { title: string, description?: string }, existingTasks: Array<{ id: string, title: string, description?: string, list: string }> }
+   */
+  app.post('/api/ai/detect-dependencies', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { newTask, existingTasks } = req.body as {
+        newTask?: { title: string; description?: string };
+        existingTasks?: Array<{ id: string; title: string; description?: string; list: string }>;
+      };
+
+      if (!newTask || !newTask.title) {
+        return res.status(400).json({ error: 'bad_request', message: 'newTask.title es requerido' });
+      }
+
+      if (!existingTasks || !Array.isArray(existingTasks)) {
+        return res.status(400).json({ error: 'bad_request', message: 'existingTasks debe ser un array' });
+      }
+
+      const dependencies = await detectTaskDependencies({
+        newTask,
+        existingTasks: existingTasks.map(t => ({
+          id: t.id,
+          title: t.title,
+          description: t.description,
+          list: (t.list || 'todo') as 'todo' | 'doing' | 'done'
+        }))
+      });
+
+      res.json({ dependencies });
+    } catch (err: any) {
+      logger.error('Error detectando dependencias', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error detectando dependencias' });
+    }
+  });
+
+  /**
+   * Detectar cuellos de botella en el tablero.
+   * POST /api/ai/detect-bottlenecks
+   * Body: { cards: Array<{ id: string, title: string, list: string, createdAt?: number, updatedAt?: number }>, thresholdDays?: number }
+   */
+  app.post('/api/ai/detect-bottlenecks', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { cards, thresholdDays } = req.body as {
+        cards?: Array<{ id: string; title: string; list: string; createdAt?: number; updatedAt?: number }>;
+        thresholdDays?: number;
+      };
+
+      if (!cards || !Array.isArray(cards) || cards.length === 0) {
+        return res.status(400).json({ error: 'bad_request', message: 'cards es requerido y debe ser un array no vacío' });
+      }
+
+      const bottlenecks = await detectBottlenecks({
+        cards: cards.map(c => ({
+          id: c.id,
+          title: c.title,
+          list: (c.list || 'todo') as 'todo' | 'doing' | 'done',
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt
+        })),
+        thresholdDays
+      });
+
+      res.json({ bottlenecks });
+    } catch (err: any) {
+      logger.error('Error detectando cuellos de botella', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error detectando cuellos de botella' });
+    }
+  });
+
+  /**
+   * Generar checklist inteligente para una tarea.
+   * POST /api/ai/generate-checklist
+   * Body: { title: string, description?: string, taskType?: string }
+   */
+  app.post('/api/ai/generate-checklist', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { title, description, taskType } = req.body as {
+        title?: string;
+        description?: string;
+        taskType?: string;
+      };
+
+      if (!title || typeof title !== 'string') {
+        return res.status(400).json({ error: 'bad_request', message: 'title es requerido' });
+      }
+
+      const checklist = await generateChecklist({ title, description, taskType });
+
+      res.json({ checklist });
+    } catch (err: any) {
+      logger.error('Error generando checklist', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error generando checklist' });
+    }
+  });
+
+  /**
+   * Detectar tareas duplicadas o similares.
+   * POST /api/ai/detect-duplicates
+   * Body: { newTask: { title: string, description?: string }, existingTasks: Array<{ id: string, title: string, description?: string }> }
+   */
+  app.post('/api/ai/detect-duplicates', authLimiter, async (req, res) => {
+    try {
+      if (!isAIServiceAvailable()) {
+        return res.status(503).json({ error: 'service_unavailable', message: 'Servicio de IA no configurado' });
+      }
+
+      const { newTask, existingTasks } = req.body as {
+        newTask?: { title: string; description?: string };
+        existingTasks?: Array<{ id: string; title: string; description?: string }>;
+      };
+
+      if (!newTask || !newTask.title) {
+        return res.status(400).json({ error: 'bad_request', message: 'newTask.title es requerido' });
+      }
+
+      if (!existingTasks || !Array.isArray(existingTasks)) {
+        return res.status(400).json({ error: 'bad_request', message: 'existingTasks debe ser un array' });
+      }
+
+      const duplicates = await detectDuplicateTasks({
+        newTask,
+        existingTasks
+      });
+
+      res.json({ duplicates });
+    } catch (err: any) {
+      logger.error('Error detectando duplicados', err, 'AI');
+      res.status(500).json({ error: 'internal_error', message: err.message || 'Error detectando tareas duplicadas' });
     }
   });
 

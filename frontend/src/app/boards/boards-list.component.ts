@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TuiButton, TuiTextfield, TuiIcon, TuiDialogService, TuiAlertService } from '@taiga-ui/core';
 import { AuthService } from '../core/auth.service';
+import { AIService } from '../core/ai.service';
 import { API_BASE } from '../core/env';
 
 /**
@@ -315,14 +316,16 @@ interface Board {
             <div class="flex flex-col gap-2">
               <tui-textfield>
                 <label tuiLabel>Nombre del tablero</label>
-                <input
-                  tuiTextfield
-                  [(ngModel)]="newBoardName"
-                  placeholder="Mi proyecto..."
-                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  (keydown.enter)="createBoard()"
-                  autofocus
-                />
+                <div class="flex gap-2">
+                  <input
+                    tuiTextfield
+                    [(ngModel)]="newBoardName"
+                    placeholder="Mi proyecto..."
+                    class="flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    (keydown.enter)="createBoard()"
+                    autofocus
+                  />
+                </div>
               </tui-textfield>
             </div>
             <div class="flex justify-end gap-3 mt-2 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -483,6 +486,7 @@ export class BoardsListComponent implements OnInit, OnDestroy {
   protected readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly alerts = inject(TuiAlertService);
+  private readonly ai = inject(AIService);
   
   // Estado del componente
   boards: Board[] = [];
