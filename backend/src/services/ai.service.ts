@@ -35,10 +35,12 @@ async function generateText(prompt: string, systemInstruction?: string): Promise
   }
 
   try {
-    // Usar gemini-pro que es compatible con la API v1beta
-    // Alternativas disponibles: 'gemini-pro', 'gemini-1.5-pro', 'gemini-1.5-flash-002'
+    // Modelos disponibles en v1beta (según documentación oficial):
+    // - 'gemini-1.5-flash-002' (rápido, recomendado)
+    // - 'gemini-1.5-pro-002' (más potente, más lento)
+    // Usar gemini-1.5-flash-002 que es compatible con la API v1beta
     const model = genAI.getGenerativeModel({ 
-      model: 'gemini-pro',
+      model: 'gemini-1.5-flash-002',
       systemInstruction: systemInstruction || 'Eres un asistente útil para gestión de proyectos. Proporcionas respuestas concisas y prácticas.'
     });
 
