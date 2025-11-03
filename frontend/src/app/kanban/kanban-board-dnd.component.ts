@@ -1297,7 +1297,7 @@ interface BoardLabel {
                     tuiButton
                     appearance="flat"
                     size="xs"
-                    iconStart="tuiIconMagic"
+                    iconStart="tuiIconStar"
                     (click)="improveCardDescription()"
                     [disabled]="improvingDescription"
                     class="text-purple-600 dark:text-purple-400"
@@ -1319,7 +1319,7 @@ interface BoardLabel {
             @if (aiAvailable && addTitle.trim()) {
               <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-2 mb-2">
-                  <tui-icon icon="tuiIconMagic" class="text-purple-600 dark:text-purple-400"></tui-icon>
+                  <tui-icon icon="tuiIconStar" class="text-purple-600 dark:text-purple-400"></tui-icon>
                   <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Asistente IA</label>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
@@ -1341,7 +1341,7 @@ interface BoardLabel {
                     tuiButton
                     appearance="flat"
                     size="s"
-                    iconStart="tuiIconLink"
+                    iconStart="tuiIconGrid"
                     (click)="detectCardDependencies()"
                     [disabled]="detectingDependencies"
                     class="text-blue-600 dark:text-blue-400"
@@ -5575,10 +5575,23 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
      * Detecta cuellos de botella en el tablero.
      */
     async detectBottlenecks(): Promise<void> {
-        if (!this.aiAvailable) return;
+        if (!this.aiAvailable) {
+            this.alerts.open('Servicio de IA no disponible', { label: 'IA no disponible', appearance: 'info' }).subscribe();
+            return;
+        }
         
         try {
             const allCards = [...this.todo, ...this.doing, ...this.done];
+            
+            // Validar que haya tarjetas antes de analizar
+            if (allCards.length === 0) {
+                this.alerts.open('No hay tarjetas en el tablero para analizar', { 
+                    label: 'Sin tarjetas', 
+                    appearance: 'info' 
+                }).subscribe();
+                return;
+            }
+            
             const cards = allCards.map(c => ({
                 id: c.id,
                 title: c.title,
@@ -5603,7 +5616,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             }
         } catch (error: any) {
             console.error('[AI] Error detectando cuellos de botella:', error);
-            this.alerts.open('Error al detectar cuellos de botella', { label: 'Error', appearance: 'negative' }).subscribe();
+            const errorMsg = error.error?.message || error.message || 'Error al detectar cuellos de botella';
+            this.alerts.open(errorMsg, { label: 'Error', appearance: 'negative' }).subscribe();
         }
     }
 
