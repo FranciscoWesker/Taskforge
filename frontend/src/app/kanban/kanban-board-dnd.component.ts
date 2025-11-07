@@ -4190,8 +4190,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     deploymentPanelOpen = false;
     deploymentLogs: Array<{ level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }> = [];
     deploymentStatus: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number } = { state: 'pending', timestamp: Date.now() };
-    private deploymentLogHandler?: (log: { level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }) => void;
-    private deploymentStatusHandler?: (status: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number }) => void;
+    private deploymentLogHandler?: (...args: unknown[]) => void;
+    private deploymentStatusHandler?: (...args: unknown[]) => void;
     private deploymentSubscribed = false;
 
     // Statistics panel state
@@ -4221,7 +4221,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         
         // Escuchar logs en tiempo real (solo si no hay handler ya registrado)
         if (!this.deploymentLogHandler) {
-            this.deploymentLogHandler = (log: { level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }) => {
+            this.deploymentLogHandler = (...args: unknown[]) => {
+                const log = args[0] as { level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string };
                 this.deploymentLogs = [...this.deploymentLogs, log].slice(-1000); // Mantener últimos 1000 logs
                 this.cdr.markForCheck();
             };
@@ -4230,7 +4231,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
 
         // Escuchar cambios de estado (solo si no hay handler ya registrado)
         if (!this.deploymentStatusHandler) {
-            this.deploymentStatusHandler = (status: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number }) => {
+            this.deploymentStatusHandler = (...args: unknown[]) => {
+                const status = args[0] as { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number };
                 this.deploymentStatus = status;
                 this.cdr.markForCheck();
             };
