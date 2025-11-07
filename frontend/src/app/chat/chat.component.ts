@@ -275,11 +275,19 @@ export class ChatComponent implements OnInit, OnDestroy {
       return;
     }
     
+    // Obtener el email del usuario autenticado
+    const userEmail = this.auth.getEmail();
+    if (!userEmail) {
+      console.error('[Chat] No se puede cargar historial: usuario no autenticado');
+      return;
+    }
+    
     try {
       const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/messages?limit=50`, { 
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-User-Email': userEmail
         }
       });
       
