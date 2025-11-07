@@ -583,11 +583,11 @@ interface Board {
                     <div class="flex items-center gap-3 p-2 bg-white rounded border border-gray-200 hover:border-blue-300 transition-colors">
                       <span class="font-medium text-gray-900 flex-1">{{ branch }}</span>
                       <select
-                        [(ngModel)]="branchMappings[branch]"
-                        (change)="onBranchMappingChange(branch, $event)"
+                        [ngModel]="getBranchMapping(branch) || ''"
+                        (ngModelChange)="setBranchMapping(branch, $event)"
                         class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:border-blue-500 focus:outline-none"
                       >
-                        <option [value]="''">Sin mapear</option>
+                        <option value="">Sin mapear</option>
                         <option value="todo">Por hacer</option>
                         <option value="doing">En progreso</option>
                         <option value="done">Hecho</option>
@@ -1071,13 +1071,13 @@ export class IntegrationsComponent implements OnInit {
       const data = await res.json() as { branches: string[] };
       this.availableBranches = data.branches || [];
       
-      // Restaurar mapeos existentes en los selects
+      // Sincronizar branchMappings con branchMappingsList después de cargar las ramas
+      // Esto asegura que los valores se muestren correctamente en los selects
       for (const branch of this.availableBranches) {
-        if (!this.branchMappings[branch]) {
-          const existing = this.branchMappingsList.find(m => m.branch === branch);
-          if (existing) {
-            this.branchMappings[branch] = existing.column;
-          }
+        const existing = this.branchMappingsList.find(m => m.branch === branch);
+        if (existing) {
+          // Mantener sincronizado con branchMappings para compatibilidad
+          this.branchMappings[branch] = existing.column;
         }
       }
     } catch (err: any) {
@@ -1088,23 +1088,33 @@ export class IntegrationsComponent implements OnInit {
   }
 
   /**
-   * Maneja el cambio de mapeo de una rama.
+   * Obtiene el mapeo actual de una rama.
    */
-  onBranchMappingChange(branch: string, event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const column = select.value as 'todo' | 'doing' | 'done' | '';
-    
-    if (column) {
-      this.branchMappings[branch] = column;
-      const existing = this.branchMappingsList.findIndex(m => m.branch === branch);
-      if (existing >= 0) {
-        this.branchMappingsList[existing].column = column;
+  getBranchMapping(branch: string): 'todo' | 'doing' | 'done' | null {
+    const mapping = this.branchMappingsList.find(m => m.branch === branch);
+    return mapping ? mapping.column : null;
+  }
+
+  /**
+   * Establece el mapeo de una rama a una columna.
+   */
+  setBranchMapping(branch: string, column: string | null): void {
+    // Validar que la columna sea válida
+    if (column && (column === 'todo' || column === 'doing' || column === 'done')) {
+      const validColumn = column as 'todo' | 'doing' | 'done';
+      // Actualizar o agregar mapeo
+      const existingIndex = this.branchMappingsList.findIndex(m => m.branch === branch);
+      if (existingIndex >= 0) {
+        this.branchMappingsList[existingIndex].column = validColumn;
       } else {
-        this.branchMappingsList.push({ branch, column });
+        this.branchMappingsList.push({ branch, column: validColumn });
       }
+      // Mantener sincronizado con branchMappings para compatibilidad
+      this.branchMappings[branch] = validColumn;
     } else {
-      delete this.branchMappings[branch];
+      // Remover mapeo (columna vacía o null)
       this.branchMappingsList = this.branchMappingsList.filter(m => m.branch !== branch);
+      delete this.branchMappings[branch];
     }
   }
 
