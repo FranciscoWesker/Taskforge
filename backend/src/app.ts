@@ -1,5 +1,5 @@
 import express from 'express';
-import type { Application } from 'express';
+import type { Application, Request } from 'express';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
@@ -147,7 +147,7 @@ const generalApiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_requests', message: 'Demasiadas solicitudes. Intenta más tarde.' },
-  skip: (req) => req.path === '/health' || req.path === '/', // No limitar health check y root
+  skip: (req: Request) => req.path === '/health' || req.path === '/', // No limitar health check y root
   // Deshabilitar validación estricta de trust proxy (Render es un proxy confiable)
   validate: {
     trustProxy: false
