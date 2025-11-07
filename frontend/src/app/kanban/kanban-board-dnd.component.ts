@@ -1647,8 +1647,15 @@ interface BoardLabel {
           <div class="flex-1 overflow-y-auto p-6 bg-gray-900">
             <div class="space-y-1 font-mono text-sm">
               @if (deploymentLogs.length === 0) {
-                <div class="text-gray-500 text-center py-8">
-                  <p>No hay logs disponibles. Los logs aparecerán aquí cuando se ejecuten builds o deployments.</p>
+                <div class="text-gray-500 text-center py-8 space-y-2">
+                  <p class="font-medium">No hay logs disponibles</p>
+                  <p class="text-sm text-gray-600">Los logs aparecerán aquí cuando:</p>
+                  <ul class="text-sm text-gray-600 text-left max-w-md mx-auto mt-2 space-y-1">
+                    <li>• Se ejecuten builds o deployments desde GitHub</li>
+                    <li>• Se reciban eventos de CI/CD desde webhooks configurados</li>
+                    <li>• Se actualice el estado de pipelines en repositorios conectados</li>
+                  </ul>
+                  <p class="text-xs text-gray-500 mt-4">Asegúrate de tener una integración de GitHub configurada con webhooks activos.</p>
                 </div>
               }
               @for (log of deploymentLogs; track log.timestamp || log.message) {
@@ -4183,6 +4190,9 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     deploymentPanelOpen = false;
     deploymentLogs: Array<{ level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }> = [];
     deploymentStatus: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number } = { state: 'pending', timestamp: Date.now() };
+    private deploymentLogHandler?: (log: { level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }) => void;
+    private deploymentStatusHandler?: (status: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number }) => void;
+    private deploymentSubscribed = false;
 
     // Statistics panel state
     statisticsPanelOpen = false;
@@ -4191,32 +4201,41 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
 
     openDeploymentPanel(): void {
         this.deploymentPanelOpen = true;
-        // Suscribirse a logs de deployment
-        if (this.boardId) {
+        
+        // Suscribirse a logs de deployment solo si no está ya suscrito
+        if (this.boardId && !this.deploymentSubscribed) {
             if (!this.socket.isConnected()) {
                 this.socket.connect();
                 // Esperar un poco antes de suscribirse
                 setTimeout(() => {
                     if (this.socket.isConnected()) {
-        this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+                        this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+                        this.deploymentSubscribed = true;
                     }
                 }, 300);
             } else {
                 this.socket.emit('deployment:subscribe', { boardId: this.boardId });
+                this.deploymentSubscribed = true;
             }
         }
         
-        // Escuchar logs en tiempo real
-        this.socket.on<{ level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }>('deployment:log', (log) => {
-            this.deploymentLogs = [...this.deploymentLogs, log].slice(-1000); // Mantener últimos 1000 logs
-            this.cdr.markForCheck();
-        });
+        // Escuchar logs en tiempo real (solo si no hay handler ya registrado)
+        if (!this.deploymentLogHandler) {
+            this.deploymentLogHandler = (log: { level: 'info' | 'warn' | 'error' | 'success'; message: string; timestamp: number; context?: string }) => {
+                this.deploymentLogs = [...this.deploymentLogs, log].slice(-1000); // Mantener últimos 1000 logs
+                this.cdr.markForCheck();
+            };
+            this.socket.on('deployment:log', this.deploymentLogHandler);
+        }
 
-        // Escuchar cambios de estado
-        this.socket.on<{ state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number }>('deployment:status', (status) => {
-            this.deploymentStatus = status;
-            this.cdr.markForCheck();
-        });
+        // Escuchar cambios de estado (solo si no hay handler ya registrado)
+        if (!this.deploymentStatusHandler) {
+            this.deploymentStatusHandler = (status: { state: 'pending' | 'running' | 'success' | 'failure' | 'cancelled'; pipeline?: string; version?: string; timestamp: number }) => {
+                this.deploymentStatus = status;
+                this.cdr.markForCheck();
+            };
+            this.socket.on('deployment:status', this.deploymentStatusHandler);
+        }
     }
 
     clearDeploymentLogs(): void {
@@ -4246,11 +4265,19 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.socket.emit('board:leave', { boardId: this.boardId });
         }
         // Cancelar suscripción a logs de deployment
-        if (this.boardId && this.socket.isConnected()) {
+        if (this.boardId && this.socket.isConnected() && this.deploymentSubscribed) {
         this.socket.emit('deployment:unsubscribe', { boardId: this.boardId });
+        this.deploymentSubscribed = false;
         }
-        this.socket.off('deployment:log');
-        this.socket.off('deployment:status');
+        // Remover handlers de deployment
+        if (this.deploymentLogHandler) {
+            this.socket.off('deployment:log', this.deploymentLogHandler);
+            this.deploymentLogHandler = undefined;
+        }
+        if (this.deploymentStatusHandler) {
+            this.socket.off('deployment:status', this.deploymentStatusHandler);
+            this.deploymentStatusHandler = undefined;
+        }
     }
 
     private getListName(arr: KanbanCard[]): 'todo' | 'doing' | 'done' | null {

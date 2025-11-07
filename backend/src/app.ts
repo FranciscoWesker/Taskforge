@@ -2883,7 +2883,7 @@ export function createApp(): Application {
   });
 
   // Actualizar mapeo de ramas de una integración
-  app.put('/api/integrations/:integrationId/branch-mapping', writeApiLimiter, async (req, res) => {
+  app.put('/api/integrations/:integrationId/branch-mapping', writeApiLimiter, requireIntegrationAccess, async (req, res) => {
     try {
       const { integrationId } = req.params;
       const { branchMapping } = req.body as { branchMapping?: { branch: string; column: 'todo' | 'doing' | 'done' }[] };
@@ -2929,7 +2929,7 @@ export function createApp(): Application {
   });
 
   // Actualizar configuración de una integración (autoCreateCards, autoCloseCards)
-  app.put('/api/integrations/:integrationId/config', writeApiLimiter, async (req, res) => {
+  app.put('/api/integrations/:integrationId/config', writeApiLimiter, requireIntegrationAccess, async (req, res) => {
     try {
       const { integrationId } = req.params;
       const { autoCreateCards, autoCloseCards } = req.body as { 

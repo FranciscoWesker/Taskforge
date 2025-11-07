@@ -1136,7 +1136,8 @@ export class IntegrationsComponent implements OnInit {
       });
 
       if (!configRes.ok) {
-        throw new Error('Error al actualizar configuración');
+        const errorData = await configRes.json().catch(() => ({ message: 'Error al actualizar configuración' }));
+        throw new Error(errorData.message || 'Error al actualizar configuración');
       }
 
       // Actualizar mapeo de ramas
@@ -1150,7 +1151,15 @@ export class IntegrationsComponent implements OnInit {
       });
 
       if (!mappingRes.ok) {
-        throw new Error('Error al actualizar mapeo de ramas');
+        const errorData = await mappingRes.json().catch(() => ({ message: 'Error al actualizar mapeo de ramas' }));
+        const errorMessage = errorData.message || 'Error al actualizar mapeo de ramas';
+        
+        // Si el error es de autorización, dar un mensaje más claro
+        if (mappingRes.status === 401 || mappingRes.status === 403) {
+          throw new Error('No tienes permisos para modificar esta integración. Asegúrate de ser el dueño del tablero.');
+        }
+        
+        throw new Error(errorMessage);
       }
 
       this.alerts.open('Configuración guardada exitosamente', { label: 'Éxito', appearance: 'success' }).subscribe();
@@ -1158,6 +1167,7 @@ export class IntegrationsComponent implements OnInit {
       this.resetConfig();
       await this.loadIntegrations();
     } catch (err: any) {
+      console.error('[Integrations] Error al guardar configuración:', err);
       this.alerts.open(err.message || 'Error al guardar la configuración', { label: 'Error', appearance: 'negative' }).subscribe();
     } finally {
       this.savingConfig = false;
