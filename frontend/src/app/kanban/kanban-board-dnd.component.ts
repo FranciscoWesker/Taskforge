@@ -10,7 +10,7 @@ import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from 
 import { SocketService } from '../core/socket.service';
 import { AuthService } from '../core/auth.service';
 import { AIService } from '../core/ai.service';
-import { API_BASE } from '../core/env';
+import { API_BASE, isDevelopment } from '../core/env';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiTextfield } from '@taiga-ui/core';
 import { TuiDialogService } from '@taiga-ui/core';
@@ -3065,7 +3065,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         if (this.socket.isConnected()) {
             this.socket.emit('board:join', { boardId: this.boardId });
         } else {
-            console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
+            if (isDevelopment()) console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
             this.socket.emit('board:join', { boardId: this.boardId });
         }
     }
@@ -3082,7 +3082,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         if (this.socket.isConnected()) {
             this.socket.emit('board:join', { boardId: this.boardId });
         } else {
-            console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
+            if (isDevelopment()) console.warn('[Kanban] Socket no conectado, intentando unirse de todas formas...');
             this.socket.emit('board:join', { boardId: this.boardId });
         }
         
@@ -4001,7 +4001,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
 
     private async loadInitial(): Promise<void> {
         if (!this.boardId) {
-            console.warn('[Kanban] No se puede cargar estado inicial: boardId no definido');
+            if (isDevelopment()) console.warn('[Kanban] No se puede cargar estado inicial: boardId no definido');
             return;
         }
         
@@ -4031,7 +4031,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                     this.router.navigate(['/app/boards']);
                     return;
                 } else if (res.status === 404) {
-                    console.warn('[Kanban] Tablero no encontrado, usando estado vacío');
+                    if (isDevelopment()) console.warn('[Kanban] Tablero no encontrado, usando estado vacío');
                     // Usar estado vacío si el tablero no existe
                     this.boardName = null;
                     this.todo = [];
@@ -4101,14 +4101,14 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
                 };
             }
             
-            console.log(`[Kanban] Estado inicial cargado: ${this.todo.length + this.doing.length + this.done.length} tarjetas`);
+            if (isDevelopment()) console.log(`[Kanban] Estado inicial cargado: ${this.todo.length + this.doing.length + this.done.length} tarjetas`);
         } catch (error) {
             console.error('[Kanban] Error al cargar estado inicial:', error);
             this.alerts.open('Error al cargar el tablero. Por favor, recarga la página.', { label: 'Error', appearance: 'negative' }).subscribe();
             
             // Reintentar una vez después de un segundo si no hay datos
             if (this.todo.length === 0 && this.doing.length === 0 && this.done.length === 0) {
-                console.warn('[Kanban] Reintentando cargar estado inicial...');
+                if (isDevelopment()) console.warn('[Kanban] Reintentando cargar estado inicial...');
                 setTimeout(() => {
                     if (this.boardId) {
                         this.loadInitial();

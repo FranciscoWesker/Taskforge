@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../core/socket.service';
 import { AuthService } from '../core/auth.service';
 import { AIService } from '../core/ai.service';
-import { API_BASE } from '../core/env';
+import { API_BASE, isDevelopment } from '../core/env';
 
 @Component({
   selector: 'app-chat',
@@ -210,7 +210,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       // Cargar historial después de unirse a la sala
       await this.loadHistory();
     } else {
-      console.warn('[Chat] Socket no conectado, intentando unirse de todas formas...');
+      if (isDevelopment()) console.warn('[Chat] Socket no conectado, intentando unirse de todas formas...');
       this.socket.emit('board:join', { boardId: this.boardId, user: this.author });
       await this.loadHistory();
     }
@@ -244,7 +244,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     
     // Asegurar que el socket esté conectado
     if (!this.socket.isConnected()) {
-      console.warn('[Chat] Socket no conectado, intentando conectar...');
+      if (isDevelopment()) console.warn('[Chat] Socket no conectado, intentando conectar...');
       this.socket.connect();
       // Esperar un poco antes de emitir
       setTimeout(() => {
@@ -271,7 +271,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   private async loadHistory(): Promise<void> {
     if (!this.boardId) {
-      console.warn('[Chat] No se puede cargar historial: boardId no definido');
+      if (isDevelopment()) console.warn('[Chat] No se puede cargar historial: boardId no definido');
       return;
     }
     
@@ -293,7 +293,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       
       if (!res.ok) {
         if (res.status === 404) {
-          console.warn('[Chat] Tablero no encontrado');
+          if (isDevelopment()) console.warn('[Chat] Tablero no encontrado');
           this.messages = [];
           return;
         }
@@ -308,16 +308,16 @@ export class ChatComponent implements OnInit, OnDestroy {
       const data = await res.json() as Array<{ author: string; text: string; ts: number }>;
       if (Array.isArray(data)) {
         this.messages = data.sort((a, b) => a.ts - b.ts); // Ordenar por timestamp ascendente
-        console.log(`[Chat] Historial cargado: ${data.length} mensajes`);
+        if (isDevelopment()) console.log(`[Chat] Historial cargado: ${data.length} mensajes`);
       } else {
-        console.warn('[Chat] Respuesta inválida del servidor');
+        if (isDevelopment()) console.warn('[Chat] Respuesta inválida del servidor');
         this.messages = [];
       }
     } catch (error) {
       console.error('[Chat] Error al cargar historial:', error);
       // Mantener mensajes existentes si hay un error de red
       if (this.messages.length === 0) {
-        console.warn('[Chat] No se pudo cargar historial, intentando nuevamente...');
+        if (isDevelopment()) console.warn('[Chat] No se pudo cargar historial, intentando nuevamente...');
         // Reintentar una vez después de un segundo
         setTimeout(() => {
           if (this.boardId) {

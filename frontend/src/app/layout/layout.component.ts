@@ -82,7 +82,7 @@ import { SocketService } from '../core/socket.service';
     <!-- Contenido principal -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- Header móvil -->
-      <header class="sticky top-0 z-10 border-b bg-white/90 dark:bg-gray-800/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-800/80 border-gray-200 dark:border-gray-700">
+      <header class="sticky top-0 z-10 border-b bg-white/90 dark:bg-gray-800/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-800/80 border-gray-200 dark:border-gray-700 sticky-optimized">
         <div class="flex items-center justify-between px-4 py-2">
           <div class="flex items-center gap-2">
             <button

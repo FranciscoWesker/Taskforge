@@ -34,4 +34,17 @@ export const API_BASE = ((): string => {
  */
 export const SOCKET_URL = API_BASE;
 
+/**
+ * Verifica si estamos en modo de desarrollo.
+ * Retorna true si estamos en localhost o si no estamos en producción.
+ */
+export const isDevelopment = (): boolean => {
+  try {
+    const hostname = window.location.hostname;
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0';
+  } catch {
+    return false;
+  }
+};
+
 

@@ -4,7 +4,7 @@
  */
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { SOCKET_URL } from './env';
+import { SOCKET_URL, isDevelopment } from './env';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
@@ -18,7 +18,7 @@ export class SocketService {
 	 */
     connect(url = SOCKET_URL): void {
 		if (this.socket?.connected) {
-			console.log('[Socket] Ya está conectado');
+			if (isDevelopment()) console.log('[Socket] Ya está conectado');
 			return;
 		}
 
@@ -47,11 +47,11 @@ export class SocketService {
 		// Event listeners para manejo de conexión
 		this.socket.on('connect', () => {
 			this.reconnectAttempts = 0;
-			console.log('[Socket] Conectado exitosamente');
+			if (isDevelopment()) console.log('[Socket] Conectado exitosamente');
 		});
 
 		this.socket.on('disconnect', (reason: string) => {
-			console.log('[Socket] Desconectado:', reason);
+			if (isDevelopment()) console.log('[Socket] Desconectado:', reason);
 			if (reason === 'io server disconnect') {
 				// El servidor desconectó el socket, intentar reconectar manualmente
 				this.socket?.connect();
@@ -60,11 +60,11 @@ export class SocketService {
 
 		this.socket.on('reconnect', (attemptNumber: number) => {
 			this.reconnectAttempts = attemptNumber;
-			console.log(`[Socket] Reconectado después de ${attemptNumber} intentos`);
+			if (isDevelopment()) console.log(`[Socket] Reconectado después de ${attemptNumber} intentos`);
 		});
 
 		this.socket.on('reconnect_attempt', (attemptNumber: number) => {
-			console.log(`[Socket] Intentando reconectar... (${attemptNumber}/${this.maxReconnectAttempts})`);
+			if (isDevelopment()) console.log(`[Socket] Intentando reconectar... (${attemptNumber}/${this.maxReconnectAttempts})`);
 		});
 
 		this.socket.on('reconnect_failed', () => {
@@ -81,7 +81,7 @@ export class SocketService {
 	 */
 	emit(event: string, payload: unknown): void {
 		if (!this.socket?.connected) {
-			console.warn(`[Socket] No conectado. No se puede emitir: ${event}`);
+			if (isDevelopment()) console.warn(`[Socket] No conectado. No se puede emitir: ${event}`);
 			return;
 		}
 		this.socket.emit(event, payload);
@@ -92,7 +92,7 @@ export class SocketService {
 	 */
 	on<T = unknown>(event: string, handler: (data: T) => void): void {
 		if (!this.socket) {
-			console.warn(`[Socket] Socket no inicializado. No se puede escuchar: ${event}`);
+			if (isDevelopment()) console.warn(`[Socket] Socket no inicializado. No se puede escuchar: ${event}`);
 			return;
 		}
 		this.socket.on(event, handler);
@@ -117,7 +117,7 @@ export class SocketService {
         if (!this.socket) return;
         try {
             this.socket.disconnect();
-			console.log('[Socket] Desconectado manualmente');
+			if (isDevelopment()) console.log('[Socket] Desconectado manualmente');
         } finally {
             this.socket = undefined;
 			this.reconnectAttempts = 0;
