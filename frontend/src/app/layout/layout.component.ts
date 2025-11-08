@@ -1,5 +1,7 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { TuiButton } from '@taiga-ui/core';
 import { TuiAvatar } from '@taiga-ui/kit';
 import { TuiIcon } from '@taiga-ui/core';
@@ -209,17 +211,70 @@ import { SocketService } from '../core/socket.service';
   </div>
   `
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent implements OnInit, OnDestroy {
   protected readonly sidebarVisible = signal(false);
   protected readonly auth = inject(AuthService);
   protected readonly router = inject(Router);
   protected readonly socket = inject(SocketService);
   protected readonly isDark = signal(false);
+  private navigationSubscription?: Subscription;
 
   ngOnInit() {
     // Inicializar tema antes de renderizar
     const isDarkMode = this.getInitialTheme();
     this.isDark.set(isDarkMode);
+
+    // Verificar si hay un último tablero guardado y redirigir si es necesario
+    this.checkAndRedirectToLastBoard();
+
+    // Escuchar eventos de navegación para redirigir al último tablero cuando sea necesario
+    this.navigationSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.checkAndRedirectToLastBoard();
+      });
+  }
+
+  ngOnDestroy() {
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+    }
+  }
+
+  private checkAndRedirectToLastBoard(): void {
+    // Solo redirigir si el usuario está autenticado
+    if (!this.auth.isAuthenticated()) {
+      return;
+    }
+
+    // Verificar la ruta actual
+    const currentUrl = this.router.url;
+    
+    // Si estamos en /app o /app/boards (sin ID específico), verificar si hay un último tablero
+    // La ruta /app/boards/:id tiene exactamente el formato /app/boards/[uuid]
+    // La ruta /app/boards/:id/chat tiene el formato /app/boards/[uuid]/chat
+    const isOnBoardsList = currentUrl === '/app' || currentUrl === '/app/boards';
+    const isOnBoardWithId = /^\/app\/boards\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(\/|$)/i.test(currentUrl);
+    
+    if (isOnBoardsList && !isOnBoardWithId) {
+      try {
+        const lastBoardId = localStorage.getItem('tf-last-board');
+        
+        // Si hay un último tablero guardado y es un UUID válido, redirigir a él
+        if (lastBoardId && lastBoardId !== 'demo' && this.isValidUUID(lastBoardId)) {
+          this.router.navigate(['/app/boards', lastBoardId]);
+        }
+      } catch (err) {
+        // Si hay error al acceder a localStorage, ignorar
+        console.warn('Error al verificar último tablero:', err);
+      }
+    }
+  }
+
+  private isValidUUID(uuid: string): boolean {
+    // Validar formato UUID básico (8-4-4-4-12 caracteres hexadecimales)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
   }
   protected readonly lastBoardId = signal<string>(
     (() => { try { return localStorage.getItem('tf-last-board') || 'demo'; } catch { return 'demo'; } })()
