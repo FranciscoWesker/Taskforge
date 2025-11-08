@@ -1,6 +1,6 @@
 # Redirecciones para SPA (Single Page Application)
 # Este archivo se copia al directorio de salida durante el build
-# Formato: source destination status_code
 # Render requiere que este archivo esté en la raíz del directorio de publicación
-/*    /index.html   200
+# Formato: source destination status_code
+/* /index.html 200
 
