@@ -1686,18 +1686,18 @@ interface BoardLabel {
                   <button
                     type="button"
                     class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
-                    [class.bg-indigo-50]="(this as any).aiGeneratedChecklist"
-                    [class.border-indigo-200]="(this as any).aiGeneratedChecklist"
-                    [class.text-indigo-700]="(this as any).aiGeneratedChecklist"
-                    [class.dark:bg-indigo-900/20]="(this as any).aiGeneratedChecklist"
-                    [class.dark:border-indigo-800]="(this as any).aiGeneratedChecklist"
-                    [class.dark:text-indigo-400]="(this as any).aiGeneratedChecklist"
-                    [class.bg-white]="!(this as any).aiGeneratedChecklist"
-                    [class.border-gray-200]="!(this as any).aiGeneratedChecklist"
-                    [class.text-gray-700]="!(this as any).aiGeneratedChecklist"
-                    [class.dark:bg-gray-800]="!(this as any).aiGeneratedChecklist"
-                    [class.dark:border-gray-700]="!(this as any).aiGeneratedChecklist"
-                    [class.dark:text-gray-300]="!(this as any).aiGeneratedChecklist"
+                    [class.bg-indigo-50]="aiGeneratedChecklist"
+                    [class.border-indigo-200]="aiGeneratedChecklist"
+                    [class.text-indigo-700]="aiGeneratedChecklist"
+                    [class.dark:bg-indigo-900/20]="aiGeneratedChecklist"
+                    [class.dark:border-indigo-800]="aiGeneratedChecklist"
+                    [class.dark:text-indigo-400]="aiGeneratedChecklist"
+                    [class.bg-white]="!aiGeneratedChecklist"
+                    [class.border-gray-200]="!aiGeneratedChecklist"
+                    [class.text-gray-700]="!aiGeneratedChecklist"
+                    [class.dark:bg-gray-800]="!aiGeneratedChecklist"
+                    [class.dark:border-gray-700]="!aiGeneratedChecklist"
+                    [class.dark:text-gray-300]="!aiGeneratedChecklist"
                     [class.opacity-50]="generatingChecklist"
                     (click)="generateCardChecklist()"
                     [disabled]="generatingChecklist"
@@ -1705,9 +1705,9 @@ interface BoardLabel {
                   >
                     <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
                     <span>{{ generatingChecklist ? 'Generando...' : 'Checklist' }}</span>
-                    @if ((this as any).aiGeneratedChecklist) {
+                    @if (aiGeneratedChecklist) {
                       <span class="ml-auto px-1.5 py-0.5 bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200 rounded text-[10px] font-semibold">
-                        {{ (this as any).aiGeneratedChecklist.length }}
+                        {{ aiGeneratedChecklist.length }}
                       </span>
                     }
                   </button>
@@ -1722,7 +1722,7 @@ interface BoardLabel {
                         <div class="text-xs font-semibold text-green-900 dark:text-green-100 mb-1.5">Análisis completado</div>
                         @if (taskAnalysis.priority) {
                           <div class="text-xs text-green-800 dark:text-green-200 mb-1">
-                            <strong>Prioridad sugerida:</strong> {{ getPriorityName(taskAnalysis.priority as any) }}
+                            <strong>Prioridad sugerida:</strong> {{ getPriorityName(taskAnalysis.priority as 'low' | 'medium' | 'high' | 'urgent') }}
                           </div>
                         }
                         @if (taskAnalysis.estimatedTime) {
@@ -3251,6 +3251,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     analyzingTask = false;
     improvingDescription = false;
     generatingChecklist = false;
+    aiGeneratedChecklist: ChecklistItem[] | null = null; // Checklist generado por IA
     detectedDependencies: Array<{ taskId: string; title: string; relationship: string; confidence: string; reason: string }> = [];
     detectedDuplicates: Array<{ taskId: string; title: string; similarity: string; reason: string }> = [];
     taskAnalysis: { priority: string; estimatedTime?: string; improvementSuggestions: string[]; missingInfo: string[]; recommendedLabels?: string[] } | null = null;
@@ -3789,7 +3790,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.detectedDependencies = [];
         this.detectedDuplicates = [];
         this.taskAnalysis = null;
-        (this as any).aiGeneratedChecklist = null;
+        this.aiGeneratedChecklist = null;
         this.cdr.markForCheck();
     }
 
@@ -3853,9 +3854,8 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             }
             
             // Agregar checklist generado por IA si existe
-            const aiChecklist = (this as any).aiGeneratedChecklist;
-            if (aiChecklist && Array.isArray(aiChecklist) && aiChecklist.length > 0) {
-                payload.checklist = aiChecklist;
+            if (this.aiGeneratedChecklist && Array.isArray(this.aiGeneratedChecklist) && this.aiGeneratedChecklist.length > 0) {
+                payload.checklist = this.aiGeneratedChecklist;
             }
             
             const res = await fetch(`${API_BASE}/api/boards/${encodeURIComponent(this.boardId)}/cards`, {
@@ -3889,7 +3889,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.detectedDependencies = [];
         this.detectedDuplicates = [];
         this.taskAnalysis = null;
-        (this as any).aiGeneratedChecklist = null;
+        this.aiGeneratedChecklist = null;
         this.cdr.markForCheck();
     }
 
@@ -5976,7 +5976,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             }));
             
             // Guardar en una variable temporal para usar al crear la tarjeta
-            (this as any).aiGeneratedChecklist = checklistItems;
+            this.aiGeneratedChecklist = checklistItems;
             
             this.alerts.open(`Se generaron ${checklist.length} elementos de checklist`, { 
                 label: 'Checklist generado', 
