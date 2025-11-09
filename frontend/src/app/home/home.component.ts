@@ -193,7 +193,6 @@ import { AuthService } from '../core/auth.service';
           </div>
         </div>
         
-<<<<<<< HEAD
         <div class="text-center mt-12">
           <p class="text-gray-600 mb-6 max-w-2xl mx-auto">
             Impulsado por <span class="font-semibold text-purple-600">Google Gemini 2.0 Flash</span>. Las funcionalidades de IA trabajan automáticamente, analizando cientos de tareas en segundos para optimizar tu flujo de trabajo de forma que sería imposible hacer manualmente.

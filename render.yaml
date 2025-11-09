@@ -1,7 +1,13 @@
+# ============================================================================
+# CONFIGURACIÓN PARA RENDER - DOS SERVICIOS SEPARADOS
+# ============================================================================
+
+# 1. BACKEND (Node.js con Socket.io)
+# ============================================================================
 services:
   - type: web
     name: taskforge-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: backend
     healthCheckPath: /health
@@ -9,27 +15,45 @@ services:
     startCommand: node dist/server.js
     autoDeploy: true
     envVars:
+      # URL del frontend en Render (para CORS)
       - key: CLIENT_ORIGIN
         value: https://taskforge-21m4.onrender.com
+      # URL del backend en Render (para referencias internas)
       - key: BACKEND_URL
         value: https://taskforge-ufzf.onrender.com
+      # MongoDB URI (configurar como secreto en Render dashboard)
       - key: MONGODB_URI
         sync: false
       # IMPORTANTE: USE_MEM_MONGO debe ser "false" en producción
       # MongoDB en memoria se pierde al reiniciar el servidor (cada 15 min en Render free tier)
-      # Este valor sobrescribe cualquier configuración en el dashboard de Render
       - key: USE_MEM_MONGO
         value: "false"
+      # NODE_ENV se establece automáticamente por Render, pero podemos forzarlo
+      - key: NODE_ENV
+        value: "production"
 
-# NOTA: Los sitios estáticos no se pueden definir en render.yaml blueprints
-# El frontend (taskforge-frontend) debe crearse manualmente en el dashboard de Render:
+# 2. FRONTEND (Angular estático)
+# ============================================================================
+# NOTA: Los sitios estáticos NO se pueden definir en render.yaml blueprints.
+# El frontend debe crearse MANUALMENTE en el dashboard de Render:
+#
+# Pasos para crear el Static Site en Render:
 # 1. Ir a Dashboard → New → Static Site
-# 2. Conectar el repositorio
+# 2. Conectar el repositorio Git
 # 3. Configurar:
 #    - Name: taskforge-frontend
 #    - Root Directory: frontend
 #    - Build Command: npm install && npm run build
 #    - Publish Directory: dist/taskforge-ui/browser
-#    - Headers: Content-Security-Policy (ver configuración en frontend/public/_redirects)
-#    - Redirects: /* -> /index.html (status 200)
+#    - Environment Variables: (ninguna necesaria, usa variables de entorno del navegador)
+#
+# El archivo static.json se copia automáticamente durante el build
+# (ver frontend/scripts/postbuild.js) y configura las redirecciones SPA.
+#
+# Configuración de redirecciones en Render Dashboard (si static.json no funciona):
+# - Ir a Settings → Redirects/Rewrites
+# - Agregar regla:
+#   * Source: /*
+#   * Destination: /index.html
+#   * Action: Rewrite
 
