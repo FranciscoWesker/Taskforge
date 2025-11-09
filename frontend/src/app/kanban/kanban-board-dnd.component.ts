@@ -401,13 +401,15 @@ interface BoardLabel {
           }
           @for (c of todo; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-200 border cursor-move group focus-visible-ring rounded-xl p-4 sm:p-5 hover:border-blue-400 dark:hover:border-blue-500"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 cursor-move group focus-visible-ring rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-1"
               [class.border-gray-200]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
               [class.dark:border-gray-700]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
-              [class.hover:border-blue-300]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
+              [class.hover:border-blue-400]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
+              [class.dark:hover:border-blue-500]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
               [class.border-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
-              [class.ring-2]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
-              [class.ring-blue-300]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
+              [class.ring-4]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
+              [class.ring-blue-200]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
+              [class.dark:ring-blue-800]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -417,30 +419,30 @@ interface BoardLabel {
               (keydown.space)="editCard('todo', i); selectedCardIndex = { list: 'todo', index: i };"
               (click)="selectedCardIndex = { list: 'todo', index: i }"
             >
-              <div class="card-body p-0">
+              <div class="card-body p-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
-                  <div class="flex items-center gap-2 mb-3 px-4 pt-4 flex-wrap">
+                  <div class="flex items-center gap-2 mb-3 px-5 pt-5 flex-wrap">
                     @if (c.priority) {
                       @switch (c.priority) {
                         @case ('urgent') {
-                          <span tuiBadge class="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 flex items-center gap-1.5">
-                            <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
+                          <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             Urgente
                           </span>
                         }
                         @case ('high') {
-                          <span tuiBadge class="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Alta
                           </span>
                         }
                         @case ('medium') {
-                          <span tuiBadge class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Media
                           </span>
                         }
                         @case ('low') {
-                          <span tuiBadge class="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Baja
                           </span>
                         }
@@ -450,7 +452,7 @@ interface BoardLabel {
                       @for (labelId of c.labels.slice(0, 3); track labelId) {
                         @if (getLabelById(labelId)) {
                           <span 
-                            class="px-2 py-0.5 text-xs font-medium rounded border"
+                            class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full border shadow-sm transition-all hover:scale-105"
                             [style.background-color]="getLabelById(labelId)!.color + '20'"
                             [style.color]="getLabelById(labelId)!.color"
                             [style.border-color]="getLabelById(labelId)!.color + '40'"
@@ -537,25 +539,25 @@ interface BoardLabel {
                   </div>
                 </div>
                 @if (c.description) {
-                  <div class="text-sm text-gray-700 dark:text-gray-300 mt-2 mb-3 px-4 line-clamp-3 leading-relaxed">{{ c.description }}</div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 px-5 line-clamp-3 leading-relaxed">{{ c.description }}</div>
                 }
                 
                 <!-- Checklist progress indicator -->
                 @if (c.checklist && c.checklist.length > 0) {
-                  <div class="mt-3 pt-3 mx-4 border-t border-gray-100 dark:border-gray-700">
+                  <div class="mt-4 pt-4 mx-5 border-t border-gray-200 dark:border-gray-700">
                     <button
                       type="button"
-                      class="flex items-center gap-2 w-full text-left text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors px-2 py-1 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      class="flex items-center gap-2.5 w-full text-left text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50"
                       (click)="openChecklist(c.id)"
                       title="Gestionar checklist"
                     >
-                      <tui-icon icon="tuiIconCheckCircle" class="text-sm text-green-600 dark:text-green-400"></tui-icon>
-                      <span class="flex-1 font-medium">
+                      <tui-icon icon="tuiIconCheckCircle" class="text-base text-green-600 dark:text-green-400"></tui-icon>
+                      <span class="flex-1 font-semibold">
                         {{ getChecklistProgress(c.checklist) }} de {{ c.checklist.length }} completado{{ c.checklist.length !== 1 ? 's' : '' }}
                       </span>
-                      <div class="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                      <div class="w-24 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
                         <div 
-                          class="h-full bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400 transition-all shadow-sm"
+                          class="h-full bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400 transition-all shadow-sm rounded-full"
                           [style.width.%]="getChecklistProgressPercent(c.checklist)"
                         ></div>
                       </div>
@@ -564,7 +566,7 @@ interface BoardLabel {
                 }
                 
                 <!-- Footer con metadata y fechas -->
-                <div class="flex items-center justify-between gap-2 mt-3 pt-3 mx-4 pb-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
+                <div class="flex items-center justify-between gap-2 mt-4 pt-4 mx-5 pb-5 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/30 -mx-5 px-5">
                   <div class="flex items-center gap-2 flex-wrap">
                     @if (c.dueDate) {
                       <div 
@@ -773,13 +775,15 @@ interface BoardLabel {
           }
           @for (c of doing; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-200 border cursor-move group focus-visible-ring rounded-xl p-4 sm:p-5 hover:border-yellow-400 dark:hover:border-yellow-500"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 cursor-move group focus-visible-ring rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-1"
               [class.border-gray-200]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
               [class.dark:border-gray-700]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
-              [class.hover:border-yellow-300]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
+              [class.hover:border-yellow-400]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
+              [class.dark:hover:border-yellow-500]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
               [class.border-yellow-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
-              [class.ring-2]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
-              [class.ring-yellow-300]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.ring-4]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.ring-yellow-200]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.dark:ring-yellow-800]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -789,30 +793,30 @@ interface BoardLabel {
               (keydown.space)="editCard('doing', i); selectedCardIndex = { list: 'doing', index: i };"
               (click)="selectedCardIndex = { list: 'doing', index: i }"
             >
-              <div class="card-body p-0">
+              <div class="card-body p-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
-                  <div class="flex items-center gap-2 mb-3 px-4 pt-4 flex-wrap">
+                  <div class="flex items-center gap-2 mb-3 px-5 pt-5 flex-wrap">
                     @if (c.priority) {
                       @switch (c.priority) {
                         @case ('urgent') {
-                          <span tuiBadge class="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 flex items-center gap-1.5">
-                            <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
+                          <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             Urgente
                           </span>
                         }
                         @case ('high') {
-                          <span tuiBadge class="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Alta
                           </span>
                         }
                         @case ('medium') {
-                          <span tuiBadge class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Media
                           </span>
                         }
                         @case ('low') {
-                          <span tuiBadge class="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1">
+                          <span class="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
                             Baja
                           </span>
                         }
@@ -838,18 +842,18 @@ interface BoardLabel {
                   </div>
                 }
                 
-                <div class="flex justify-between items-start gap-2 mb-3 px-4">
-                  <div class="font-bold text-base text-gray-900 dark:text-gray-100 flex-1 flex items-center gap-2 leading-tight">
+                <div class="flex justify-between items-start gap-3 mb-4 px-5">
+                  <div class="font-bold text-lg text-gray-900 dark:text-gray-100 flex-1 flex items-start gap-2.5 leading-snug">
                     @if (c.metadata?.type === 'commit') {
-                      <tui-icon icon="tuiIconCode" class="text-blue-600 text-base flex-shrink-0" title="Commit"></tui-icon>
+                      <tui-icon icon="tuiIconCode" class="text-blue-600 text-lg flex-shrink-0 mt-0.5" title="Commit"></tui-icon>
                     }
                     @if (c.metadata?.type === 'pull_request') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-base flex-shrink-0" title="Pull Request"></tui-icon>
+                      <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-lg flex-shrink-0 mt-0.5" title="Pull Request"></tui-icon>
                     }
                     @if (c.metadata?.type === 'branch') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-green-600 text-base flex-shrink-0" title="Branch"></tui-icon>
+                      <tui-icon icon="tuiIconGitBranch" class="text-green-600 text-lg flex-shrink-0 mt-0.5" title="Branch"></tui-icon>
                     }
-                    <span class="break-words">{{ c.title }}</span>
+                    <span class="break-words leading-relaxed">{{ c.title }}</span>
                   </div>
                   <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
@@ -909,7 +913,7 @@ interface BoardLabel {
                   </div>
                 </div>
                 @if (c.description) {
-                  <div class="text-sm text-gray-700 dark:text-gray-300 mt-2 mb-3 px-4 line-clamp-3 leading-relaxed">{{ c.description }}</div>
+                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 px-5 line-clamp-3 leading-relaxed">{{ c.description }}</div>
                 }
                 @if (getTaskReferences(c).length > 0) {
                   <div class="mt-3 pt-3 border-t border-gray-200">
@@ -1066,13 +1070,15 @@ interface BoardLabel {
           }
           @for (c of done; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-200 border cursor-move group focus-visible-ring rounded-xl p-4 sm:p-5 hover:border-green-400 dark:hover:border-green-500"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 cursor-move group focus-visible-ring rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-1 opacity-90"
               [class.border-gray-200]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
               [class.dark:border-gray-700]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
-              [class.hover:border-green-300]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
+              [class.hover:border-green-400]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
+              [class.dark:hover:border-green-500]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
               [class.border-green-500]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
-              [class.ring-2]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
-              [class.ring-green-300]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
+              [class.ring-4]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
+              [class.ring-green-200]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
+              [class.dark:ring-green-800]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -1082,30 +1088,30 @@ interface BoardLabel {
               (keydown.space)="editCard('done', i); selectedCardIndex = { list: 'done', index: i };"
               (click)="selectedCardIndex = { list: 'done', index: i }"
             >
-              <div class="card-body p-0">
+              <div class="card-body p-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
-                  <div class="flex items-center gap-2 mb-3 px-4 pt-4 flex-wrap">
+                  <div class="flex items-center gap-2 mb-3 px-5 pt-5 flex-wrap">
                     @if (c.priority) {
                       @switch (c.priority) {
                         @case ('urgent') {
-                          <span tuiBadge class="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 flex items-center gap-1.5 opacity-75">
-                            <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
+                          <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0 opacity-75">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             Urgente
                           </span>
                         }
                         @case ('high') {
-                          <span tuiBadge class="bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 opacity-75">
+                          <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0 opacity-75">
                             Alta
                           </span>
                         }
                         @case ('medium') {
-                          <span tuiBadge class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 opacity-75">
+                          <span class="inline-flex items-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0 opacity-75">
                             Media
                           </span>
                         }
                         @case ('low') {
-                          <span tuiBadge class="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm text-xs font-semibold px-2.5 py-1 opacity-75">
+                          <span class="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0 opacity-75">
                             Baja
                           </span>
                         }
