@@ -566,153 +566,162 @@ interface BoardLabel {
                 }
                 
                 <!-- Footer con metadata y fechas -->
-                <div class="flex items-center justify-between gap-2 mt-4 pt-4 mx-5 pb-5 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/30 -mx-5 px-5">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    @if (c.dueDate) {
-                      <div 
-                        class="flex items-center gap-1 px-2 py-0.5 rounded border transition-colors"
-                        [class.bg-red-100]="isOverdue(c.dueDate)"
-                        [class.text-red-800]="isOverdue(c.dueDate)"
-                        [class.border-red-300]="isOverdue(c.dueDate)"
-                        [class.dark:bg-red-900/30]="isOverdue(c.dueDate)"
-                        [class.dark:text-red-300]="isOverdue(c.dueDate)"
-                        [class.bg-orange-100]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                        [class.text-orange-800]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                        [class.border-orange-300]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                        [class.dark:bg-orange-900/30]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                        [class.dark:text-orange-300]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                        [class.bg-gray-100]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                        [class.text-gray-700]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                        [class.border-gray-300]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                        [class.dark:bg-gray-700]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                        [class.dark:text-gray-300]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                        [title]="'Vence: ' + formatDueDate(c.dueDate)"
-                      >
-                        <tui-icon 
-                          [icon]="isOverdue(c.dueDate) ? 'tuiIconAlertCircle' : 'tuiIconCalendar'" 
-                          class="text-xs"
-                        ></tui-icon>
-                        <span>{{ formatDueDate(c.dueDate) }}</span>
-                      </div>
-                    }
-                    @if (c.assignee) {
-                      <div 
-                        class="flex items-center gap-1 px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-700"
-                        [title]="'Asignado a: ' + c.assignee"
-                      >
-                        <div class="w-4 h-4 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                          {{ getInitials(c.assignee) }}
+                @if (c.dueDate || c.assignee || c.createdAt || (c.updatedAt && c.updatedAt !== c.createdAt)) {
+                  <div class="mt-4 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @if (c.dueDate) {
+                        <div 
+                          class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors"
+                          [class.bg-red-50]="isOverdue(c.dueDate)"
+                          [class.text-red-700]="isOverdue(c.dueDate)"
+                          [class.border-red-200]="isOverdue(c.dueDate)"
+                          [class.dark:bg-red-900/20]="isOverdue(c.dueDate)"
+                          [class.dark:text-red-400]="isOverdue(c.dueDate)"
+                          [class.dark:border-red-800]="isOverdue(c.dueDate)"
+                          [class.bg-orange-50]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.text-orange-700]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.border-orange-200]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.dark:bg-orange-900/20]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.dark:text-orange-400]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.dark:border-orange-800]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.bg-gray-50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.text-gray-600]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.border-gray-200]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.dark:bg-gray-800/50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.dark:text-gray-400]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.dark:border-gray-700]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.border]="true"
+                          [title]="'Vence: ' + formatDueDate(c.dueDate)"
+                        >
+                          <tui-icon 
+                            [icon]="isOverdue(c.dueDate) ? 'tuiIconAlertCircle' : 'tuiIconCalendar'" 
+                            class="text-xs w-3 h-3"
+                          ></tui-icon>
+                          <span class="whitespace-nowrap">{{ formatDueDate(c.dueDate) }}</span>
                         </div>
-                        <span class="truncate max-w-[80px] text-xs">{{ c.assignee }}</span>
-                      </div>
-                    }
-                    @if (c.createdAt) {
-                      <div class="flex items-center gap-1" title="Creada {{ formatCardDate(c.createdAt) }}">
-                        <tui-icon icon="tuiIconCalendar" class="text-xs"></tui-icon>
-                        <span>{{ formatCardDate(c.createdAt) }}</span>
-                      </div>
-                    }
+                      }
+                      @if (c.assignee) {
+                        <div 
+                          class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-medium"
+                          [title]="'Asignado a: ' + c.assignee"
+                        >
+                          <div class="w-4 h-4 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
+                            {{ getInitials(c.assignee) }}
+                          </div>
+                          <span class="truncate max-w-[100px]">{{ c.assignee }}</span>
+                        </div>
+                      }
+                      @if (c.createdAt) {
+                        <div class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400" title="Creada {{ formatCardDate(c.createdAt) }}">
+                          <tui-icon icon="tuiIconClock" class="text-xs w-3 h-3"></tui-icon>
+                          <span class="whitespace-nowrap">{{ formatCardDateRelative(c.createdAt) }}</span>
+                        </div>
+                      }
+                      @if (c.updatedAt && c.updatedAt !== c.createdAt) {
+                        <div class="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500" title="Actualizada {{ formatCardDate(c.updatedAt) }}">
+                          <tui-icon icon="tuiIconRefresh" class="text-xs w-3 h-3"></tui-icon>
+                          <span class="whitespace-nowrap">{{ formatCardDateRelative(c.updatedAt) }}</span>
+                        </div>
+                      }
+                    </div>
                   </div>
-                  @if (c.updatedAt && c.updatedAt !== c.createdAt) {
-                    <span class="text-gray-400 dark:text-gray-500" title="Actualizada {{ formatCardDate(c.updatedAt) }}">
-                      {{ formatCardDateRelative(c.updatedAt) }}
-                    </span>
-                  }
-                </div>
+                }
                 
                 @if (getTaskReferences(c).length > 0) {
-                  <div class="mt-3 pt-3 border-t border-gray-200">
-                    <div class="flex items-center gap-2 mb-2">
-                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600"></tui-icon>
+                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 mb-2.5">
+                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600 dark:text-blue-400"></tui-icon>
                       <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
                     </div>
                     <div class="space-y-2">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
-                          <div class="bg-blue-50 border border-blue-200 rounded p-2 text-xs">
-                            <div class="flex items-start gap-2">
-                              @if (ref.type === 'commit') {
-                                <tui-icon icon="tuiIconCode" class="text-blue-600 text-xs mt-0.5 flex-shrink-0"></tui-icon>
-                                <div class="flex-1 min-w-0">
-                                  <div class="font-medium text-blue-900 truncate">{{ ref.message || 'Commit' }}</div>
-                                  @if (ref.context) {
-                                    <div class="text-blue-700 mt-1 truncate">{{ ref.context }}</div>
-                                  }
-                                  @if (ref.url) {
-                                    <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline mt-1 inline-block">
-                                      Ver commit →
-                                    </a>
-                                  }
-                                </div>
-                              }
-                              @if (ref.type === 'pull_request') {
-                                <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-xs mt-0.5 flex-shrink-0"></tui-icon>
-                                <div class="flex-1 min-w-0">
-                                  <div class="font-medium text-purple-900 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
-                                  @if (ref.context) {
-                                    <div class="text-purple-700 mt-1 truncate">{{ ref.context }}</div>
-                                  }
-                                  @if (ref.url) {
-                                    <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:text-purple-800 underline mt-1 inline-block">
-                                      Ver PR →
-                                    </a>
-                                  }
-                                </div>
-                              }
-                            </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5 text-xs">
+                          <div class="flex items-start gap-2.5">
+                            @if (ref.type === 'commit') {
+                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <div class="flex-1 min-w-0">
+                                <div class="font-medium text-blue-900 dark:text-blue-200 truncate">{{ ref.message || 'Commit' }}</div>
+                                @if (ref.context) {
+                                  <div class="text-blue-700 dark:text-blue-300 mt-1 text-xs truncate">{{ ref.context }}</div>
+                                }
+                                @if (ref.url) {
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-1.5 inline-block text-xs">
+                                    Ver commit →
+                                  </a>
+                                }
+                              </div>
+                            }
+                            @if (ref.type === 'pull_request') {
+                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <div class="flex-1 min-w-0">
+                                <div class="font-medium text-purple-900 dark:text-purple-200 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
+                                @if (ref.context) {
+                                  <div class="text-purple-700 dark:text-purple-300 mt-1 text-xs truncate">{{ ref.context }}</div>
+                                }
+                                @if (ref.url) {
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-1.5 inline-block text-xs">
+                                    Ver PR →
+                                  </a>
+                                }
+                              </div>
+                            }
                           </div>
-                        }
-                        @if (getTaskReferences(c).length > 2) {
-                          <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
-                            +{{ getTaskReferences(c).length - 2 }} más
-                          </div>
-                        }
-                      </div>
+                        </div>
+                      }
+                      @if (getTaskReferences(c).length > 2) {
+                        <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
+                          +{{ getTaskReferences(c).length - 2 }} más
+                        </div>
+                      }
                     </div>
+                  </div>
                 }
                 @if (c.metadata?.ciStatus) {
-                  <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-200">
-                    @switch (c.metadata?.ciStatus?.state) {
-                      @case ('success') {
-                        <span tuiBadge class="bg-green-100 text-green-800 border-green-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @switch (c.metadata?.ciStatus?.state) {
+                        @case ('success') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconCheck" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('failure') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconClose" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('pending') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-xs font-medium">
+                            <span class="inline-block w-2.5 h-2.5 border-2 border-yellow-600 dark:border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('error') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @default {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-xs font-medium">
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
                       }
-                      @case ('failure') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconClose" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                      @if (c.metadata?.url) {
+                        <a 
+                          [href]="c.metadata!.url!" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline font-medium"
+                          title="Ver en GitHub"
+                        >
+                          Ver →
+                        </a>
                       }
-                      @case ('pending') {
-                        <span tuiBadge class="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs font-semibold">
-                          <span class="inline-block w-2 h-2 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></span>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @case ('error') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @default {
-                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                    }
-                    @if (c.metadata?.url) {
-                      <a 
-                        [href]="c.metadata!.url!" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="text-xs text-blue-600 hover:text-blue-800 underline"
-                        title="Ver en GitHub"
-                      >
-                        Ver →
-                      </a>
-                    }
+                    </div>
                   </div>
                 }
               </div>
@@ -916,98 +925,100 @@ interface BoardLabel {
                   <div class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 px-5 line-clamp-3 leading-relaxed">{{ c.description }}</div>
                 }
                 @if (getTaskReferences(c).length > 0) {
-                  <div class="mt-3 pt-3 border-t border-gray-200">
-                    <div class="flex items-center gap-2 mb-2">
-                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600"></tui-icon>
+                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 mb-2.5">
+                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600 dark:text-blue-400"></tui-icon>
                       <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
                     </div>
                     <div class="space-y-2">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
-                          <div class="bg-blue-50 border border-blue-200 rounded p-2 text-xs">
-                            <div class="flex items-start gap-2">
-                              @if (ref.type === 'commit') {
-                                <tui-icon icon="tuiIconCode" class="text-blue-600 text-xs mt-0.5 flex-shrink-0"></tui-icon>
-                                <div class="flex-1 min-w-0">
-                                  <div class="font-medium text-blue-900 truncate">{{ ref.message || 'Commit' }}</div>
-                                  @if (ref.context) {
-                                    <div class="text-blue-700 mt-1 truncate">{{ ref.context }}</div>
-                                  }
-                                  @if (ref.url) {
-                                    <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline mt-1 inline-block">
-                                      Ver commit →
-                                    </a>
-                                  }
-                                </div>
-                              }
-                              @if (ref.type === 'pull_request') {
-                                <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-xs mt-0.5 flex-shrink-0"></tui-icon>
-                                <div class="flex-1 min-w-0">
-                                  <div class="font-medium text-purple-900 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
-                                  @if (ref.context) {
-                                    <div class="text-purple-700 mt-1 truncate">{{ ref.context }}</div>
-                                  }
-                                  @if (ref.url) {
-                                    <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:text-purple-800 underline mt-1 inline-block">
-                                      Ver PR →
-                                    </a>
-                                  }
-                                </div>
-                              }
-                            </div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5 text-xs">
+                          <div class="flex items-start gap-2.5">
+                            @if (ref.type === 'commit') {
+                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <div class="flex-1 min-w-0">
+                                <div class="font-medium text-blue-900 dark:text-blue-200 truncate">{{ ref.message || 'Commit' }}</div>
+                                @if (ref.context) {
+                                  <div class="text-blue-700 dark:text-blue-300 mt-1 text-xs truncate">{{ ref.context }}</div>
+                                }
+                                @if (ref.url) {
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-1.5 inline-block text-xs">
+                                    Ver commit →
+                                  </a>
+                                }
+                              </div>
+                            }
+                            @if (ref.type === 'pull_request') {
+                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <div class="flex-1 min-w-0">
+                                <div class="font-medium text-purple-900 dark:text-purple-200 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
+                                @if (ref.context) {
+                                  <div class="text-purple-700 dark:text-purple-300 mt-1 text-xs truncate">{{ ref.context }}</div>
+                                }
+                                @if (ref.url) {
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-1.5 inline-block text-xs">
+                                    Ver PR →
+                                  </a>
+                                }
+                              </div>
+                            }
                           </div>
-                        }
-                        @if (getTaskReferences(c).length > 2) {
-                          <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
-                            +{{ getTaskReferences(c).length - 2 }} más
-                          </div>
-                        }
-                      </div>
+                        </div>
+                      }
+                      @if (getTaskReferences(c).length > 2) {
+                        <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
+                          +{{ getTaskReferences(c).length - 2 }} más
+                        </div>
+                      }
                     </div>
+                  </div>
                 }
                 @if (c.metadata?.ciStatus) {
-                  <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-200">
-                    @switch (c.metadata?.ciStatus?.state) {
-                      @case ('success') {
-                        <span tuiBadge class="bg-green-100 text-green-800 border-green-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @switch (c.metadata?.ciStatus?.state) {
+                        @case ('success') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconCheck" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('failure') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconClose" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('pending') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-xs font-medium">
+                            <span class="inline-block w-2.5 h-2.5 border-2 border-yellow-600 dark:border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('error') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @default {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-xs font-medium">
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
                       }
-                      @case ('failure') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconClose" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                      @if (c.metadata?.url) {
+                        <a 
+                          [href]="c.metadata!.url!" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline font-medium"
+                          title="Ver en GitHub"
+                        >
+                          Ver →
+                        </a>
                       }
-                      @case ('pending') {
-                        <span tuiBadge class="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs font-semibold">
-                          <span class="inline-block w-2 h-2 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></span>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @case ('error') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @default {
-                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                    }
-                    @if (c.metadata?.url) {
-                      <a 
-                        [href]="c.metadata!.url!" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="text-xs text-blue-600 hover:text-blue-800 underline"
-                        title="Ver en GitHub"
-                      >
-                        Ver →
-                      </a>
-                    }
+                    </div>
                   </div>
                 }
               </div>
@@ -1211,49 +1222,51 @@ interface BoardLabel {
                   <div class="text-sm text-gray-700 dark:text-gray-300 mt-2 mb-3 px-4 line-clamp-3 leading-relaxed line-through opacity-75">{{ c.description }}</div>
                 }
                 @if (c.metadata?.ciStatus) {
-                  <div class="flex items-center gap-2 mt-2 pt-2 border-t border-gray-200">
-                    @switch (c.metadata?.ciStatus?.state) {
-                      @case ('success') {
-                        <span tuiBadge class="bg-green-100 text-green-800 border-green-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @switch (c.metadata?.ciStatus?.state) {
+                        @case ('success') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconCheck" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('failure') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconClose" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('pending') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-xs font-medium">
+                            <span class="inline-block w-2.5 h-2.5 border-2 border-yellow-600 dark:border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @case ('error') {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                            <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
+                        @default {
+                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-xs font-medium">
+                            CI: {{ c.metadata?.ciStatus?.context || '' }}
+                          </span>
+                        }
                       }
-                      @case ('failure') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconClose" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
+                      @if (c.metadata?.url) {
+                        <a 
+                          [href]="c.metadata!.url!" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline font-medium"
+                          title="Ver en GitHub"
+                        >
+                          Ver →
+                        </a>
                       }
-                      @case ('pending') {
-                        <span tuiBadge class="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs font-semibold">
-                          <span class="inline-block w-2 h-2 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></span>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @case ('error') {
-                        <span tuiBadge class="bg-red-100 text-red-800 border-red-300 text-xs font-semibold">
-                          <tui-icon icon="tuiIconAlertCircle" class="text-xs"></tui-icon>
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                      @default {
-                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
-                          CI: {{ c.metadata?.ciStatus?.context || '' }}
-                        </span>
-                      }
-                    }
-                    @if (c.metadata?.url) {
-                      <a 
-                        [href]="c.metadata!.url!" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        class="text-xs text-blue-600 hover:text-blue-800 underline"
-                        title="Ver en GitHub"
-                      >
-                        Ver →
-                      </a>
-                    }
+                    </div>
                   </div>
                 }
               </div>
