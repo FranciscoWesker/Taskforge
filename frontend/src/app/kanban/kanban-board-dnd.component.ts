@@ -214,7 +214,7 @@ interface BoardLabel {
             <span tuiBadge class="font-semibold">{{ todo.length + doing.length + done.length }}</span>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-gray-600">En progreso:</span>
+            <span class="text-gray-600 dark:text-gray-400">En progreso:</span>
             <span tuiBadge class="font-semibold">{{ doing.length }}</span>
           </div>
         </div>
@@ -227,7 +227,7 @@ interface BoardLabel {
             appearance="flat"
             size="s"
             iconStart="tuiIconSettings"
-            class="text-blue-600"
+            class="text-blue-600 dark:text-blue-400"
             title="Gestionar integraciones Git"
           >
             Integraciones Git
@@ -239,7 +239,7 @@ interface BoardLabel {
             size="s"
             iconStart="tuiIconRefresh"
             (click)="openDeploymentPanel()"
-            class="text-purple-600"
+            class="text-purple-600 dark:text-purple-400"
             title="Ver logs de deployment y CI/CD"
           >
             Deployment Logs
@@ -289,8 +289,8 @@ interface BoardLabel {
             Reset WIP
           </button>
           @if (wipSaving) {
-            <span class="text-sm text-gray-700 font-medium flex items-center gap-1">
-              <span class="inline-block w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium flex items-center gap-1">
+              <span class="inline-block w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></span>
               Guardando…
             </span>
           }
@@ -340,7 +340,7 @@ interface BoardLabel {
           }"
         >
           @if (todo.length === 0) {
-            <div class="flex flex-col items-center justify-center h-64 text-gray-600">
+            <div class="flex flex-col items-center justify-center h-64 text-gray-600 dark:text-gray-400">
               <tui-icon icon="tuiIconPlus" class="text-4xl mb-2 opacity-40"></tui-icon>
               <p class="text-sm font-medium">Arrastra tarjetas aquí</p>
             </div>
@@ -412,7 +412,7 @@ interface BoardLabel {
                 }
                 
                 <div class="flex justify-between items-start gap-2 mb-2">
-                  <div class="font-semibold text-gray-900 flex-1 flex items-center gap-2">
+                  <div class="font-semibold text-gray-900 dark:text-gray-100 flex-1 flex items-center gap-2">
                     @if (c.metadata?.type === 'commit') {
                       <tui-icon icon="tuiIconCode" class="text-blue-600 text-sm" title="Commit"></tui-icon>
                     }
@@ -567,7 +567,7 @@ interface BoardLabel {
                   <div class="mt-3 pt-3 border-t border-gray-200">
                     <div class="flex items-center gap-2 mb-2">
                       <tui-icon icon="tuiIconCode" class="text-xs text-blue-600"></tui-icon>
-                      <span class="text-xs font-semibold text-gray-700">Referencias en código</span>
+                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
                     </div>
                     <div class="space-y-2">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
@@ -605,7 +605,7 @@ interface BoardLabel {
                           </div>
                         }
                         @if (getTaskReferences(c).length > 2) {
-                          <div class="text-xs text-gray-600 text-center pt-1">
+                          <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
                             +{{ getTaskReferences(c).length - 2 }} más
                           </div>
                         }
@@ -640,7 +640,7 @@ interface BoardLabel {
                         </span>
                       }
                       @default {
-                        <span tuiBadge class="bg-gray-100 text-gray-800 border-gray-300 text-xs font-semibold">
+                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
                           CI: {{ c.metadata?.ciStatus?.context || '' }}
                         </span>
                       }
@@ -700,7 +700,7 @@ interface BoardLabel {
           }"
         >
           @if (doing.length === 0) {
-            <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+            <div class="flex flex-col items-center justify-center h-64 text-gray-400 dark:text-gray-500">
               <tui-icon icon="tuiIconPlus" class="text-4xl mb-2 opacity-30"></tui-icon>
               <p class="text-sm">Arrastra tarjetas aquí</p>
             </div>
@@ -724,7 +724,7 @@ interface BoardLabel {
             >
               <div class="card-body p-3 sm:p-4">
                 <div class="flex justify-between items-start gap-2 mb-2">
-                  <div class="font-semibold text-gray-900 flex-1 flex items-center gap-2">
+                  <div class="font-semibold text-gray-900 dark:text-gray-100 flex-1 flex items-center gap-2">
                     @if (c.metadata?.type === 'commit') {
                       <tui-icon icon="tuiIconCode" class="text-blue-600 text-sm" title="Commit"></tui-icon>
                     }
@@ -770,13 +770,13 @@ interface BoardLabel {
                   </div>
                 </div>
                 @if (c.description) {
-                  <div class="text-sm text-gray-700 mt-2 line-clamp-2">{{ c.description }}</div>
+                  <div class="text-sm text-gray-700 dark:text-gray-300 mt-2 line-clamp-2">{{ c.description }}</div>
                 }
                 @if (getTaskReferences(c).length > 0) {
                   <div class="mt-3 pt-3 border-t border-gray-200">
                     <div class="flex items-center gap-2 mb-2">
                       <tui-icon icon="tuiIconCode" class="text-xs text-blue-600"></tui-icon>
-                      <span class="text-xs font-semibold text-gray-700">Referencias en código</span>
+                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
                     </div>
                     <div class="space-y-2">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
@@ -814,7 +814,7 @@ interface BoardLabel {
                           </div>
                         }
                         @if (getTaskReferences(c).length > 2) {
-                          <div class="text-xs text-gray-600 text-center pt-1">
+                          <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
                             +{{ getTaskReferences(c).length - 2 }} más
                           </div>
                         }
@@ -849,7 +849,7 @@ interface BoardLabel {
                         </span>
                       }
                       @default {
-                        <span tuiBadge class="bg-gray-100 text-gray-800 border-gray-300 text-xs font-semibold">
+                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
                           CI: {{ c.metadata?.ciStatus?.context || '' }}
                         </span>
                       }
@@ -916,7 +916,7 @@ interface BoardLabel {
           }
           @for (c of done; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group opacity-90 focus-visible-ring"
+              class="card kanban-card bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-200 border cursor-move group opacity-90 focus-visible-ring"
               [class.border-gray-200]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
               [class.hover:border-green-300]="selectedCardIndex?.list !== 'done' || selectedCardIndex?.index !== i"
               [class.border-blue-500]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
@@ -1009,7 +1009,7 @@ interface BoardLabel {
                         </span>
                       }
                       @default {
-                        <span tuiBadge class="bg-gray-100 text-gray-800 border-gray-300 text-xs font-semibold">
+                        <span tuiBadge class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 text-xs font-semibold">
                           CI: {{ c.metadata?.ciStatus?.context || '' }}
                         </span>
                       }
@@ -1049,7 +1049,7 @@ interface BoardLabel {
                   tuiTextfield 
                   [(ngModel)]="editTitle" 
                   placeholder="Título de la tarjeta" 
-                  class="w-full bg-white text-gray-900"
+                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </tui-textfield>
             </div>
@@ -1221,9 +1221,9 @@ interface BoardLabel {
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-gray-700 mb-3">
                 <p class="font-semibold text-blue-900 mb-1">💡 Formatos soportados:</p>
                 <ul class="list-disc list-inside space-y-1 text-gray-700 ml-2">
-                  <li>Commit: <code class="bg-white px-1 rounded">https://github.com/owner/repo/commit/SHA</code></li>
-                  <li>Pull Request: <code class="bg-white px-1 rounded">https://github.com/owner/repo/pull/123</code></li>
-                  <li>Branch: <code class="bg-white px-1 rounded">https://github.com/owner/repo/tree/branch-name</code></li>
+                  <li>Commit: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/commit/SHA</code></li>
+                  <li>Pull Request: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/pull/123</code></li>
+                  <li>Branch: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/tree/branch-name</code></li>
                 </ul>
               </div>
               <div class="flex flex-col gap-2">
@@ -1234,7 +1234,7 @@ interface BoardLabel {
                     type="url"
                     [(ngModel)]="editGitUrl"
                     placeholder="https://github.com/owner/repo/commit/abc123..."
-                    class="w-full bg-white text-gray-900"
+                    class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </tui-textfield>
                 <p class="text-xs text-gray-500">Pega la URL de un commit, Pull Request o branch de GitHub</p>
@@ -1284,7 +1284,7 @@ interface BoardLabel {
                   tuiTextfield 
                   [(ngModel)]="addTitle" 
                   placeholder="Título de la tarjeta" 
-                  class="w-full bg-white text-gray-900"
+                  class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </tui-textfield>
             </div>
@@ -1543,9 +1543,9 @@ interface BoardLabel {
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-gray-700 mb-3">
                 <p class="font-semibold text-blue-900 mb-1">💡 Formatos soportados:</p>
                 <ul class="list-disc list-inside space-y-1 text-gray-700 ml-2">
-                  <li>Commit: <code class="bg-white px-1 rounded">https://github.com/owner/repo/commit/SHA</code></li>
-                  <li>Pull Request: <code class="bg-white px-1 rounded">https://github.com/owner/repo/pull/123</code></li>
-                  <li>Branch: <code class="bg-white px-1 rounded">https://github.com/owner/repo/tree/branch-name</code></li>
+                  <li>Commit: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/commit/SHA</code></li>
+                  <li>Pull Request: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/pull/123</code></li>
+                  <li>Branch: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">https://github.com/owner/repo/tree/branch-name</code></li>
                 </ul>
               </div>
               <div class="flex flex-col gap-2">
@@ -1556,7 +1556,7 @@ interface BoardLabel {
                     type="url"
                     [(ngModel)]="addGitUrl"
                     placeholder="https://github.com/owner/repo/commit/abc123..."
-                    class="w-full bg-white text-gray-900"
+                    class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </tui-textfield>
                 <p class="text-xs text-gray-500">Pega la URL de un commit, Pull Request o branch de GitHub</p>

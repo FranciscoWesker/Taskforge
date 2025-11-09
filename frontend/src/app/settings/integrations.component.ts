@@ -60,11 +60,11 @@ interface Board {
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <tui-icon icon="tuiIconSettings" class="text-blue-600"></tui-icon>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <tui-icon icon="tuiIconSettings" class="text-blue-600 dark:text-blue-400"></tui-icon>
           <span>Integraciones Git</span>
         </h1>
-        <p class="text-sm text-gray-700 mt-1">Conecta repositorios Git con tus tableros Kanban y configura mapeo de ramas</p>
+        <p class="text-sm text-gray-700 dark:text-gray-300 mt-1">Conecta repositorios Git con tus tableros Kanban y configura mapeo de ramas</p>
       </div>
       <button
         tuiButton
@@ -80,7 +80,7 @@ interface Board {
 
     <!-- Selector de Tablero -->
     @if (!boardId) {
-      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl shadow-md p-6">
+      <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-2 border-blue-200 dark:border-blue-700 rounded-xl shadow-md p-6">
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0">
             <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg">
@@ -88,16 +88,16 @@ interface Board {
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-bold text-gray-900 mb-1">Selecciona un tablero</h3>
-            <p class="text-sm text-gray-600 mb-4">Elige el tablero para el cual deseas gestionar las integraciones Git</p>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">Selecciona un tablero</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Elige el tablero para el cual deseas gestionar las integraciones Git</p>
             @if (loadingBoards) {
               <div class="flex items-center gap-3 py-3">
-                <div class="inline-block w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-sm text-gray-700 font-medium">Cargando tableros...</p>
+                <div class="inline-block w-5 h-5 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Cargando tableros...</p>
               </div>
             } @else if (boards.length === 0) {
-              <div class="bg-white border border-gray-200 rounded-lg p-4">
-                <p class="text-sm text-gray-700 mb-3">No tienes tableros. Crea uno primero.</p>
+              <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <p class="text-sm text-gray-700 dark:text-gray-300 mb-3">No tienes tableros. Crea uno primero.</p>
                 <a
                   [routerLink]="['/app/boards']"
                   tuiButton
@@ -111,20 +111,20 @@ interface Board {
               </div>
             } @else {
               <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Tablero:</label>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tablero:</label>
                 <select
                   [(ngModel)]="selectedBoardId"
                   (change)="selectBoard()"
-                  class="w-full px-4 py-3 border-2 border-blue-300 rounded-xl bg-white text-base font-medium text-gray-900 shadow-sm hover:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-200 focus:border-blue-500 transition-all duration-200 cursor-pointer"
+                  class="w-full px-4 py-3 border-2 border-blue-300 dark:border-blue-600 rounded-xl bg-white dark:bg-gray-700 text-base font-medium text-gray-900 dark:text-gray-100 shadow-sm hover:border-blue-400 dark:hover:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 cursor-pointer"
                 >
-                  <option value="" disabled class="text-gray-400">-- Selecciona un tablero --</option>
+                  <option value="" disabled class="text-gray-400 dark:text-gray-500">-- Selecciona un tablero --</option>
                   @for (board of boards; track board.boardId) {
                     <option [value]="board.boardId" class="py-2">
                       {{ board.name || 'Sin nombre' }}
                     </option>
                   }
                 </select>
-                <p class="text-xs text-gray-500 mt-2">Selecciona un tablero para ver y gestionar sus integraciones</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Selecciona un tablero para ver y gestionar sus integraciones</p>
               </div>
             }
           </div>
@@ -134,12 +134,12 @@ interface Board {
 
     <!-- Tablero Seleccionado -->
     @if (boardId && selectedBoard) {
-      <div class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+      <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <tui-icon icon="tuiIconCheck" class="text-green-600"></tui-icon>
+          <tui-icon icon="tuiIconCheck" class="text-green-600 dark:text-green-400"></tui-icon>
           <div>
-            <p class="text-sm font-semibold text-green-900">Tablero seleccionado:</p>
-            <p class="text-lg font-bold text-green-900">{{ selectedBoard.name || 'Sin nombre' }}</p>
+            <p class="text-sm font-semibold text-green-900 dark:text-green-100">Tablero seleccionado:</p>
+            <p class="text-lg font-bold text-green-900 dark:text-green-100">{{ selectedBoard.name || 'Sin nombre' }}</p>
           </div>
         </div>
         <button
@@ -148,7 +148,7 @@ interface Board {
           appearance="flat"
           size="xs"
           (click)="clearBoardSelection()"
-          class="text-green-700"
+          class="text-green-700 dark:text-green-300"
         >
           Cambiar tablero
         </button>
@@ -160,7 +160,7 @@ interface Board {
       <div class="flex items-center justify-center py-12">
         <div class="text-center space-y-3">
           <div class="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p class="text-sm text-gray-700">Cargando integraciones...</p>
+          <p class="text-sm text-gray-700 dark:text-gray-300">Cargando integraciones...</p>
         </div>
       </div>
     }
@@ -193,8 +193,8 @@ interface Board {
         <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 mx-auto flex items-center justify-center mb-4">
           <tui-icon icon="tuiIconCode" class="text-4xl text-blue-600"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 mb-2">No hay integraciones conectadas</h2>
-        <p class="text-gray-700 mb-6">Conecta un repositorio de GitHub para crear tarjetas automáticamente desde commits y PRs</p>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">No hay integraciones conectadas</h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Conecta un repositorio de GitHub para crear tarjetas automáticamente desde commits y PRs</p>
         <button
           tuiButton
           type="button"
@@ -214,8 +214,8 @@ interface Board {
         <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 mx-auto flex items-center justify-center mb-4">
           <tui-icon icon="tuiIconGridLarge" class="text-4xl text-blue-600"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 mb-2">Selecciona un tablero</h2>
-        <p class="text-gray-700 mb-6">Selecciona un tablero de la lista de arriba para gestionar sus integraciones Git</p>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Selecciona un tablero</h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-6">Selecciona un tablero de la lista de arriba para gestionar sus integraciones Git</p>
       </div>
     }
 
@@ -223,7 +223,7 @@ interface Board {
     @if (boardId && !loading && integrations.length > 0) {
       <div class="grid grid-cols-1 gap-4">
         @for (integration of integrations; track integration.integrationId) {
-          <div class="card bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-gray-300 hover:border-blue-500 rounded-lg overflow-hidden">
+          <div class="card bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 rounded-lg overflow-hidden">
             <div class="card-body p-5">
               <div class="flex items-start justify-between gap-4 mb-4">
                 <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -233,15 +233,15 @@ interface Board {
                     }
                   </div>
                   <div class="flex-1 min-w-0">
-                    <h3 class="font-bold text-gray-900 text-lg mb-1 truncate">
+                    <h3 class="font-bold text-gray-900 dark:text-gray-100 text-lg mb-1 truncate">
                       {{ integration.repoOwner }}/{{ integration.repoName }}
                     </h3>
-                    <p class="text-sm text-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
                       @if (integration.provider === 'github') {
-                        <span tuiBadge class="bg-blue-100 text-blue-800 border-blue-300 text-xs font-semibold mr-2">GitHub</span>
+                        <span tuiBadge class="bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-700 text-xs font-semibold mr-2">GitHub</span>
                       }
                       @if (integration.branchMapping && integration.branchMapping.length > 0) {
-                        <span class="text-gray-600">{{ integration.branchMapping.length }} rama{{ integration.branchMapping.length > 1 ? 's' : '' }} mapeada{{ integration.branchMapping.length > 1 ? 's' : '' }}</span>
+                        <span class="text-gray-600 dark:text-gray-400">{{ integration.branchMapping.length }} rama{{ integration.branchMapping.length > 1 ? 's' : '' }} mapeada{{ integration.branchMapping.length > 1 ? 's' : '' }}</span>
                       }
                     </p>
                   </div>
@@ -271,30 +271,30 @@ interface Board {
               </div>
               
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mb-4">
-                <div class="flex items-center gap-2 p-2 bg-gray-50 rounded border border-gray-200">
-                  <span class="text-gray-600 font-medium">Auto-crear:</span>
-                  <span [class.text-green-600]="integration.autoCreateCards" [class.text-gray-400]="!integration.autoCreateCards" class="font-semibold">
+                <div class="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                  <span class="text-gray-600 dark:text-gray-400 font-medium">Auto-crear:</span>
+                  <span [class.text-green-600]="integration.autoCreateCards" [class.dark:text-green-400]="integration.autoCreateCards" [class.text-gray-400]="!integration.autoCreateCards" [class.dark:text-gray-500]="!integration.autoCreateCards" class="font-semibold">
                     {{ integration.autoCreateCards ? 'Sí' : 'No' }}
                   </span>
                 </div>
-                <div class="flex items-center gap-2 p-2 bg-gray-50 rounded border border-gray-200">
-                  <span class="text-gray-600 font-medium">Auto-cerrar:</span>
-                  <span [class.text-green-600]="integration.autoCloseCards" [class.text-gray-400]="!integration.autoCloseCards" class="font-semibold">
+                <div class="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                  <span class="text-gray-600 dark:text-gray-400 font-medium">Auto-cerrar:</span>
+                  <span [class.text-green-600]="integration.autoCloseCards" [class.dark:text-green-400]="integration.autoCloseCards" [class.text-gray-400]="!integration.autoCloseCards" [class.dark:text-gray-500]="!integration.autoCloseCards" class="font-semibold">
                     {{ integration.autoCloseCards ? 'Sí' : 'No' }}
                   </span>
                 </div>
                 @if (integration.webhookUrl) {
-                  <div class="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200">
-                    <tui-icon icon="tuiIconCheck" class="text-green-600 text-xs"></tui-icon>
-                    <span class="text-green-800 font-semibold text-xs">Webhook configurado</span>
+                  <div class="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/30 rounded border border-green-200 dark:border-green-700">
+                    <tui-icon icon="tuiIconCheck" class="text-green-600 dark:text-green-400 text-xs"></tui-icon>
+                    <span class="text-green-800 dark:text-green-200 font-semibold text-xs">Webhook configurado</span>
                   </div>
                 }
               </div>
 
               <!-- Branch Mappings Preview -->
               @if (integration.branchMapping && integration.branchMapping.length > 0) {
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <p class="text-sm font-semibold text-gray-700 mb-2">Mapeo de ramas:</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Mapeo de ramas:</p>
                   <div class="flex flex-wrap gap-2">
                     @for (mapping of integration.branchMapping; track mapping.branch) {
                       <span tuiBadge 
@@ -315,8 +315,8 @@ interface Board {
                   </div>
                 </div>
               } @else {
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <p class="text-sm text-gray-600 italic">No hay ramas mapeadas. Configura el mapeo para asignar ramas a columnas del Kanban.</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p class="text-sm text-gray-600 dark:text-gray-400 italic">No hay ramas mapeadas. Configura el mapeo para asignar ramas a columnas del Kanban.</p>
                 </div>
               }
             </div>
@@ -328,21 +328,21 @@ interface Board {
     <!-- GitHub Connection Dialog -->
     @if (githubDialogOpen) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="githubDialogOpen = false; resetGitHubForm()">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" (click)="$event.stopPropagation()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconCode" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Conectar repositorio GitHub</h3>
+            <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400"></tui-icon>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Conectar repositorio GitHub</h3>
           </div>
 
           <!-- Paso 1: Ingresar Token -->
           @if (step === 'token') {
             <div class="space-y-4">
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-gray-700">
-                <p class="font-semibold text-gray-900 mb-1">⚠️ Requisitos:</p>
-                <ul class="list-disc list-inside space-y-1 text-gray-700">
+              <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-3 text-sm text-gray-700 dark:text-gray-300">
+                <p class="font-semibold text-gray-900 dark:text-gray-100 mb-1">⚠️ Requisitos:</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                   <li>Necesitas un Personal Access Token de GitHub</li>
-                  <li>El token debe tener permisos: <code class="bg-white px-1 rounded">repo</code> y <code class="bg-white px-1 rounded">admin:repo_hook</code></li>
-                  <li>Genera uno en: <a href="https://github.com/settings/tokens" target="_blank" class="text-blue-600 underline">GitHub Settings → Tokens</a></li>
+                  <li>El token debe tener permisos: <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">repo</code> y <code class="bg-white dark:bg-gray-700 px-1 rounded text-gray-900 dark:text-gray-100">admin:repo_hook</code></li>
+                  <li>Genera uno en: <a href="https://github.com/settings/tokens" target="_blank" class="text-blue-600 dark:text-blue-400 underline">GitHub Settings → Tokens</a></li>
     </ul>
               </div>
               <div class="flex flex-col gap-2">
@@ -353,21 +353,21 @@ interface Board {
                     type="password"
                     [(ngModel)]="githubToken"
                     placeholder="ghp_xxxxxxxxxxxxx"
-                    class="w-full bg-white text-gray-900"
+                    class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     (keydown.enter)="verifyTokenAndLoadRepos()"
                     autofocus
                   />
                 </tui-textfield>
-                <p class="text-xs text-gray-600">Solo necesitas ingresar el token. Buscaremos tus repositorios automáticamente.</p>
+                <p class="text-xs text-gray-600 dark:text-gray-400">Solo necesitas ingresar el token. Buscaremos tus repositorios automáticamente.</p>
               </div>
-              <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200">
+              <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   tuiButton
                   type="button"
                   appearance="flat"
                   size="m"
                   (click)="githubDialogOpen = false; resetGitHubForm()"
-                  class="text-gray-700"
+                  class="text-gray-700 dark:text-gray-300"
                 >
                   Cancelar
                 </button>
@@ -413,11 +413,11 @@ interface Board {
               }
               
               @if (githubUser) {
-                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                   <img [src]="githubUser.avatar_url" [alt]="githubUser.login" class="w-10 h-10 rounded-full">
                   <div>
-                    <p class="font-semibold text-gray-900">Autenticado como</p>
-                    <p class="text-sm text-gray-600">{{ githubUser.login }}</p>
+                    <p class="font-semibold text-gray-900 dark:text-gray-100">Autenticado como</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ githubUser.login }}</p>
                   </div>
                 </div>
               }
@@ -425,30 +425,30 @@ interface Board {
               @if (loadingRepos) {
                 <div class="flex items-center justify-center py-8">
                   <div class="text-center space-y-3">
-                    <div class="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-sm text-gray-700">Cargando repositorios...</p>
+                    <div class="inline-block w-8 h-8 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">Cargando repositorios...</p>
                   </div>
                 </div>
               }
 
               @if (!loadingRepos && githubRepos.length > 0) {
                 <div class="space-y-2">
-                  <label class="text-sm font-semibold text-gray-900">Selecciona un repositorio:</label>
-                  <div class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                  <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Selecciona un repositorio:</label>
+                  <div class="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     @for (repo of githubRepos; track repo.full_name) {
-                      <label class="flex items-center gap-3 p-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors">
+                      <label class="flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-colors">
                         <input
                           type="radio"
                           name="selectedRepo"
                           [value]="repo.full_name"
                           [(ngModel)]="selectedRepo"
-                          class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          class="w-4 h-4 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400"
                         />
                         <div class="flex-1 min-w-0">
-                          <p class="font-medium text-gray-900 truncate">{{ repo.full_name }}</p>
-                          <p class="text-xs text-gray-600">Rama por defecto: {{ repo.default_branch }}</p>
+                          <p class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ repo.full_name }}</p>
+                          <p class="text-xs text-gray-600 dark:text-gray-400">Rama por defecto: {{ repo.default_branch }}</p>
                         </div>
-                        <a [href]="repo.html_url" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()" class="text-blue-600 hover:text-blue-800">
+                        <a [href]="repo.html_url" target="_blank" rel="noopener noreferrer" (click)="$event.stopPropagation()" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                           <tui-icon icon="tuiIconCode" class="text-sm"></tui-icon>
                         </a>
                       </label>
@@ -459,18 +459,18 @@ interface Board {
 
               @if (!loadingRepos && githubRepos.length === 0) {
                 <div class="text-center py-8">
-                  <p class="text-sm text-gray-600">No se encontraron repositorios. Verifica que el token tenga los permisos necesarios.</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">No se encontraron repositorios. Verifica que el token tenga los permisos necesarios.</p>
                 </div>
               }
 
-              <div class="flex justify-between gap-3 mt-4 pt-4 border-t border-gray-200">
+              <div class="flex justify-between gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   tuiButton
                   type="button"
                   appearance="flat"
                   size="m"
                   (click)="step = 'token'"
-                  class="text-gray-700"
+                  class="text-gray-700 dark:text-gray-300"
                 >
                   ← Volver
                 </button>
@@ -481,7 +481,7 @@ interface Board {
                     appearance="flat"
                     size="m"
                     (click)="githubDialogOpen = false; resetGitHubForm()"
-                    class="text-gray-700"
+                    class="text-gray-700 dark:text-gray-300"
                   >
                     Cancelar
                   </button>
@@ -508,35 +508,35 @@ interface Board {
     <!-- Configuration Dialog -->
     @if (configDialogOpen && selectedIntegration) {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm animate-in" (click)="configDialogOpen = false">
-        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" (click)="$event.stopPropagation()">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto animate-scale-in" (click)="$event.stopPropagation()">
           <div class="flex items-center gap-2 mb-4">
-            <tui-icon icon="tuiIconSettings" class="text-blue-600"></tui-icon>
-            <h3 class="text-xl font-bold text-gray-900">Configurar integración</h3>
+            <tui-icon icon="tuiIconSettings" class="text-blue-600 dark:text-blue-400"></tui-icon>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Configurar integración</h3>
           </div>
           <div class="space-y-6">
             <!-- Repository Info -->
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <p class="text-sm font-semibold text-gray-900 mb-1">Repositorio:</p>
-              <p class="text-lg font-bold text-gray-900">{{ selectedIntegration.repoOwner }}/{{ selectedIntegration.repoName }}</p>
+            <div class="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">Repositorio:</p>
+              <p class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ selectedIntegration.repoOwner }}/{{ selectedIntegration.repoName }}</p>
             </div>
 
             <!-- Auto Create/Close Settings -->
             <div class="space-y-4">
-              <h4 class="text-sm font-semibold text-gray-900">Configuración automática</h4>
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+              <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Configuración automática</h4>
+              <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
                 <div>
-                  <p class="font-medium text-gray-900">Crear tarjetas automáticamente</p>
-                  <p class="text-xs text-gray-600">Crea tarjetas desde commits y PRs automáticamente</p>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">Crear tarjetas automáticamente</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Crea tarjetas desde commits y PRs automáticamente</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" [(ngModel)]="configAutoCreate" class="sr-only peer">
                   <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                 </label>
               </div>
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+              <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
                 <div>
-                  <p class="font-medium text-gray-900">Cerrar tarjetas automáticamente</p>
-                  <p class="text-xs text-gray-600">Mueve tarjetas a "Hecho" cuando CI/CD sea exitoso</p>
+                  <p class="font-medium text-gray-900 dark:text-gray-100">Cerrar tarjetas automáticamente</p>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Mueve tarjetas a "Hecho" cuando CI/CD sea exitoso</p>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" [(ngModel)]="configAutoClose" class="sr-only peer">
@@ -548,7 +548,7 @@ interface Board {
             <!-- Branch Mapping -->
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <h4 class="text-sm font-semibold text-gray-900">Mapeo de ramas a columnas</h4>
+                <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Mapeo de ramas a columnas</h4>
                 <button
                   tuiButton
                   type="button"
@@ -557,18 +557,18 @@ interface Board {
                   iconStart="tuiIconRefresh"
                   (click)="loadBranches()"
                   [disabled]="loadingBranches"
-                  class="text-blue-600"
+                  class="text-blue-600 dark:text-blue-400"
                 >
                   {{ loadingBranches ? 'Cargando...' : 'Actualizar ramas' }}
                 </button>
               </div>
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-gray-700">
-                <p class="font-semibold text-blue-900 mb-1">💡 ¿Qué es esto?</p>
+              <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-3 text-xs text-gray-700 dark:text-gray-300">
+                <p class="font-semibold text-blue-900 dark:text-blue-100 mb-1">💡 ¿Qué es esto?</p>
                 <p>Asigna ramas del repositorio a columnas del Kanban. Los commits en ramas mapeadas crearán tarjetas en la columna correspondiente.</p>
               </div>
               
               @if (availableBranches.length === 0 && !loadingBranches) {
-                <p class="text-sm text-gray-600 italic">Carga las ramas del repositorio para configurar el mapeo</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 italic">Carga las ramas del repositorio para configurar el mapeo</p>
               }
 
               @if (loadingBranches) {
@@ -578,14 +578,14 @@ interface Board {
               }
 
               @if (availableBranches.length > 0) {
-                <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                   @for (branch of availableBranches; track branch) {
-                    <div class="flex items-center gap-3 p-2 bg-white rounded border border-gray-200 hover:border-blue-300 transition-colors">
-                      <span class="font-medium text-gray-900 flex-1">{{ branch }}</span>
+                    <div class="flex items-center gap-3 p-2 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors">
+                      <span class="font-medium text-gray-900 dark:text-gray-100 flex-1">{{ branch }}</span>
                       <select
                         [ngModel]="getBranchMapping(branch) || ''"
                         (ngModelChange)="setBranchMapping(branch, $event)"
-                        class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:border-blue-500 focus:outline-none"
+                        class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none"
                       >
                         <option value="">Sin mapear</option>
                         <option value="todo">Por hacer</option>
@@ -598,8 +598,8 @@ interface Board {
               }
 
               @if (branchMappingsList.length > 0) {
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <p class="text-sm font-semibold text-gray-700 mb-2">Mapeos configurados:</p>
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Mapeos configurados:</p>
                   <div class="flex flex-wrap gap-2">
                     @for (mapping of branchMappingsList; track mapping.branch) {
                       <span tuiBadge 
@@ -615,7 +615,7 @@ interface Board {
                         <button
                           type="button"
                           (click)="removeBranchMapping(mapping.branch)"
-                          class="ml-1 text-gray-600 hover:text-red-600"
+                          class="ml-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                         >
                           ×
                         </button>
@@ -626,14 +626,14 @@ interface Board {
               }
             </div>
 
-            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <button
                 tuiButton
                 type="button"
                 appearance="flat"
                 size="m"
                 (click)="configDialogOpen = false; resetConfig()"
-                class="text-gray-700"
+                class="text-gray-700 dark:text-gray-300"
               >
                 Cancelar
               </button>

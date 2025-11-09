@@ -260,7 +260,7 @@ interface Board {
               }
 
               @if (board.members && board.members.length > 0) {
-                <div class="flex items-center gap-2 text-sm text-gray-800 mb-3 font-medium">
+                <div class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200 mb-3 font-medium">
                   <tui-icon icon="tuiIconMessage" class="text-base text-blue-600"></tui-icon>
                   <span>{{ board.members.length }} miembro{{ board.members.length > 1 ? 's' : '' }}</span>
                 </div>

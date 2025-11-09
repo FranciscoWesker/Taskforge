@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiAvatar } from '@taiga-ui/kit';
@@ -16,14 +16,25 @@ import { API_BASE, isDevelopment } from '../core/env';
   selector: 'app-chat',
   standalone: true,
   template: `
-  <div class="space-y-3">
-    <div class="flex items-center justify-between gap-2">
-      <h1 class="text-lg font-semibold flex items-center gap-2">
-        <span>Chat del tablero</span>
+  <div class="flex flex-col h-full max-h-[calc(100vh-12rem)] space-y-4">
+    <!-- Header mejorado -->
+    <div class="flex items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-3 flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <tui-icon icon="tuiIconMessage" class="text-blue-600 dark:text-blue-400 text-xl"></tui-icon>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">Chat del tablero</h1>
+        </div>
         @if (presence.length > 0) {
-          <span tuiBadge>{{ presence.length }}</span>
+          <div class="flex items-center gap-2 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700">
+            <div class="flex items-center -space-x-2">
+              @for (u of presence.slice(0,3); track u) {
+                <tui-avatar size="xs" [round]="true" class="border-2 border-white dark:border-gray-800">{{ initials(u) }}</tui-avatar>
+              }
+            </div>
+            <span tuiBadge class="ml-1 bg-blue-600 dark:bg-blue-500 text-white text-xs font-semibold">{{ presence.length }}</span>
+          </div>
         }
-      </h1>
+      </div>
       @if (messages.length > 5) {
         <button
           tuiButton
@@ -33,50 +44,107 @@ import { API_BASE, isDevelopment } from '../core/env';
           iconStart="tuiIconHistory"
           (click)="summarizeChat()"
           [disabled]="summarizing"
+          class="text-blue-600 dark:text-blue-400"
           title="Resumir conversación con IA"
         >
           {{ summarizing ? 'Resumiendo...' : 'Resumir' }}
         </button>
       }
     </div>
-    @if (presence.length > 0) {
-      <div class="flex items-center gap-1">
-        @for (u of presence.slice(0,5); track u) {
-          <tui-avatar size="s" [round]="true">{{ initials(u) }}</tui-avatar>
+
+    <!-- Indicador de presencia y escritura -->
+    @if (presence.length > 0 || typingAuthors.size > 0) {
+      <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+        @if (presence.length > 0) {
+          <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="font-medium">{{ presence.length }} {{ presence.length === 1 ? 'usuario conectado' : 'usuarios conectados' }}</span>
+          </div>
         }
-        @if (presence.length > 5) {
-          <tui-avatar size="s" [round]="true">{{ '+' + (presence.length - 5) }}</tui-avatar>
+        @if (typingAuthors.size > 0) {
+          <div class="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 animate-pulse">
+            <div class="flex gap-1">
+              <div class="w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+              <div class="w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+              <div class="w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+            <span class="font-medium italic">{{ getTypingAuthors() }} {{ typingAuthors.size > 1 ? 'están' : 'está' }} escribiendo…</span>
+          </div>
         }
       </div>
     }
-    <div class="text-xs text-gray-700 font-medium">
-      Conectados: {{ presence.length }}
-      @if (presence.length > 0) {
-        <span>— {{ presence.slice(0,5).join(', ') }}@if (presence.length > 5) {<span> y {{ presence.length - 5 }} más</span>}</span>
-      }
-    </div>
-    @if (typingAuthors.size > 0) {
-      <div class="text-xs text-gray-700 font-medium h-4">
-        <span>{{ getTypingAuthors() }} {{ typingAuthors.size > 1 ? 'están' : 'está' }} escribiendo…</span>
-      </div>
-    }
-    <div class="card bg-white shadow p-3 min-h-48 max-h-80 overflow-y-auto space-y-2 border border-gray-200">
-      @for (m of messages; track m.ts) {
-        <div class="text-sm">
-          <span class="font-semibold text-gray-900">{{ m.author }}</span>
-          <span class="text-gray-600">· {{ m.ts | date:'shortTime' }}</span>
-          <div class="text-gray-900 mt-1">{{ m.text }}</div>
+
+    <!-- Área de mensajes mejorada -->
+    <div 
+      #messagesContainer
+      class="flex-1 overflow-y-auto space-y-3 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700 scroll-smooth"
+      style="scrollbar-width: thin; scrollbar-color: rgb(156 163 175) transparent;"
+    >
+      @if (messages.length === 0) {
+        <div class="flex flex-col items-center justify-center h-full text-center py-12">
+          <div class="h-16 w-16 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
+            <tui-icon icon="tuiIconMessage" class="text-3xl text-blue-600 dark:text-blue-400"></tui-icon>
+          </div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">No hay mensajes aún</p>
+          <p class="text-xs text-gray-500 dark:text-gray-500">Sé el primero en iniciar la conversación</p>
         </div>
       }
-      @if (messages.length === 0) {
-        <div class="text-xs text-gray-600">Aún no hay mensajes.</div>
+      
+      @for (m of messages; track m.ts) {
+        <div class="flex items-start gap-3 animate-fade-in" [class.flex-row-reverse]="isOwnMessage(m.author)">
+          <!-- Avatar -->
+          <div class="flex-shrink-0">
+            <tui-avatar size="m" [round]="true" [class.bg-blue-600]="isOwnMessage(m.author)" [class.bg-gray-400]="!isOwnMessage(m.author)">
+              {{ initials(m.author) }}
+            </tui-avatar>
+          </div>
+          
+          <!-- Mensaje -->
+          <div class="flex-1 min-w-0" [class.items-end]="isOwnMessage(m.author)" [class.flex]="isOwnMessage(m.author)" [class.flex-col]="isOwnMessage(m.author)">
+            <div 
+              class="rounded-2xl px-4 py-2.5 max-w-[75%] shadow-sm transition-all hover:shadow-md"
+              [class.bg-blue-600]="isOwnMessage(m.author)"
+              [class.text-white]="isOwnMessage(m.author)"
+              [class.bg-white]="!isOwnMessage(m.author)"
+              [class.dark:bg-gray-800]="!isOwnMessage(m.author)"
+              [class.text-gray-900]="!isOwnMessage(m.author)"
+              [class.dark:text-gray-100]="!isOwnMessage(m.author)"
+              [class.border]="!isOwnMessage(m.author)"
+              [class.border-gray-200]="!isOwnMessage(m.author)"
+              [class.dark:border-gray-700]="!isOwnMessage(m.author)"
+            >
+              @if (!isOwnMessage(m.author)) {
+                <div class="text-xs font-semibold mb-1 text-gray-700 dark:text-gray-300">{{ m.author }}</div>
+              }
+              <div class="text-sm leading-relaxed whitespace-pre-wrap break-words">{{ m.text }}</div>
+              <div 
+                class="text-xs mt-1.5 flex items-center gap-1"
+                [class.text-blue-100]="isOwnMessage(m.author)"
+                [class.text-gray-500]="!isOwnMessage(m.author)"
+                [class.dark:text-gray-400]="!isOwnMessage(m.author)"
+              >
+                <span>{{ formatMessageTime(m.ts) }}</span>
+                @if (isOwnMessage(m.author)) {
+                  <tui-icon icon="tuiIconCheck" class="text-xs opacity-70"></tui-icon>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
       }
+
+      <!-- Resumen de IA mejorado -->
       @if (chatSummary) {
-        <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <div class="flex items-start justify-between gap-2 mb-2">
+        <div class="mt-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border-2 border-blue-200 dark:border-blue-700 shadow-lg animate-scale-in">
+          <div class="flex items-start justify-between gap-3 mb-3">
             <div class="flex items-center gap-2">
-              <tui-icon icon="tuiIconHistory" class="text-blue-600 dark:text-blue-400"></tui-icon>
-              <span class="text-sm font-semibold text-blue-900 dark:text-blue-100">Resumen de la conversación</span>
+              <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                <tui-icon icon="tuiIconHistory" class="text-white text-sm"></tui-icon>
+              </div>
+              <div>
+                <span class="text-sm font-bold text-blue-900 dark:text-blue-100">Resumen de IA</span>
+                <p class="text-xs text-blue-700 dark:text-blue-300">Generado por Google Gemini</p>
+              </div>
             </div>
             <button
               tuiButton
@@ -85,40 +153,60 @@ import { API_BASE, isDevelopment } from '../core/env';
               size="xs"
               iconStart="tuiIconX"
               (click)="chatSummary = ''"
-              class="!p-1 !min-h-0 !h-5 !w-5"
+              class="!p-1 !min-h-0 !h-6 !w-6 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800"
               title="Cerrar resumen"
             ></button>
           </div>
-          <p class="text-sm text-blue-800 dark:text-blue-200">{{ chatSummary }}</p>
+          <p class="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">{{ chatSummary }}</p>
         </div>
       }
     </div>
-    <form (ngSubmit)="send()" class="flex gap-2">
-      <tui-textfield class="flex-1">
-        <input
-          tuiTextfield
-          type="text"
-          placeholder="Escribe un mensaje..."
-          [(ngModel)]="draft"
-          name="draft"
-          (input)="onDraftInput()"
-        />
-      </tui-textfield>
-      <button
-        tuiButton
-        type="submit"
-        appearance="primary"
-        size="m"
-        [disabled]="!draft.trim()"
-      >
-        Enviar
-      </button>
+
+    <!-- Input mejorado -->
+    <form (ngSubmit)="send()" class="flex items-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex-1 relative">
+        <tui-textfield class="w-full">
+          <input
+            tuiTextfield
+            type="text"
+            placeholder="Escribe un mensaje..."
+            [(ngModel)]="draft"
+            name="draft"
+            (input)="onDraftInput()"
+            (keydown.enter)="!$event.shiftKey && send()"
+            class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl pr-12"
+          />
+        </tui-textfield>
+        @if (draft.trim()) {
+          <button
+            type="button"
+            (click)="send()"
+            class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white flex items-center justify-center transition-colors shadow-sm"
+            title="Enviar (Enter)"
+          >
+            <tui-icon icon="tuiIconArrowRight" class="text-sm"></tui-icon>
+          </button>
+        }
+      </div>
+      @if (!draft.trim()) {
+        <button
+          tuiButton
+          type="submit"
+          appearance="primary"
+          size="m"
+          [disabled]="true"
+          class="opacity-50 cursor-not-allowed"
+        >
+          <tui-icon icon="tuiIconArrowRight"></tui-icon>
+        </button>
+      }
     </form>
   </div>
   `,
   imports: [CommonModule, FormsModule, TuiAvatar, TuiBadge, TuiButton, TuiTextfield, TuiIcon]
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+  @ViewChild('messagesContainer') private messagesContainer?: ElementRef<HTMLDivElement>;
   private readonly socket = inject(SocketService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -134,6 +222,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   get author(): string {
     return this.auth.getDisplayName() || this.auth.getEmail() || 'Anónimo';
   }
+  private shouldScrollToBottom = false;
+  
   private messageHandler = (msg: { boardId: string; author: string; text: string; ts: number }) => {
     if (msg.boardId !== this.boardId) return;
     // Evitar duplicados: verificar si el mensaje ya existe (mismo timestamp y autor)
@@ -144,6 +234,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.messages = [...this.messages, { author: msg.author, text: msg.text, ts: msg.ts }];
       // Ordenar por timestamp después de agregar
       this.messages.sort((a, b) => a.ts - b.ts);
+      // Auto-scroll si el mensaje es nuevo o es del usuario actual
+      this.shouldScrollToBottom = true;
     }
   };
   typingAuthors = new Set<string>();
@@ -267,6 +359,44 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.draft = '';
     // detener typing si estaba activo
     this.emitTyping(false);
+    // Auto-scroll después de enviar
+    this.shouldScrollToBottom = true;
+  }
+  
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollToBottom) {
+      this.scrollToBottom();
+      this.shouldScrollToBottom = false;
+    }
+  }
+  
+  private scrollToBottom(): void {
+    if (this.messagesContainer) {
+      const element = this.messagesContainer.nativeElement;
+      element.scrollTop = element.scrollHeight;
+    }
+  }
+  
+  isOwnMessage(author: string): boolean {
+    return author === this.author;
+  }
+  
+  formatMessageTime(ts: number): string {
+    const date = new Date(ts);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Ahora';
+    if (diffMins < 60) return `Hace ${diffMins} min`;
+    if (diffHours < 24) return `Hace ${diffHours} h`;
+    if (diffDays === 1) return 'Ayer';
+    if (diffDays < 7) return `Hace ${diffDays} días`;
+    
+    // Si es más de una semana, mostrar fecha completa
+    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   }
 
   private async loadHistory(): Promise<void> {
@@ -309,6 +439,10 @@ export class ChatComponent implements OnInit, OnDestroy {
       if (Array.isArray(data)) {
         this.messages = data.sort((a, b) => a.ts - b.ts); // Ordenar por timestamp ascendente
         if (isDevelopment()) console.log(`[Chat] Historial cargado: ${data.length} mensajes`);
+        // Auto-scroll después de cargar historial
+        setTimeout(() => {
+          this.shouldScrollToBottom = true;
+        }, 100);
       } else {
         if (isDevelopment()) console.warn('[Chat] Respuesta inválida del servidor');
         this.messages = [];
