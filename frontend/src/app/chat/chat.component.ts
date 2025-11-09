@@ -16,16 +16,16 @@ import { API_BASE, isDevelopment } from '../core/env';
   selector: 'app-chat',
   standalone: true,
   template: `
-  <div class="flex flex-col h-full max-h-[calc(100vh-12rem)] space-y-4">
-    <!-- Header mejorado -->
-    <div class="flex items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
-      <div class="flex items-center gap-3 flex-1 min-w-0">
+  <div class="flex flex-col h-full max-h-[calc(100vh-10rem)] sm:max-h-[calc(100vh-12rem)] space-y-3 sm:space-y-4">
+    <!-- Header mejorado y responsivo -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 w-full sm:w-auto">
         <div class="flex items-center gap-2">
-          <tui-icon icon="tuiIconMessage" class="text-blue-600 dark:text-blue-400 text-xl"></tui-icon>
-          <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">Chat del tablero</h1>
+          <tui-icon icon="tuiIconMessage" class="text-blue-600 dark:text-blue-400 text-lg sm:text-xl flex-shrink-0"></tui-icon>
+          <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 truncate">Chat del tablero</h1>
         </div>
         @if (presence.length > 0) {
-          <div class="flex items-center gap-2 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700">
+          <div class="hidden sm:flex items-center gap-2 px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-200 dark:border-blue-700">
             <div class="flex items-center -space-x-2">
               @for (u of presence.slice(0,3); track u) {
                 <tui-avatar size="xs" [round]="true" class="border-2 border-white dark:border-gray-800">{{ initials(u) }}</tui-avatar>
@@ -35,10 +35,10 @@ import { API_BASE, isDevelopment } from '../core/env';
           </div>
         }
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto scrollbar-thin">
         @if (aiAvailable) {
-          <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm">
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm">
               <div class="relative">
                 <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 <div class="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping opacity-75"></div>
@@ -48,7 +48,7 @@ import { API_BASE, isDevelopment } from '../core/env';
             @if (messages.length > 5) {
               <button
                 type="button"
-                class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
+                class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95 flex-shrink-0"
                 [class.bg-gradient-to-r]="chatSummary"
                 [class.from-purple-500]="chatSummary"
                 [class.to-indigo-500]="chatSummary"
@@ -71,10 +71,10 @@ import { API_BASE, isDevelopment } from '../core/env';
               >
                 @if (summarizing) {
                   <div class="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span>Resumiendo...</span>
+                  <span class="hidden sm:inline">Resumiendo...</span>
                 } @else {
                   <tui-icon icon="tuiIconHistory" class="text-xs"></tui-icon>
-                  <span>{{ chatSummary ? 'Resumen generado' : 'Resumir con IA' }}</span>
+                  <span class="hidden sm:inline">{{ chatSummary ? 'Resumen' : 'Resumir' }}</span>
                   @if (chatSummary) {
                     <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
                   }
@@ -83,7 +83,7 @@ import { API_BASE, isDevelopment } from '../core/env';
             }
           </div>
         } @else {
-          <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
             <span class="text-xs font-medium text-gray-500 dark:text-gray-400">IA no disponible</span>
           </div>

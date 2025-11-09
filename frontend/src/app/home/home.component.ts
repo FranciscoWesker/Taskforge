@@ -11,25 +11,27 @@ import { AuthService } from '../core/auth.service';
   template: `
   <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 animate-in">
     <!-- Navigation Header -->
-    <nav class="sticky top-0 z-50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <nav class="sticky top-0 z-50 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
+        <div class="flex items-center justify-between h-16 sm:h-18">
           <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-lg font-bold shadow-lg">
+            <div class="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-lg font-bold shadow-lg hover-lift transition-transform">
               TF
             </div>
-            <span class="text-xl font-bold text-gray-900 dark:text-gray-100">TaskForge</span>
+            <span class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">TaskForge</span>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
             @if (!auth.isAuthenticated()) {
               <a routerLink="/login" tuiButton appearance="flat" size="s" class="hover-lift">
-                Iniciar sesión
+                <span class="hidden sm:inline">Iniciar sesión</span>
+                <span class="sm:hidden">Entrar</span>
               </a>
-              <a routerLink="/register" tuiButton appearance="primary" size="s" class="hover-glow">
-                Crear cuenta
+              <a routerLink="/register" tuiButton appearance="primary" size="s" class="hover-glow shadow-md">
+                <span class="hidden sm:inline">Crear cuenta</span>
+                <span class="sm:hidden">Registro</span>
               </a>
             } @else {
-              <a routerLink="/app" tuiButton appearance="primary" size="s" class="hover-glow">
+              <a routerLink="/app" tuiButton appearance="primary" size="s" class="hover-glow shadow-md">
                 Ir a la app
               </a>
             }
@@ -39,28 +41,28 @@ import { AuthService } from '../core/auth.service';
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative overflow-hidden py-20 sm:py-32">
+    <section class="relative overflow-hidden py-16 sm:py-24 lg:py-32">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center space-y-8 animate-slide-up">
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+        <div class="text-center space-y-6 sm:space-y-8 animate-slide-up">
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-gray-100 leading-tight px-4">
             Organiza tu trabajo con
-            <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span class="block sm:inline bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2 sm:mt-0">
               TaskForge
             </span>
           </h1>
-          <p class="text-xl sm:text-2xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <p class="text-lg sm:text-xl lg:text-2xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 leading-relaxed">
             La herramienta perfecta para gestionar proyectos con tableros Kanban inteligentes, comunicación en tiempo real y automatización impulsada por IA
           </p>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4 px-4">
             @if (!auth.isAuthenticated()) {
-              <a routerLink="/register" tuiButton appearance="primary" size="l" class="shadow-xl hover-glow animate-scale-in">
+              <a routerLink="/register" tuiButton appearance="primary" size="l" class="w-full sm:w-auto shadow-xl hover-glow animate-scale-in">
                 Comenzar gratis
               </a>
-              <a routerLink="/login" tuiButton appearance="outline" size="l" class="hover-lift">
+              <a routerLink="/login" tuiButton appearance="outline" size="l" class="w-full sm:w-auto hover-lift">
                 Ya tengo cuenta
               </a>
             } @else {
-              <a routerLink="/app" tuiButton appearance="primary" size="l" class="shadow-xl hover-glow">
+              <a routerLink="/app" tuiButton appearance="primary" size="l" class="w-full sm:w-auto shadow-xl hover-glow">
                 Ir a la aplicación
               </a>
             }
@@ -70,22 +72,22 @@ import { AuthService } from '../core/auth.service';
     </section>
 
     <!-- Features Section -->
-    <section class="py-20 bg-white dark:bg-gray-800">
+    <section class="py-16 sm:py-20 lg:py-24 bg-white dark:bg-gray-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16 animate-slide-up">
-          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full mb-6 text-sm font-semibold shadow-lg">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <div class="text-center mb-12 sm:mb-16 animate-slide-up">
+          <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full mb-6 text-xs sm:text-sm font-semibold shadow-lg hover-glow">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
             Potenciado por IA Generativa
           </div>
-          <h2 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">Características principales</h2>
-          <p class="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 px-4">Características principales</h2>
+          <p class="text-base sm:text-lg lg:text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto px-4 leading-relaxed">
             Todo lo que necesitas para gestionar proyectos eficientemente. Cada funcionalidad está optimizada con inteligencia artificial para maximizar tu productividad y reducir trabajo manual.
           </p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           <!-- Feature 1: Kanban con IA -->
           <div class="card bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border border-blue-200 dark:border-blue-700 shadow-lg hover-elevate animate-slide-up">
             <div class="card-body p-6">
@@ -202,42 +204,42 @@ import { AuthService } from '../core/auth.service';
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white animate-slide-up">
-        <h2 class="text-4xl font-bold mb-4">¿Listo para comenzar?</h2>
-        <p class="text-xl mb-8 text-blue-100">
+    <section class="py-16 sm:py-20 lg:py-24 bg-gradient-to-r from-blue-600 to-purple-600 relative overflow-hidden">
+      <!-- Decorative background -->
+      <div class="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
+      <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white animate-slide-up">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 px-4">¿Listo para comenzar?</h2>
+        <p class="text-lg sm:text-xl mb-8 text-blue-100 px-4 leading-relaxed">
           Únete a TaskForge hoy y transforma la forma en que gestionas tus proyectos
         </p>
         @if (!auth.isAuthenticated()) {
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a routerLink="/register" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4">
+            <a routerLink="/register" tuiButton appearance="primary" size="l" class="w-full sm:w-auto bg-white text-blue-600 border-0 shadow-xl hover-glow">
               Crear cuenta gratis
             </a>
-            <a routerLink="/login" tuiButton appearance="outline" size="l" class="border-2 border-white text-white hover:bg-white hover:text-blue-600 hover-lift">
+            <a routerLink="/login" tuiButton appearance="outline" size="l" class="w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-blue-600 hover-lift">
               Iniciar sesión
             </a>
           </div>
         } @else {
-          <a routerLink="/app" tuiButton appearance="primary" size="l" class="bg-white text-blue-600 border-0 shadow-xl hover-glow">
+          <a routerLink="/app" tuiButton appearance="primary" size="l" class="w-full sm:w-auto bg-white text-blue-600 border-0 shadow-xl hover-glow">
             Ir a la aplicación
           </a>
         }
       </div>
     </section>
 
-
-
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-12">
+    <footer class="bg-gray-900 text-gray-400 py-12 sm:py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
           <div class="flex items-center justify-center gap-3 mb-4">
-            <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-sm font-bold">
+            <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-base sm:text-lg font-bold shadow-lg">
               TF
             </div>
-            <span class="text-lg font-bold text-white">TaskForge</span>
+            <span class="text-lg sm:text-xl font-bold text-white tracking-tight">TaskForge</span>
           </div>
-          <p class="text-sm">© 2025 TaskForge. Organiza tu trabajo, colabora mejor.</p>
+          <p class="text-sm sm:text-base">© 2025 TaskForge. Organiza tu trabajo, colabora mejor.</p>
         </div>
       </div>
     </footer>

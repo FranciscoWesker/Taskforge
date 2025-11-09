@@ -190,36 +190,40 @@ interface Board {
 
     <!-- Boards Grid -->
     @if (!loading && filteredBoards.length > 0) {
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
         @for (board of filteredBoards; track board.boardId) {
           <div 
-            class="card-interactive bg-white dark:bg-gray-800 shadow-md border border-gray-300 dark:border-gray-700 group rounded-lg overflow-hidden focus-ring"
+            class="card-interactive bg-white dark:bg-gray-800 shadow-md hover:shadow-xl border border-gray-200 dark:border-gray-700 group rounded-xl overflow-hidden focus-ring transition-all duration-300"
             role="article"
             [attr.aria-label]="'Tablero: ' + (board.name || 'Sin nombre')"
             tabindex="0"
             (keydown.enter)="router.navigate(['/app/boards', board.boardId])"
             (keydown.space)="router.navigate(['/app/boards', board.boardId])"
           >
-            <div class="card-body p-5 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
-              <div class="flex items-start justify-between gap-2 mb-3">
+            <div class="card-body p-5 sm:p-6 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
+              <!-- Header con título y acciones -->
+              <div class="flex items-start justify-between gap-2 mb-4">
                 <div class="flex-1 min-w-0">
-                  <h3 class="font-bold text-gray-900 dark:text-gray-100 truncate mb-1 text-lg">
+                  <h3 class="font-bold text-gray-900 dark:text-gray-100 truncate mb-1.5 text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {{ board.name || 'Sin nombre' }}
                   </h3>
-                  <p class="text-xs text-gray-700 dark:text-gray-400 font-medium">
-                    Actualizado {{ formatDate(board.updatedAt) }}
+                  <p class="text-xs text-gray-600 dark:text-gray-400 font-medium flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ formatDate(board.updatedAt) }}
                   </p>
                 </div>
-                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                   <button
                     tuiButton
                     type="button"
                     appearance="flat"
                     size="xs"
                     iconStart="tuiIconEdit"
-                    (click)="renameBoard(board)"
+                    (click)="renameBoard(board); $event.stopPropagation()"
                     title="Renombrar"
-                    class="!p-1 !min-h-0 !h-6 !w-6"
+                    class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400"
                   ></button>
                   <button
                     tuiButton
@@ -227,9 +231,9 @@ interface Board {
                     appearance="flat"
                     size="xs"
                     iconStart="tuiIconSettings"
-                    (click)="shareBoard(board)"
+                    (click)="shareBoard(board); $event.stopPropagation()"
                     title="Compartir"
-                    class="!p-1 !min-h-0 !h-6 !w-6"
+                    class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400"
                   ></button>
                   <button
                     tuiButton
@@ -237,69 +241,76 @@ interface Board {
                     appearance="flat"
                     size="xs"
                     iconStart="tuiIconTrash"
-                    (click)="deleteBoard(board)"
+                    (click)="deleteBoard(board); $event.stopPropagation()"
                     title="Eliminar"
-                    class="!p-1 !min-h-0 !h-6 !w-6 text-red-600"
+                    class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
                   ></button>
                 </div>
               </div>
               
+              <!-- Estadísticas de tareas -->
               @if (board.todoCount !== undefined || board.doingCount !== undefined || board.doneCount !== undefined) {
-                <div class="flex items-center gap-4 text-sm font-semibold mb-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                  <span class="flex items-center gap-1.5 text-blue-700">
-                    <span class="w-3 h-3 rounded-full bg-blue-500 shadow-sm"></span>
-                    <span class="text-gray-900 dark:text-gray-100">{{ board.todoCount || 0 }}</span>
-                  </span>
-                  <span class="flex items-center gap-1.5 text-yellow-700">
-                    <span class="w-3 h-3 rounded-full bg-yellow-500 shadow-sm"></span>
-                    <span class="text-gray-900 dark:text-gray-100">{{ board.doingCount || 0 }}</span>
-                  </span>
-                  <span class="flex items-center gap-1.5 text-green-700">
-                    <span class="w-3 h-3 rounded-full bg-green-500 shadow-sm"></span>
-                    <span class="text-gray-900 dark:text-gray-100">{{ board.doneCount || 0 }}</span>
-                  </span>
+                <div class="flex items-center gap-3 sm:gap-4 text-sm font-semibold mb-4 p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-700 rounded-xl shadow-sm">
+                  <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm animate-pulse"></div>
+                    <span class="text-gray-900 dark:text-gray-100 text-xs sm:text-sm">{{ board.todoCount || 0 }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm animate-pulse"></div>
+                    <span class="text-gray-900 dark:text-gray-100 text-xs sm:text-sm">{{ board.doingCount || 0 }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm"></div>
+                    <span class="text-gray-900 dark:text-gray-100 text-xs sm:text-sm">{{ board.doneCount || 0 }}</span>
+                  </div>
                 </div>
               }
 
+              <!-- Miembros -->
               @if (board.members && board.members.length > 0) {
-                <div class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200 mb-3 font-medium">
-                  <tui-icon icon="tuiIconMessage" class="text-base text-blue-600"></tui-icon>
-                  <span>{{ board.members.length }} miembro{{ board.members.length > 1 ? 's' : '' }}</span>
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 mb-4 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                  <tui-icon icon="tuiIconMessage" class="text-base text-blue-600 dark:text-blue-400"></tui-icon>
+                  <span class="font-medium">{{ board.members.length }} miembro{{ board.members.length > 1 ? 's' : '' }}</span>
                 </div>
               }
 
-                     <div class="flex gap-2 mt-2">
-                       <a
-                         [routerLink]="['/app/boards', board.boardId]"
-                         tuiButton
-                         type="button"
-                         appearance="primary"
-                         size="s"
-                         class="flex-1"
-                       >
-                         Abrir
-                       </a>
-                       <a
-                         [routerLink]="['/app/boards', board.boardId, 'chat']"
-                         tuiButton
-                         type="button"
-                         appearance="flat"
-                         size="s"
-                         iconStart="tuiIconMessage"
-                         title="Chat"
-                       ></a>
-                       <a
-                         [routerLink]="['/app/settings/integrations']"
-                         [queryParams]="{ boardId: board.boardId }"
-                         tuiButton
-                         type="button"
-                         appearance="flat"
-                         size="s"
-                         iconStart="tuiIconSettings"
-                         title="Integraciones Git"
-                         class="text-blue-600"
-                       ></a>
-                     </div>
+              <!-- Botones de acción -->
+              <div class="flex gap-2 mt-auto pt-2">
+                <a
+                  [routerLink]="['/app/boards', board.boardId]"
+                  tuiButton
+                  type="button"
+                  appearance="primary"
+                  size="s"
+                  class="flex-1 hover-glow"
+                  (click)="$event.stopPropagation()"
+                >
+                  Abrir
+                </a>
+                <a
+                  [routerLink]="['/app/boards', board.boardId, 'chat']"
+                  tuiButton
+                  type="button"
+                  appearance="flat"
+                  size="s"
+                  iconStart="tuiIconMessage"
+                  title="Chat"
+                  class="hover-lift"
+                  (click)="$event.stopPropagation()"
+                ></a>
+                <a
+                  [routerLink]="['/app/settings/integrations']"
+                  [queryParams]="{ boardId: board.boardId }"
+                  tuiButton
+                  type="button"
+                  appearance="flat"
+                  size="s"
+                  iconStart="tuiIconSettings"
+                  title="Integraciones Git"
+                  class="text-blue-600 dark:text-blue-400 hover-lift"
+                  (click)="$event.stopPropagation()"
+                ></a>
+              </div>
             </div>
           </div>
         }
