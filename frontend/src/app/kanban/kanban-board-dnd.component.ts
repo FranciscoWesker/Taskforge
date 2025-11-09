@@ -1722,7 +1722,7 @@ interface BoardLabel {
                         <div class="text-xs font-semibold text-green-900 dark:text-green-100 mb-1.5">Análisis completado</div>
                         @if (taskAnalysis.priority) {
                           <div class="text-xs text-green-800 dark:text-green-200 mb-1">
-                            <strong>Prioridad sugerida:</strong> {{ getPriorityName(taskAnalysis.priority as 'low' | 'medium' | 'high' | 'urgent') }}
+                            <strong>Prioridad sugerida:</strong> {{ getPriorityNameFromString(taskAnalysis.priority) }}
                           </div>
                         }
                         @if (taskAnalysis.estimatedTime) {
@@ -4996,6 +4996,18 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             urgent: 'Urgente'
         };
         return names[priority] || priority;
+    }
+
+    /**
+     * Obtiene el nombre de la prioridad desde un string (para uso con taskAnalysis).
+     */
+    getPriorityNameFromString(priority: string): string {
+        const validPriorities: Array<'low' | 'medium' | 'high' | 'urgent'> = ['low', 'medium', 'high', 'urgent'];
+        const normalizedPriority = priority.toLowerCase() as 'low' | 'medium' | 'high' | 'urgent';
+        if (validPriorities.includes(normalizedPriority)) {
+            return this.getPriorityName(normalizedPriority);
+        }
+        return priority; // Retornar el string original si no es válido
     }
 
     /**
