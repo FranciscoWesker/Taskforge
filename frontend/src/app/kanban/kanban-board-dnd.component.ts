@@ -98,7 +98,6 @@ interface BoardLabel {
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-1">
         <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 min-w-0">
-            <tui-icon icon="tuiIconGridLarge" class="text-blue-600 dark:text-blue-400 flex-shrink-0"></tui-icon>
             <span class="truncate">{{ boardName || 'Tablero Kanban' }}</span>
           </h1>
           <button 
