@@ -468,9 +468,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.typingTimeout = setTimeout(() => this.emitTyping(false), 1200);
   }
   
-  handleEnterKey(event: KeyboardEvent): void {
-    if (!event.shiftKey) {
-      event.preventDefault();
+  handleEnterKey(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (!keyboardEvent.shiftKey) {
+      keyboardEvent.preventDefault();
       this.send();
     }
   }

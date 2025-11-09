@@ -6,6 +6,7 @@
  */
 import { Routes, CanActivateFn } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { lastBoardRedirectGuard } from './core/last-board-redirect.guard';
 
 export const routes: Routes = [
   // Ruta raíz - Página de inicio pública
@@ -37,7 +38,8 @@ export const routes: Routes = [
       // Lista de tableros del usuario
       {
         path: 'boards',
-        loadComponent: () => import('./boards/boards-list.component').then(m => m.BoardsListComponent)
+        loadComponent: () => import('./boards/boards-list.component').then(m => m.BoardsListComponent),
+        canActivate: [lastBoardRedirectGuard as CanActivateFn]
       },
       // Tablero Kanban específico
       {
