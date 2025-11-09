@@ -401,15 +401,10 @@ interface BoardLabel {
           }
           @for (c of todo; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 cursor-move group focus-visible-ring rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-1"
-              [class.border-gray-200]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
-              [class.dark:border-gray-700]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
-              [class.hover:border-blue-400]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
-              [class.dark:hover:border-blue-500]="selectedCardIndex?.list !== 'todo' || selectedCardIndex?.index !== i"
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-move group overflow-hidden"
+              [class.ring-2]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
+              [class.ring-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               [class.border-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
-              [class.ring-4]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
-              [class.ring-blue-200]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
-              [class.dark:ring-blue-800]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -419,30 +414,30 @@ interface BoardLabel {
               (keydown.space)="editCard('todo', i); selectedCardIndex = { list: 'todo', index: i };"
               (click)="selectedCardIndex = { list: 'todo', index: i }"
             >
-              <div class="card-body p-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
+              <div class="p-4">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
-                  <div class="flex items-center gap-2 mb-3 px-5 pt-5 flex-wrap">
+                  <div class="flex items-center gap-2 mb-3 flex-wrap">
                     @if (c.priority) {
                       @switch (c.priority) {
                         @case ('urgent') {
-                          <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded">
                             <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             Urgente
                           </span>
                         }
                         @case ('high') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-xs font-medium rounded">
                             Alta
                           </span>
                         }
                         @case ('medium') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-medium rounded">
                             Media
                           </span>
                         }
                         @case ('low') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded">
                             Baja
                           </span>
                         }
@@ -452,44 +447,50 @@ interface BoardLabel {
                       @for (labelId of c.labels.slice(0, 3); track labelId) {
                         @if (getLabelById(labelId)) {
                           <span 
-                            class="inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full border shadow-sm transition-all hover:scale-105"
-                            [style.background-color]="getLabelById(labelId)!.color + '20'"
+                            class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded border"
+                            [style.background-color]="getLabelById(labelId)!.color + '15'"
                             [style.color]="getLabelById(labelId)!.color"
-                            [style.border-color]="getLabelById(labelId)!.color + '40'"
+                            [style.border-color]="getLabelById(labelId)!.color + '30'"
                           >
                             {{ getLabelById(labelId)!.name }}
-                        </span>
+                          </span>
                         }
                       }
                       @if (c.labels.length > 3) {
-                        <span class="text-xs text-gray-500 dark:text-gray-400">+{{ c.labels.length - 3 }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">+{{ c.labels.length - 3 }}</span>
                       }
                     }
                   </div>
                 }
                 
-                <div class="flex justify-between items-start gap-2 mb-2">
-                  <div class="font-semibold text-gray-900 dark:text-gray-100 flex-1 flex items-center gap-2">
-                    @if (c.metadata?.type === 'commit') {
-                      <tui-icon icon="tuiIconCode" class="text-blue-600 text-sm" title="Commit"></tui-icon>
+                <!-- Título y acciones -->
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start gap-2 mb-1">
+                      @if (c.metadata?.type === 'commit') {
+                        <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0" title="Commit"></tui-icon>
+                      }
+                      @if (c.metadata?.type === 'pull_request') {
+                        <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0" title="Pull Request"></tui-icon>
+                      }
+                      @if (c.metadata?.type === 'branch') {
+                        <tui-icon icon="tuiIconGitBranch" class="text-green-600 dark:text-green-400 text-sm mt-0.5 flex-shrink-0" title="Branch"></tui-icon>
+                      }
+                      <h3 class="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug break-words">{{ c.title }}</h3>
+                    </div>
+                    @if (c.description) {
+                      <p class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 line-clamp-2 leading-relaxed">{{ c.description }}</p>
                     }
-                    @if (c.metadata?.type === 'pull_request') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-sm" title="Pull Request"></tui-icon>
-                    }
-                    @if (c.metadata?.type === 'branch') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-green-600 text-sm" title="Branch"></tui-icon>
-                    }
-                    <span>{{ c.title }}</span>
                   </div>
-                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button 
                       tuiButton 
                       type="button" 
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconComment"
-                      (click)="openComments(c.id)"
-                      class="!p-1 !min-h-0 !h-6 !w-6"
+                      (click)="openComments(c.id); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       title="Comentarios"
                     ></button>
                     @if (c.checklist && c.checklist.length > 0) {
@@ -499,21 +500,9 @@ interface BoardLabel {
                         appearance="flat" 
                         size="xs"
                         iconStart="tuiIconCheckCircle"
-                        (click)="openChecklist(c.id)"
-                        class="!p-1 !min-h-0 !h-6 !w-6"
+                        (click)="openChecklist(c.id); $event.stopPropagation()"
+                        class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         [title]="getChecklistProgress(c.checklist) + '/' + c.checklist.length + ' completados'"
-                      ></button>
-                    }
-                    @if (!c.checklist || c.checklist.length === 0) {
-                      <button 
-                        tuiButton 
-                        type="button" 
-                        appearance="flat" 
-                        size="xs"
-                        iconStart="tuiIconCheckCircle"
-                        (click)="openChecklist(c.id)"
-                        class="!p-1 !min-h-0 !h-6 !w-6 opacity-50"
-                        title="Agregar checklist"
                       ></button>
                     }
                     <button 
@@ -522,8 +511,8 @@ interface BoardLabel {
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconEdit"
-                      (click)="editCard('todo', i)"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      (click)="editCard('todo', i); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       title="Editar"
                     ></button>
                     <button 
@@ -532,32 +521,29 @@ interface BoardLabel {
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconTrash"
-                      (click)="removeCard('todo', i)"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                      (click)="removeCard('todo', i); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                       title="Eliminar"
                     ></button>
                   </div>
                 </div>
-                @if (c.description) {
-                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 px-5 line-clamp-3 leading-relaxed">{{ c.description }}</div>
-                }
                 
                 <!-- Checklist progress indicator -->
                 @if (c.checklist && c.checklist.length > 0) {
-                  <div class="mt-4 pt-4 mx-5 border-t border-gray-200 dark:border-gray-700">
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                     <button
                       type="button"
-                      class="flex items-center gap-2.5 w-full text-left text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                      (click)="openChecklist(c.id)"
+                      class="flex items-center gap-2 w-full text-left text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors py-1.5 rounded hover:bg-gray-50 dark:hover:bg-gray-700/30"
+                      (click)="openChecklist(c.id); $event.stopPropagation()"
                       title="Gestionar checklist"
                     >
-                      <tui-icon icon="tuiIconCheckCircle" class="text-base text-green-600 dark:text-green-400"></tui-icon>
-                      <span class="flex-1 font-semibold">
-                        {{ getChecklistProgress(c.checklist) }} de {{ c.checklist.length }} completado{{ c.checklist.length !== 1 ? 's' : '' }}
+                      <tui-icon icon="tuiIconCheckCircle" class="text-sm text-green-600 dark:text-green-400"></tui-icon>
+                      <span class="flex-1 font-medium">
+                        {{ getChecklistProgress(c.checklist) }}/{{ c.checklist.length }}
                       </span>
-                      <div class="w-24 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                      <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div 
-                          class="h-full bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-400 dark:to-emerald-400 transition-all shadow-sm rounded-full"
+                          class="h-full bg-green-500 dark:bg-green-400 transition-all rounded-full"
                           [style.width.%]="getChecklistProgressPercent(c.checklist)"
                         ></div>
                       </div>
@@ -567,30 +553,23 @@ interface BoardLabel {
                 
                 <!-- Footer con metadata y fechas -->
                 @if (c.dueDate || c.assignee || c.createdAt || (c.updatedAt && c.updatedAt !== c.createdAt)) {
-                  <div class="mt-4 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex items-center gap-2 flex-wrap">
                       @if (c.dueDate) {
                         <div 
-                          class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-colors"
+                          class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
                           [class.bg-red-50]="isOverdue(c.dueDate)"
                           [class.text-red-700]="isOverdue(c.dueDate)"
-                          [class.border-red-200]="isOverdue(c.dueDate)"
                           [class.dark:bg-red-900/20]="isOverdue(c.dueDate)"
                           [class.dark:text-red-400]="isOverdue(c.dueDate)"
-                          [class.dark:border-red-800]="isOverdue(c.dueDate)"
                           [class.bg-orange-50]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
                           [class.text-orange-700]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                          [class.border-orange-200]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
                           [class.dark:bg-orange-900/20]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
                           [class.dark:text-orange-400]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
-                          [class.dark:border-orange-800]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
                           [class.bg-gray-50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
                           [class.text-gray-600]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                          [class.border-gray-200]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
                           [class.dark:bg-gray-800/50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
                           [class.dark:text-gray-400]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                          [class.dark:border-gray-700]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
-                          [class.border]="true"
                           [title]="'Vence: ' + formatDueDate(c.dueDate)"
                         >
                           <tui-icon 
@@ -602,13 +581,13 @@ interface BoardLabel {
                       }
                       @if (c.assignee) {
                         <div 
-                          class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 text-xs font-medium"
+                          class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-medium"
                           [title]="'Asignado a: ' + c.assignee"
                         >
-                          <div class="w-4 h-4 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
+                          <div class="w-3.5 h-3.5 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0">
                             {{ getInitials(c.assignee) }}
                           </div>
-                          <span class="truncate max-w-[100px]">{{ c.assignee }}</span>
+                          <span class="truncate max-w-[80px]">{{ c.assignee }}</span>
                         </div>
                       }
                       @if (c.createdAt) {
@@ -617,50 +596,38 @@ interface BoardLabel {
                           <span class="whitespace-nowrap">{{ formatCardDateRelative(c.createdAt) }}</span>
                         </div>
                       }
-                      @if (c.updatedAt && c.updatedAt !== c.createdAt) {
-                        <div class="inline-flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500" title="Actualizada {{ formatCardDate(c.updatedAt) }}">
-                          <tui-icon icon="tuiIconRefresh" class="text-xs w-3 h-3"></tui-icon>
-                          <span class="whitespace-nowrap">{{ formatCardDateRelative(c.updatedAt) }}</span>
-                        </div>
-                      }
                     </div>
                   </div>
                 }
                 
                 @if (getTaskReferences(c).length > 0) {
-                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-2 mb-2.5">
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center gap-1.5 mb-2">
                       <tui-icon icon="tuiIconCode" class="text-xs text-blue-600 dark:text-blue-400"></tui-icon>
-                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
+                      <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Referencias</span>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-1.5">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
-                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5 text-xs">
-                          <div class="flex items-start gap-2.5">
+                        <div class="bg-gray-50 dark:bg-gray-800/50 rounded p-2 text-xs">
+                          <div class="flex items-start gap-2">
                             @if (ref.type === 'commit') {
-                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-xs mt-0.5 flex-shrink-0"></tui-icon>
                               <div class="flex-1 min-w-0">
-                                <div class="font-medium text-blue-900 dark:text-blue-200 truncate">{{ ref.message || 'Commit' }}</div>
-                                @if (ref.context) {
-                                  <div class="text-blue-700 dark:text-blue-300 mt-1 text-xs truncate">{{ ref.context }}</div>
-                                }
+                                <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ ref.message || 'Commit' }}</div>
                                 @if (ref.url) {
-                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-1.5 inline-block text-xs">
-                                    Ver commit →
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-0.5 inline-block text-xs">
+                                    Ver →
                                   </a>
                                 }
                               </div>
                             }
                             @if (ref.type === 'pull_request') {
-                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-xs mt-0.5 flex-shrink-0"></tui-icon>
                               <div class="flex-1 min-w-0">
-                                <div class="font-medium text-purple-900 dark:text-purple-200 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
-                                @if (ref.context) {
-                                  <div class="text-purple-700 dark:text-purple-300 mt-1 text-xs truncate">{{ ref.context }}</div>
-                                }
+                                <div class="font-medium text-gray-900 dark:text-gray-100 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
                                 @if (ref.url) {
-                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-1.5 inline-block text-xs">
-                                    Ver PR →
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-0.5 inline-block text-xs">
+                                    Ver →
                                   </a>
                                 }
                               </div>
@@ -669,7 +636,7 @@ interface BoardLabel {
                         </div>
                       }
                       @if (getTaskReferences(c).length > 2) {
-                        <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 text-center pt-0.5">
                           +{{ getTaskReferences(c).length - 2 }} más
                         </div>
                       }
@@ -677,35 +644,35 @@ interface BoardLabel {
                   </div>
                 }
                 @if (c.metadata?.ciStatus) {
-                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex items-center gap-2 flex-wrap">
                       @switch (c.metadata?.ciStatus?.state) {
                         @case ('success') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium">
                             <tui-icon icon="tuiIconCheck" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('failure') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs font-medium">
                             <tui-icon icon="tuiIconClose" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('pending') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-xs font-medium">
                             <span class="inline-block w-2.5 h-2.5 border-2 border-yellow-600 dark:border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('error') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs font-medium">
                             <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @default {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium">
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
@@ -784,15 +751,10 @@ interface BoardLabel {
           }
           @for (c of doing; track c.id; let i = $index) {
             <div 
-              class="card kanban-card bg-white dark:bg-gray-800 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 cursor-move group focus-visible-ring rounded-2xl overflow-hidden hover:scale-[1.02] hover:-translate-y-1"
-              [class.border-gray-200]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
-              [class.dark:border-gray-700]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
-              [class.hover:border-yellow-400]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
-              [class.dark:hover:border-yellow-500]="selectedCardIndex?.list !== 'doing' || selectedCardIndex?.index !== i"
-              [class.border-yellow-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
-              [class.ring-4]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
-              [class.ring-yellow-200]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
-              [class.dark:ring-yellow-800]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 cursor-move group overflow-hidden"
+              [class.ring-2]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.ring-orange-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.border-orange-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -802,30 +764,30 @@ interface BoardLabel {
               (keydown.space)="editCard('doing', i); selectedCardIndex = { list: 'doing', index: i };"
               (click)="selectedCardIndex = { list: 'doing', index: i }"
             >
-              <div class="card-body p-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-800 dark:to-gray-900/50">
+              <div class="p-4">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
-                  <div class="flex items-center gap-2 mb-3 px-5 pt-5 flex-wrap">
+                  <div class="flex items-center gap-2 mb-3 flex-wrap">
                     @if (c.priority) {
                       @switch (c.priority) {
                         @case ('urgent') {
-                          <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded">
                             <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             Urgente
                           </span>
                         }
                         @case ('high') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 text-xs font-medium rounded">
                             Alta
                           </span>
                         }
                         @case ('medium') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-medium rounded">
                             Media
                           </span>
                         }
                         @case ('low') {
-                          <span class="inline-flex items-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md border-0">
+                          <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded">
                             Baja
                           </span>
                         }
@@ -835,13 +797,13 @@ interface BoardLabel {
                       @for (labelId of c.labels.slice(0, 3); track labelId) {
                         @if (getLabelById(labelId)) {
                           <span 
-                            class="px-2 py-0.5 text-xs font-medium rounded-full border shadow-sm"
-                            [style.background-color]="getLabelById(labelId)!.color + '20'"
+                            class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded border"
+                            [style.background-color]="getLabelById(labelId)!.color + '15'"
                             [style.color]="getLabelById(labelId)!.color"
-                            [style.border-color]="getLabelById(labelId)!.color + '40'"
+                            [style.border-color]="getLabelById(labelId)!.color + '30'"
                           >
                             {{ getLabelById(labelId)!.name }}
-                        </span>
+                          </span>
                         }
                       }
                       @if (c.labels.length > 3) {
@@ -851,28 +813,34 @@ interface BoardLabel {
                   </div>
                 }
                 
-                <div class="flex justify-between items-start gap-3 mb-4 px-5">
-                  <div class="font-bold text-lg text-gray-900 dark:text-gray-100 flex-1 flex items-start gap-2.5 leading-snug">
-                    @if (c.metadata?.type === 'commit') {
-                      <tui-icon icon="tuiIconCode" class="text-blue-600 text-lg flex-shrink-0 mt-0.5" title="Commit"></tui-icon>
+                <!-- Título y acciones -->
+                <div class="flex items-start justify-between gap-3 mb-2">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start gap-2 mb-1">
+                      @if (c.metadata?.type === 'commit') {
+                        <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0" title="Commit"></tui-icon>
+                      }
+                      @if (c.metadata?.type === 'pull_request') {
+                        <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0" title="Pull Request"></tui-icon>
+                      }
+                      @if (c.metadata?.type === 'branch') {
+                        <tui-icon icon="tuiIconGitBranch" class="text-green-600 dark:text-green-400 text-sm mt-0.5 flex-shrink-0" title="Branch"></tui-icon>
+                      }
+                      <h3 class="font-semibold text-gray-900 dark:text-gray-100 text-sm leading-snug break-words">{{ c.title }}</h3>
+                    </div>
+                    @if (c.description) {
+                      <p class="text-xs text-gray-600 dark:text-gray-400 mt-1.5 line-clamp-2 leading-relaxed">{{ c.description }}</p>
                     }
-                    @if (c.metadata?.type === 'pull_request') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-purple-600 text-lg flex-shrink-0 mt-0.5" title="Pull Request"></tui-icon>
-                    }
-                    @if (c.metadata?.type === 'branch') {
-                      <tui-icon icon="tuiIconGitBranch" class="text-green-600 text-lg flex-shrink-0 mt-0.5" title="Branch"></tui-icon>
-                    }
-                    <span class="break-words leading-relaxed">{{ c.title }}</span>
                   </div>
-                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                     <button 
                       tuiButton 
                       type="button" 
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconComment"
-                      (click)="openComments(c.id)"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                      (click)="openComments(c.id); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       title="Comentarios"
                     ></button>
                     @if (c.checklist && c.checklist.length > 0) {
@@ -882,21 +850,9 @@ interface BoardLabel {
                         appearance="flat" 
                         size="xs"
                         iconStart="tuiIconCheckCircle"
-                        (click)="openChecklist(c.id)"
-                        class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+                        (click)="openChecklist(c.id); $event.stopPropagation()"
+                        class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                         [title]="getChecklistProgress(c.checklist) + '/' + c.checklist.length + ' completados'"
-                      ></button>
-                    }
-                    @if (!c.checklist || c.checklist.length === 0) {
-                      <button 
-                        tuiButton 
-                        type="button" 
-                        appearance="flat" 
-                        size="xs"
-                        iconStart="tuiIconCheckCircle"
-                        (click)="openChecklist(c.id)"
-                        class="!p-1.5 !min-h-0 !h-7 !w-7 opacity-50 hover:opacity-100 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition-colors"
-                        title="Agregar checklist"
                       ></button>
                     }
                     <button 
@@ -905,8 +861,8 @@ interface BoardLabel {
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconEdit"
-                      (click)="editCard('doing', i)"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      (click)="editCard('doing', i); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                       title="Editar"
                     ></button>
                     <button 
@@ -915,49 +871,113 @@ interface BoardLabel {
                       appearance="flat" 
                       size="xs"
                       iconStart="tuiIconTrash"
-                      (click)="removeCard('doing', i)"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                      (click)="removeCard('doing', i); $event.stopPropagation()"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                       title="Eliminar"
                     ></button>
                   </div>
                 </div>
-                @if (c.description) {
-                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-2 mb-4 px-5 line-clamp-3 leading-relaxed">{{ c.description }}</div>
+                
+                <!-- Checklist progress indicator -->
+                @if (c.checklist && c.checklist.length > 0) {
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <button
+                      type="button"
+                      class="flex items-center gap-2 w-full text-left text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors py-1.5 rounded hover:bg-gray-50 dark:hover:bg-gray-700/30"
+                      (click)="openChecklist(c.id); $event.stopPropagation()"
+                      title="Gestionar checklist"
+                    >
+                      <tui-icon icon="tuiIconCheckCircle" class="text-sm text-green-600 dark:text-green-400"></tui-icon>
+                      <span class="flex-1 font-medium">
+                        {{ getChecklistProgress(c.checklist) }}/{{ c.checklist.length }}
+                      </span>
+                      <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div 
+                          class="h-full bg-green-500 dark:bg-green-400 transition-all rounded-full"
+                          [style.width.%]="getChecklistProgressPercent(c.checklist)"
+                        ></div>
+                      </div>
+                    </button>
+                  </div>
                 }
-                @if (getTaskReferences(c).length > 0) {
-                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center gap-2 mb-2.5">
-                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600 dark:text-blue-400"></tui-icon>
-                      <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">Referencias en código</span>
+                
+                <!-- Footer con metadata y fechas -->
+                @if (c.dueDate || c.assignee || c.createdAt || (c.updatedAt && c.updatedAt !== c.createdAt)) {
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      @if (c.dueDate) {
+                        <div 
+                          class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium"
+                          [class.bg-red-50]="isOverdue(c.dueDate)"
+                          [class.text-red-700]="isOverdue(c.dueDate)"
+                          [class.dark:bg-red-900/20]="isOverdue(c.dueDate)"
+                          [class.dark:text-red-400]="isOverdue(c.dueDate)"
+                          [class.bg-orange-50]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.text-orange-700]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.dark:bg-orange-900/20]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.dark:text-orange-400]="!isOverdue(c.dueDate) && isDueSoon(c.dueDate)"
+                          [class.bg-gray-50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.text-gray-600]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.dark:bg-gray-800/50]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [class.dark:text-gray-400]="!isOverdue(c.dueDate) && !isDueSoon(c.dueDate)"
+                          [title]="'Vence: ' + formatDueDate(c.dueDate)"
+                        >
+                          <tui-icon 
+                            [icon]="isOverdue(c.dueDate) ? 'tuiIconAlertCircle' : 'tuiIconCalendar'" 
+                            class="text-xs w-3 h-3"
+                          ></tui-icon>
+                          <span class="whitespace-nowrap">{{ formatDueDate(c.dueDate) }}</span>
+                        </div>
+                      }
+                      @if (c.assignee) {
+                        <div 
+                          class="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-medium"
+                          [title]="'Asignado a: ' + c.assignee"
+                        >
+                          <div class="w-3.5 h-3.5 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0">
+                            {{ getInitials(c.assignee) }}
+                          </div>
+                          <span class="truncate max-w-[80px]">{{ c.assignee }}</span>
+                        </div>
+                      }
+                      @if (c.createdAt) {
+                        <div class="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400" title="Creada {{ formatCardDate(c.createdAt) }}">
+                          <tui-icon icon="tuiIconClock" class="text-xs w-3 h-3"></tui-icon>
+                          <span class="whitespace-nowrap">{{ formatCardDateRelative(c.createdAt) }}</span>
+                        </div>
+                      }
                     </div>
-                    <div class="space-y-2">
+                  </div>
+                }
+                
+                @if (getTaskReferences(c).length > 0) {
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center gap-1.5 mb-2">
+                      <tui-icon icon="tuiIconCode" class="text-xs text-blue-600 dark:text-blue-400"></tui-icon>
+                      <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Referencias</span>
+                    </div>
+                    <div class="space-y-1.5">
                       @for (ref of getTaskReferences(c).slice(0, 2); track ref.timestamp || ref.url) {
-                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2.5 text-xs">
-                          <div class="flex items-start gap-2.5">
+                        <div class="bg-gray-50 dark:bg-gray-800/50 rounded p-2 text-xs">
+                          <div class="flex items-start gap-2">
                             @if (ref.type === 'commit') {
-                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <tui-icon icon="tuiIconCode" class="text-blue-600 dark:text-blue-400 text-xs mt-0.5 flex-shrink-0"></tui-icon>
                               <div class="flex-1 min-w-0">
-                                <div class="font-medium text-blue-900 dark:text-blue-200 truncate">{{ ref.message || 'Commit' }}</div>
-                                @if (ref.context) {
-                                  <div class="text-blue-700 dark:text-blue-300 mt-1 text-xs truncate">{{ ref.context }}</div>
-                                }
+                                <div class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ ref.message || 'Commit' }}</div>
                                 @if (ref.url) {
-                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-1.5 inline-block text-xs">
-                                    Ver commit →
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline mt-0.5 inline-block text-xs">
+                                    Ver →
                                   </a>
                                 }
                               </div>
                             }
                             @if (ref.type === 'pull_request') {
-                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                              <tui-icon icon="tuiIconGitBranch" class="text-purple-600 dark:text-purple-400 text-xs mt-0.5 flex-shrink-0"></tui-icon>
                               <div class="flex-1 min-w-0">
-                                <div class="font-medium text-purple-900 dark:text-purple-200 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
-                                @if (ref.context) {
-                                  <div class="text-purple-700 dark:text-purple-300 mt-1 text-xs truncate">{{ ref.context }}</div>
-                                }
+                                <div class="font-medium text-gray-900 dark:text-gray-100 truncate">PR #{{ ref.number }}: {{ ref.title || 'Pull Request' }}</div>
                                 @if (ref.url) {
-                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-1.5 inline-block text-xs">
-                                    Ver PR →
+                                  <a [href]="ref.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 underline mt-0.5 inline-block text-xs">
+                                    Ver →
                                   </a>
                                 }
                               </div>
@@ -966,7 +986,7 @@ interface BoardLabel {
                         </div>
                       }
                       @if (getTaskReferences(c).length > 2) {
-                        <div class="text-xs text-gray-600 dark:text-gray-400 text-center pt-1">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 text-center pt-0.5">
                           +{{ getTaskReferences(c).length - 2 }} más
                         </div>
                       }
@@ -974,35 +994,35 @@ interface BoardLabel {
                   </div>
                 }
                 @if (c.metadata?.ciStatus) {
-                  <div class="mt-3 pt-3 px-5 border-t border-gray-200 dark:border-gray-700">
+                  <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                     <div class="flex items-center gap-2 flex-wrap">
                       @switch (c.metadata?.ciStatus?.state) {
                         @case ('success') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-xs font-medium">
                             <tui-icon icon="tuiIconCheck" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('failure') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs font-medium">
                             <tui-icon icon="tuiIconClose" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('pending') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-xs font-medium">
                             <span class="inline-block w-2.5 h-2.5 border-2 border-yellow-600 dark:border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @case ('error') {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-xs font-medium">
                             <tui-icon icon="tuiIconAlertCircle" class="text-xs w-3 h-3"></tui-icon>
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
                         @default {
-                          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-xs font-medium">
+                          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium">
                             CI: {{ c.metadata?.ciStatus?.context || '' }}
                           </span>
                         }
@@ -1532,20 +1552,30 @@ interface BoardLabel {
             </div>
             <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
                 @if (aiAvailable && addTitle.trim()) {
                   <button
                     type="button"
-                    tuiButton
-                    appearance="flat"
-                    size="xs"
-                    iconStart="tuiIconStar"
+                    class="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
+                    [class.bg-purple-50]="improvingDescription || addDescription.trim()"
+                    [class.border-purple-200]="improvingDescription || addDescription.trim()"
+                    [class.text-purple-700]="improvingDescription || addDescription.trim()"
+                    [class.dark:bg-purple-900/20]="improvingDescription || addDescription.trim()"
+                    [class.dark:border-purple-800]="improvingDescription || addDescription.trim()"
+                    [class.dark:text-purple-400]="improvingDescription || addDescription.trim()"
+                    [class.bg-white]="!improvingDescription && !addDescription.trim()"
+                    [class.border-gray-200]="!improvingDescription && !addDescription.trim()"
+                    [class.text-gray-700]="!improvingDescription && !addDescription.trim()"
+                    [class.dark:bg-gray-800]="!improvingDescription && !addDescription.trim()"
+                    [class.dark:border-gray-700]="!improvingDescription && !addDescription.trim()"
+                    [class.dark:text-gray-300]="!improvingDescription && !addDescription.trim()"
+                    [class.opacity-50]="improvingDescription"
                     (click)="improveCardDescription()"
                     [disabled]="improvingDescription"
-                    class="text-purple-600 dark:text-purple-400"
                     title="Mejorar descripción con IA"
                   >
-                    {{ improvingDescription ? 'Mejorando...' : 'Mejorar' }}
+                    <tui-icon icon="tuiIconStar" class="text-xs"></tui-icon>
+                    <span>{{ improvingDescription ? 'Mejorando...' : 'Mejorar con IA' }}</span>
                   </button>
                 }
               </div>
@@ -1559,100 +1589,204 @@ interface BoardLabel {
             
             <!-- Funcionalidades de IA -->
             @if (aiAvailable && addTitle.trim()) {
-              <div class="flex flex-col gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex items-center gap-2 mb-2">
-                  <tui-icon icon="tuiIconStar" class="text-purple-600 dark:text-purple-400"></tui-icon>
-                  <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Asistente IA</label>
+              <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-2 mb-3">
+                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                    <tui-icon icon="tuiIconStar" class="text-white text-sm"></tui-icon>
+                  </div>
+                  <div>
+                    <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Asistente IA</label>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Herramientas inteligentes para mejorar tu tarea</p>
+                  </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                
+                <div class="grid grid-cols-2 gap-2 mb-3">
                   <button
                     type="button"
-                    tuiButton
-                    appearance="flat"
-                    size="s"
-                    iconStart="tuiIconSearch"
+                    class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
+                    [class.bg-orange-50]="detectedDuplicates.length > 0"
+                    [class.border-orange-200]="detectedDuplicates.length > 0"
+                    [class.text-orange-700]="detectedDuplicates.length > 0"
+                    [class.dark:bg-orange-900/20]="detectedDuplicates.length > 0"
+                    [class.dark:border-orange-800]="detectedDuplicates.length > 0"
+                    [class.dark:text-orange-400]="detectedDuplicates.length > 0"
+                    [class.bg-white]="detectedDuplicates.length === 0"
+                    [class.border-gray-200]="detectedDuplicates.length === 0"
+                    [class.text-gray-700]="detectedDuplicates.length === 0"
+                    [class.dark:bg-gray-800]="detectedDuplicates.length === 0"
+                    [class.dark:border-gray-700]="detectedDuplicates.length === 0"
+                    [class.dark:text-gray-300]="detectedDuplicates.length === 0"
+                    [class.opacity-50]="detectingDuplicates"
                     (click)="detectCardDuplicates()"
                     [disabled]="detectingDuplicates"
-                    class="text-orange-600 dark:text-orange-400"
                     title="Detectar tareas duplicadas"
                   >
-                    {{ detectingDuplicates ? '...' : 'Duplicados' }}
+                    <tui-icon icon="tuiIconSearch" class="text-xs"></tui-icon>
+                    <span>{{ detectingDuplicates ? 'Buscando...' : 'Duplicados' }}</span>
+                    @if (detectedDuplicates.length > 0) {
+                      <span class="ml-auto px-1.5 py-0.5 bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-200 rounded text-[10px] font-semibold">
+                        {{ detectedDuplicates.length }}
+                      </span>
+                    }
                   </button>
                   <button
                     type="button"
-                    tuiButton
-                    appearance="flat"
-                    size="s"
-                    iconStart="tuiIconGrid"
+                    class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
+                    [class.bg-blue-50]="detectedDependencies.length > 0"
+                    [class.border-blue-200]="detectedDependencies.length > 0"
+                    [class.text-blue-700]="detectedDependencies.length > 0"
+                    [class.dark:bg-blue-900/20]="detectedDependencies.length > 0"
+                    [class.dark:border-blue-800]="detectedDependencies.length > 0"
+                    [class.dark:text-blue-400]="detectedDependencies.length > 0"
+                    [class.bg-white]="detectedDependencies.length === 0"
+                    [class.border-gray-200]="detectedDependencies.length === 0"
+                    [class.text-gray-700]="detectedDependencies.length === 0"
+                    [class.dark:bg-gray-800]="detectedDependencies.length === 0"
+                    [class.dark:border-gray-700]="detectedDependencies.length === 0"
+                    [class.dark:text-gray-300]="detectedDependencies.length === 0"
+                    [class.opacity-50]="detectingDependencies"
                     (click)="detectCardDependencies()"
                     [disabled]="detectingDependencies"
-                    class="text-blue-600 dark:text-blue-400"
                     title="Detectar dependencias"
                   >
-                    {{ detectingDependencies ? '...' : 'Dependencias' }}
+                    <tui-icon icon="tuiIconGrid" class="text-xs"></tui-icon>
+                    <span>{{ detectingDependencies ? 'Analizando...' : 'Dependencias' }}</span>
+                    @if (detectedDependencies.length > 0) {
+                      <span class="ml-auto px-1.5 py-0.5 bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded text-[10px] font-semibold">
+                        {{ detectedDependencies.length }}
+                      </span>
+                    }
                   </button>
                   <button
                     type="button"
-                    tuiButton
-                    appearance="flat"
-                    size="s"
-                    iconStart="tuiIconBarChart"
+                    class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
+                    [class.bg-green-50]="taskAnalysis"
+                    [class.border-green-200]="taskAnalysis"
+                    [class.text-green-700]="taskAnalysis"
+                    [class.dark:bg-green-900/20]="taskAnalysis"
+                    [class.dark:border-green-800]="taskAnalysis"
+                    [class.dark:text-green-400]="taskAnalysis"
+                    [class.bg-white]="!taskAnalysis"
+                    [class.border-gray-200]="!taskAnalysis"
+                    [class.text-gray-700]="!taskAnalysis"
+                    [class.dark:bg-gray-800]="!taskAnalysis"
+                    [class.dark:border-gray-700]="!taskAnalysis"
+                    [class.dark:text-gray-300]="!taskAnalysis"
+                    [class.opacity-50]="analyzingTask"
                     (click)="analyzeCardTask()"
                     [disabled]="analyzingTask"
-                    class="text-green-600 dark:text-green-400"
                     title="Analizar tarea"
                   >
-                    {{ analyzingTask ? '...' : 'Analizar' }}
+                    <tui-icon icon="tuiIconBarChart" class="text-xs"></tui-icon>
+                    <span>{{ analyzingTask ? 'Analizando...' : 'Analizar' }}</span>
+                    @if (taskAnalysis) {
+                      <tui-icon icon="tuiIconCheck" class="text-xs ml-auto"></tui-icon>
+                    }
                   </button>
                   <button
                     type="button"
-                    tuiButton
-                    appearance="flat"
-                    size="s"
-                    iconStart="tuiIconCheck"
+                    class="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border transition-all hover:shadow-sm"
+                    [class.bg-indigo-50]="(this as any).aiGeneratedChecklist"
+                    [class.border-indigo-200]="(this as any).aiGeneratedChecklist"
+                    [class.text-indigo-700]="(this as any).aiGeneratedChecklist"
+                    [class.dark:bg-indigo-900/20]="(this as any).aiGeneratedChecklist"
+                    [class.dark:border-indigo-800]="(this as any).aiGeneratedChecklist"
+                    [class.dark:text-indigo-400]="(this as any).aiGeneratedChecklist"
+                    [class.bg-white]="!(this as any).aiGeneratedChecklist"
+                    [class.border-gray-200]="!(this as any).aiGeneratedChecklist"
+                    [class.text-gray-700]="!(this as any).aiGeneratedChecklist"
+                    [class.dark:bg-gray-800]="!(this as any).aiGeneratedChecklist"
+                    [class.dark:border-gray-700]="!(this as any).aiGeneratedChecklist"
+                    [class.dark:text-gray-300]="!(this as any).aiGeneratedChecklist"
+                    [class.opacity-50]="generatingChecklist"
                     (click)="generateCardChecklist()"
                     [disabled]="generatingChecklist"
-                    class="text-indigo-600 dark:text-indigo-400"
                     title="Generar checklist"
                   >
-                    {{ generatingChecklist ? '...' : 'Checklist' }}
+                    <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
+                    <span>{{ generatingChecklist ? 'Generando...' : 'Checklist' }}</span>
+                    @if ((this as any).aiGeneratedChecklist) {
+                      <span class="ml-auto px-1.5 py-0.5 bg-indigo-200 dark:bg-indigo-800 text-indigo-800 dark:text-indigo-200 rounded text-[10px] font-semibold">
+                        {{ (this as any).aiGeneratedChecklist.length }}
+                      </span>
+                    }
                   </button>
                 </div>
                 
                 <!-- Mostrar resultados de análisis -->
                 @if (taskAnalysis) {
-                  <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <div class="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">Análisis:</div>
-                    @if (taskAnalysis.missingInfo.length > 0) {
-                      <div class="text-xs text-blue-800 dark:text-blue-200 mb-1">
-                        <strong>Falta:</strong> {{ taskAnalysis.missingInfo.join(', ') }}
+                  <div class="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div class="flex items-start gap-2 mb-2">
+                      <tui-icon icon="tuiIconCheckCircle" class="text-green-600 dark:text-green-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-xs font-semibold text-green-900 dark:text-green-100 mb-1.5">Análisis completado</div>
+                        @if (taskAnalysis.priority) {
+                          <div class="text-xs text-green-800 dark:text-green-200 mb-1">
+                            <strong>Prioridad sugerida:</strong> {{ getPriorityName(taskAnalysis.priority as any) }}
+                          </div>
+                        }
+                        @if (taskAnalysis.estimatedTime) {
+                          <div class="text-xs text-green-800 dark:text-green-200 mb-1">
+                            <strong>Tiempo estimado:</strong> {{ taskAnalysis.estimatedTime }}
+                          </div>
+                        }
+                        @if (taskAnalysis.missingInfo.length > 0) {
+                          <div class="text-xs text-green-800 dark:text-green-200 mb-1">
+                            <strong>Información faltante:</strong> {{ taskAnalysis.missingInfo.join(', ') }}
+                          </div>
+                        }
+                        @if (taskAnalysis.improvementSuggestions.length > 0) {
+                          <div class="text-xs text-green-800 dark:text-green-200">
+                            <strong>Sugerencias:</strong>
+                            <ul class="list-disc list-inside mt-1 space-y-0.5">
+                              @for (suggestion of taskAnalysis.improvementSuggestions; track suggestion) {
+                                <li>{{ suggestion }}</li>
+                              }
+                            </ul>
+                          </div>
+                        }
                       </div>
-                    }
-                    @if (taskAnalysis.improvementSuggestions.length > 0) {
-                      <div class="text-xs text-blue-800 dark:text-blue-200">
-                        <strong>Sugerencias:</strong> {{ taskAnalysis.improvementSuggestions.join('; ') }}
-                      </div>
-                    }
+                    </div>
                   </div>
                 }
                 
                 <!-- Mostrar dependencias detectadas -->
                 @if (detectedDependencies.length > 0) {
-                  <div class="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
-                    <div class="text-xs font-semibold text-yellow-900 dark:text-yellow-100 mb-1">Dependencias:</div>
-                    @for (dep of detectedDependencies; track dep.taskId) {
-                      <div class="text-xs text-yellow-800 dark:text-yellow-200">• {{ dep.title }} ({{ dep.relationship }})</div>
-                    }
+                  <div class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <div class="flex items-start gap-2 mb-2">
+                      <tui-icon icon="tuiIconGrid" class="text-blue-600 dark:text-blue-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-1.5">Dependencias detectadas</div>
+                        <div class="space-y-1">
+                          @for (dep of detectedDependencies; track dep.taskId) {
+                            <div class="text-xs text-blue-800 dark:text-blue-200 p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded">
+                              <div class="font-medium">{{ dep.title }}</div>
+                              <div class="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">{{ dep.relationship }} ({{ dep.confidence }})</div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 }
                 
                 <!-- Mostrar duplicados detectados -->
                 @if (detectedDuplicates.length > 0) {
-                  <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded border border-red-200 dark:border-red-800">
-                    <div class="text-xs font-semibold text-red-900 dark:text-red-100 mb-1">Duplicados:</div>
-                    @for (dup of detectedDuplicates; track dup.taskId) {
-                      <div class="text-xs text-red-800 dark:text-red-200">• {{ dup.title }} ({{ dup.similarity }})</div>
-                    }
+                  <div class="mt-3 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <div class="flex items-start gap-2 mb-2">
+                      <tui-icon icon="tuiIconAlertCircle" class="text-orange-600 dark:text-orange-400 text-sm mt-0.5 flex-shrink-0"></tui-icon>
+                      <div class="flex-1 min-w-0">
+                        <div class="text-xs font-semibold text-orange-900 dark:text-orange-100 mb-1.5">Tareas similares encontradas</div>
+                        <div class="space-y-1">
+                          @for (dup of detectedDuplicates; track dup.taskId) {
+                            <div class="text-xs text-orange-800 dark:text-orange-200 p-1.5 bg-orange-100 dark:bg-orange-900/30 rounded">
+                              <div class="font-medium">{{ dup.title }}</div>
+                              <div class="text-[11px] text-orange-700 dark:text-orange-300 mt-0.5">Similitud: {{ dup.similarity }}</div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 }
               </div>

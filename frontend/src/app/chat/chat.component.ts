@@ -35,21 +35,60 @@ import { API_BASE, isDevelopment } from '../core/env';
           </div>
         }
       </div>
-      @if (messages.length > 5) {
-        <button
-          tuiButton
-          type="button"
-          appearance="flat"
-          size="s"
-          iconStart="tuiIconHistory"
-          (click)="summarizeChat()"
-          [disabled]="summarizing"
-          class="text-blue-600 dark:text-blue-400"
-          title="Resumir conversación con IA"
-        >
-          {{ summarizing ? 'Resumiendo...' : 'Resumir' }}
-        </button>
-      }
+      <div class="flex items-center gap-2">
+        @if (aiAvailable) {
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-lg border border-purple-200 dark:border-purple-800 shadow-sm">
+              <div class="relative">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div class="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <span class="text-xs font-semibold text-purple-700 dark:text-purple-400">IA Activa</span>
+            </div>
+            @if (messages.length > 5) {
+              <button
+                type="button"
+                class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 hover:shadow-md hover:scale-105 active:scale-95"
+                [class.bg-gradient-to-r]="chatSummary"
+                [class.from-purple-500]="chatSummary"
+                [class.to-indigo-500]="chatSummary"
+                [class.text-white]="chatSummary"
+                [class.border-transparent]="chatSummary"
+                [class.shadow-md]="chatSummary"
+                [class.bg-white]="!chatSummary"
+                [class.border-gray-200]="!chatSummary"
+                [class.text-gray-700]="!chatSummary"
+                [class.dark:bg-gray-800]="!chatSummary"
+                [class.dark:border-gray-700]="!chatSummary"
+                [class.dark:text-gray-300]="!chatSummary"
+                [class.hover:bg-purple-50]="!chatSummary"
+                [class.dark:hover:bg-purple-900/20]="!chatSummary"
+                [class.opacity-50]="summarizing"
+                [class.cursor-not-allowed]="summarizing"
+                (click)="summarizeChat()"
+                [disabled]="summarizing"
+                title="Resumir conversación con IA"
+              >
+                @if (summarizing) {
+                  <div class="w-3 h-3 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Resumiendo...</span>
+                } @else {
+                  <tui-icon icon="tuiIconHistory" class="text-xs"></tui-icon>
+                  <span>{{ chatSummary ? 'Resumen generado' : 'Resumir con IA' }}</span>
+                  @if (chatSummary) {
+                    <tui-icon icon="tuiIconCheck" class="text-xs"></tui-icon>
+                  }
+                }
+              </button>
+            }
+          </div>
+        } @else {
+          <div class="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">IA no disponible</span>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Indicador de presencia y escritura -->
@@ -135,34 +174,37 @@ import { API_BASE, isDevelopment } from '../core/env';
 
       <!-- Resumen de IA mejorado -->
       @if (chatSummary) {
-        <div class="mt-4 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl border-2 border-blue-200 dark:border-blue-700 shadow-lg animate-scale-in">
+        <div class="mt-4 p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl border border-purple-200 dark:border-purple-800 shadow-md">
           <div class="flex items-start justify-between gap-3 mb-3">
-            <div class="flex items-center gap-2">
-              <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                <tui-icon icon="tuiIconHistory" class="text-white text-sm"></tui-icon>
+            <div class="flex items-center gap-2.5">
+              <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-sm">
+                <tui-icon icon="tuiIconStar" class="text-white text-sm"></tui-icon>
               </div>
               <div>
-                <span class="text-sm font-bold text-blue-900 dark:text-blue-100">Resumen de IA</span>
-                <p class="text-xs text-blue-700 dark:text-blue-300">Generado por Google Gemini</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-purple-900 dark:text-purple-100">Resumen de IA</span>
+                  <span class="px-1.5 py-0.5 bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 text-[10px] font-semibold rounded">Gemini</span>
+                </div>
+                <p class="text-xs text-purple-700 dark:text-purple-300 mt-0.5">Análisis inteligente de la conversación</p>
               </div>
             </div>
             <button
-              tuiButton
               type="button"
-              appearance="flat"
-              size="xs"
-              iconStart="tuiIconX"
               (click)="chatSummary = ''"
-              class="!p-1 !min-h-0 !h-6 !w-6 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800"
+              class="h-6 w-6 rounded-lg flex items-center justify-center text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-800 transition-colors"
               title="Cerrar resumen"
-            ></button>
+            >
+              <tui-icon icon="tuiIconX" class="text-xs"></tui-icon>
+            </button>
           </div>
-          <p class="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">{{ chatSummary }}</p>
+          <div class="bg-white dark:bg-gray-800/50 rounded-lg p-3 border border-purple-100 dark:border-purple-900/30">
+            <p class="text-sm text-gray-900 dark:text-gray-100 leading-relaxed whitespace-pre-wrap">{{ chatSummary }}</p>
+          </div>
         </div>
       }
     </div>
 
-    <!-- Input mejorado -->
+    <!-- Input mejorado con IA -->
     <form (ngSubmit)="send()" class="flex items-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
       <div class="flex-1 relative">
         <tui-textfield class="w-full">
@@ -174,19 +216,54 @@ import { API_BASE, isDevelopment } from '../core/env';
             name="draft"
             (input)="onDraftInput()"
             (keydown.enter)="handleEnterKey($event)"
-            class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl pr-12"
+            class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl"
+            [class.pr-28]="draft.trim() && aiAvailable"
+            [class.pr-12]="draft.trim() && !aiAvailable"
+            [class.pr-4]="!draft.trim()"
           />
         </tui-textfield>
-        @if (draft.trim()) {
-          <button
-            type="button"
-            (click)="send()"
-            class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white flex items-center justify-center transition-colors shadow-sm"
-            title="Enviar (Enter)"
-          >
-            <tui-icon icon="tuiIconArrowRight" class="text-sm"></tui-icon>
-          </button>
-        }
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+          @if (draft.trim() && aiAvailable) {
+            <button
+              type="button"
+              class="h-8 w-8 rounded-lg border-2 transition-all duration-200 hover:shadow-md hover:scale-110 active:scale-95 flex items-center justify-center group"
+              [class.bg-gradient-to-br]="improvingMessage"
+              [class.from-purple-500]="improvingMessage"
+              [class.to-indigo-500]="improvingMessage"
+              [class.border-purple-500]="improvingMessage"
+              [class.text-white]="improvingMessage"
+              [class.shadow-md]="improvingMessage"
+              [class.bg-white]="!improvingMessage"
+              [class.border-purple-300]="!improvingMessage"
+              [class.text-purple-600]="!improvingMessage"
+              [class.dark:bg-gray-800]="!improvingMessage"
+              [class.dark:border-purple-700]="!improvingMessage"
+              [class.dark:text-purple-400]="!improvingMessage"
+              [class.hover:bg-purple-50]="!improvingMessage"
+              [class.dark:hover:bg-purple-900/20]="!improvingMessage"
+              [class.cursor-not-allowed]="improvingMessage"
+              (click)="improveMessage(); $event.stopPropagation()"
+              [disabled]="improvingMessage"
+              title="Mejorar mensaje con IA"
+            >
+              @if (improvingMessage) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              } @else {
+                <tui-icon icon="tuiIconStar" class="text-sm group-hover:scale-110 transition-transform"></tui-icon>
+              }
+            </button>
+          }
+          @if (draft.trim()) {
+            <button
+              type="button"
+              (click)="send(); $event.stopPropagation()"
+              class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95"
+              title="Enviar (Enter)"
+            >
+              <tui-icon icon="tuiIconArrowRight" class="text-sm"></tui-icon>
+            </button>
+          }
+        </div>
       </div>
       @if (!draft.trim()) {
         <button
@@ -218,6 +295,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   draft = '';
   summarizing = false;
   chatSummary = '';
+  aiAvailable = false;
+  improvingMessage = false;
   
   get author(): string {
     return this.auth.getDisplayName() || this.auth.getEmail() || 'Anónimo';
@@ -254,6 +333,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngOnInit(): void {
     // Asegurar que el socket esté conectado
     this.socket.connect();
+    
+    // Verificar disponibilidad de IA
+    this.checkAIAvailability();
     
     // Escuchar mensajes del chat del tablero ANTES de unirse a la sala
     this.socket.on('board:chat:message', this.messageHandler);
@@ -499,21 +581,27 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   /**
+   * Verifica la disponibilidad del servicio de IA.
+   */
+  private async checkAIAvailability(): Promise<void> {
+    try {
+      this.aiAvailable = await this.ai.checkAvailability();
+    } catch (error) {
+      console.warn('[Chat AI] Error verificando disponibilidad:', error);
+      this.aiAvailable = false;
+    }
+  }
+
+  /**
    * Genera un resumen de la conversación usando IA.
    */
   async summarizeChat(): Promise<void> {
-    if (this.messages.length < 5 || this.summarizing) return;
+    if (this.messages.length < 5 || this.summarizing || !this.aiAvailable) return;
     
     this.summarizing = true;
     this.chatSummary = '';
     
     try {
-      const available = await this.ai.checkAvailability();
-      if (!available) {
-        this.alerts.open('Servicio de IA no disponible', { label: 'IA no disponible', appearance: 'warning' }).subscribe();
-        return;
-      }
-
       const formattedMessages = this.messages.map(msg => ({
         user: msg.author,
         text: msg.text,
@@ -526,6 +614,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       });
       
       this.chatSummary = summary;
+      this.scrollToBottom();
     } catch (error: any) {
       console.error('Error resumiendo chat:', error);
       this.alerts.open(
@@ -534,6 +623,46 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       ).subscribe();
     } finally {
       this.summarizing = false;
+    }
+  }
+
+  /**
+   * Mejora el mensaje actual usando IA antes de enviarlo.
+   */
+  async improveMessage(): Promise<void> {
+    if (!this.draft.trim() || this.improvingMessage || !this.aiAvailable) return;
+    
+    this.improvingMessage = true;
+    
+    try {
+      // Usar el método improveDescription para mejorar el mensaje
+      const improvement = await this.ai.improveDescription({
+        title: 'Mensaje de chat',
+        currentDescription: this.draft,
+        context: `Conversación del tablero con ${this.messages.length} mensajes anteriores`
+      });
+      
+      this.draft = improvement.improvedDescription;
+      
+      if (improvement.missingElements.length > 0) {
+        this.alerts.open(
+          `Mensaje mejorado. Se agregaron: ${improvement.missingElements.join(', ')}`,
+          { label: 'Mensaje mejorado', appearance: 'success' }
+        ).subscribe();
+      } else {
+        this.alerts.open(
+          'Mensaje mejorado con IA',
+          { label: 'Mensaje mejorado', appearance: 'success' }
+        ).subscribe();
+      }
+    } catch (error: any) {
+      console.error('Error mejorando mensaje:', error);
+      this.alerts.open(
+        error.message || 'Error al mejorar el mensaje',
+        { label: 'Error IA', appearance: 'negative' }
+      ).subscribe();
+    } finally {
+      this.improvingMessage = false;
     }
   }
 }
