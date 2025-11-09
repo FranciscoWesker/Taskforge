@@ -384,7 +384,7 @@ interface BoardLabel {
           [cdkDropListData]="todo" 
           [cdkDropListConnectedTo]="['doing-list', 'done-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50"
+          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50 relative"
           [ngClass]="{
             'border-red-400 bg-red-50/50 dark:bg-red-900/10': wipFlash.todo,
             'border-gray-200 dark:border-gray-700/50': !wipFlash.todo
@@ -401,11 +401,12 @@ interface BoardLabel {
           }
           @for (c of todo; track c.id; let i = $index) {
             <div 
-              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group overflow-hidden min-h-[140px] flex flex-col"
+              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group min-h-[140px] flex flex-col relative isolate"
               [class.ring-2]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               [class.ring-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               [class.border-blue-500]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               [class.shadow-md]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
+              [class.z-10]="selectedCardIndex?.list === 'todo' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -415,7 +416,7 @@ interface BoardLabel {
               (keydown.space)="editCard('todo', i); selectedCardIndex = { list: 'todo', index: i };"
               (click)="selectedCardIndex = { list: 'todo', index: i }"
             >
-              <div class="p-4 flex-1 flex flex-col">
+              <div class="p-4 flex-1 flex flex-col overflow-visible">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
                   <div class="flex items-center gap-2 mb-3 flex-wrap">
@@ -483,7 +484,7 @@ interface BoardLabel {
                       <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2 leading-relaxed">{{ c.description }}</p>
                     }
                   </div>
-                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 relative z-10">
                     <button 
                       tuiButton 
                       type="button" 
@@ -491,7 +492,7 @@ interface BoardLabel {
                       size="xs"
                       iconStart="tuiIconComment"
                       (click)="openComments(c.id); $event.stopPropagation()"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded relative z-10"
                       title="Comentarios"
                     ></button>
                     @if (c.checklist && c.checklist.length > 0) {
@@ -735,7 +736,7 @@ interface BoardLabel {
           [cdkDropListData]="doing" 
           [cdkDropListConnectedTo]="['todo-list', 'done-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50"
+          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50 relative"
           [ngClass]="{
             'border-red-400 bg-red-50/50 dark:bg-red-900/10': wipFlash.doing,
             'border-gray-200 dark:border-gray-700/50': !wipFlash.doing
@@ -752,11 +753,12 @@ interface BoardLabel {
           }
           @for (c of doing; track c.id; let i = $index) {
             <div 
-              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group overflow-hidden min-h-[140px] flex flex-col"
+              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group min-h-[140px] flex flex-col relative isolate"
               [class.ring-2]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               [class.ring-amber-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               [class.border-amber-500]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               [class.shadow-md]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
+              [class.z-10]="selectedCardIndex?.list === 'doing' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -766,7 +768,7 @@ interface BoardLabel {
               (keydown.space)="editCard('doing', i); selectedCardIndex = { list: 'doing', index: i };"
               (click)="selectedCardIndex = { list: 'doing', index: i }"
             >
-              <div class="p-4 flex-1 flex flex-col">
+              <div class="p-4 flex-1 flex flex-col overflow-visible">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
                   <div class="flex items-center gap-2 mb-3 flex-wrap">
@@ -834,7 +836,7 @@ interface BoardLabel {
                       <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2 leading-relaxed">{{ c.description }}</p>
                     }
                   </div>
-                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 relative z-10">
                     <button 
                       tuiButton 
                       type="button" 
@@ -842,7 +844,7 @@ interface BoardLabel {
                       size="xs"
                       iconStart="tuiIconComment"
                       (click)="openComments(c.id); $event.stopPropagation()"
-                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                      class="!p-1.5 !min-h-0 !h-7 !w-7 hover:bg-gray-100 dark:hover:bg-gray-700 rounded relative z-10"
                       title="Comentarios"
                     ></button>
                     @if (c.checklist && c.checklist.length > 0) {
@@ -1086,7 +1088,7 @@ interface BoardLabel {
           [cdkDropListData]="done" 
           [cdkDropListConnectedTo]="['todo-list', 'doing-list']"
           (cdkDropListDropped)="drop($event)" 
-          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50"
+          class="bg-gray-50/50 dark:bg-gray-800/30 rounded-2xl p-4 min-h-[600px] space-y-3 transition-all duration-300 border-2 border-dashed border-gray-200 dark:border-gray-700/50 relative"
           [ngClass]="{
             'border-red-400 bg-red-50/50 dark:bg-red-900/10': wipFlash.done,
             'border-gray-200 dark:border-gray-700/50': !wipFlash.done
@@ -1103,11 +1105,12 @@ interface BoardLabel {
           }
           @for (c of done; track c.id; let i = $index) {
             <div 
-              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group overflow-hidden min-h-[140px] flex flex-col opacity-90"
+              class="bg-white dark:bg-gray-800 border border-gray-200/80 dark:border-gray-700/50 rounded-xl shadow-sm hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 cursor-move group min-h-[140px] flex flex-col relative isolate opacity-90"
               [class.ring-2]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
               [class.ring-emerald-500]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
               [class.border-emerald-500]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
               [class.shadow-md]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
+              [class.z-10]="selectedCardIndex?.list === 'done' && selectedCardIndex?.index === i"
               cdkDrag
               [cdkDragData]="c"
               role="button"
@@ -1117,7 +1120,7 @@ interface BoardLabel {
               (keydown.space)="editCard('done', i); selectedCardIndex = { list: 'done', index: i };"
               (click)="selectedCardIndex = { list: 'done', index: i }"
             >
-              <div class="p-4 flex-1 flex flex-col">
+              <div class="p-4 flex-1 flex flex-col overflow-visible">
                 <!-- Header con prioridad y etiquetas -->
                 @if (c.priority || (c.labels && c.labels.length > 0)) {
                   <div class="flex items-center gap-2 mb-3 flex-wrap">
