@@ -10,31 +10,19 @@ export function createSocketServer(httpServer: HttpServer): Server {
   const isDev = isDevelopment();
 
   // Configurar CORS para Socket.io
-  // En desarrollo: función que permite localhost automáticamente
-  // En producción: lista explícita de orígenes permitidos
-  const corsConfig = isDev
-    ? {
-        origin: (origin: string | undefined, callback: (err: Error | null, allow: boolean) => void): void => {
-          if (!origin || isOriginAllowed(origin)) {
-            callback(null, true);
-          } else {
-            callback(new Error('Origin no permitido por CORS'), false);
-          }
-        },
-        credentials: true,
-        methods: ['GET', 'POST'],
+  // Usar función que valida orígenes usando isOriginAllowed
+  // Esto permite localhost en desarrollo y orígenes de Render en producción
+  const corsConfig = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow: boolean) => void): void => {
+      if (!origin || isOriginAllowed(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Origin no permitido por CORS'), false);
       }
-    : allowedOrigins.length > 0
-    ? {
-        origin: allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins,
-        credentials: true,
-        methods: ['GET', 'POST'],
-      }
-    : {
-        origin: false, // Bloquear todas las conexiones si no hay orígenes configurados
-        credentials: true,
-        methods: ['GET', 'POST'],
-      };
+    },
+    credentials: true,
+    methods: ['GET', 'POST'],
+  };
 
   // Logging solo en desarrollo
   if (process.env.NODE_ENV !== 'production') {

@@ -23,6 +23,7 @@ export function corsMiddleware(req: Request, res: Response, next: NextFunction):
   }
 
   // SIEMPRE establecer los headers CORS - esto es crítico
+  // Esto asegura que incluso si hay un error, los headers CORS se envíen
   if (corsOrigin) {
     res.setHeader('Access-Control-Allow-Origin', corsOrigin);
   }
@@ -30,6 +31,14 @@ export function corsMiddleware(req: Request, res: Response, next: NextFunction):
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-User-Email');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
+  
+  // Asegurar que los headers se envíen incluso en errores
+  // Esto es importante para que el navegador no bloquee las respuestas de error
+  res.on('finish', () => {
+    if (corsOrigin && !res.getHeader('Access-Control-Allow-Origin')) {
+      res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+    }
+  });
   
   // Manejar preflight (OPTIONS) - responder inmediatamente
   if (req.method === 'OPTIONS') {

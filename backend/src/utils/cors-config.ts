@@ -146,7 +146,7 @@ export function getAllowedOrigins(): string[] {
 /**
  * Valida si un origen está permitido para CORS.
  * En desarrollo, permite localhost automáticamente.
- * En producción, solo permite orígenes explícitamente configurados.
+ * En producción, permite orígenes explícitamente configurados Y cualquier origen de Render.
  */
 export function isOriginAllowed(origin: string | undefined): boolean {
   if (!origin) {
@@ -168,6 +168,27 @@ export function isOriginAllowed(origin: string | undefined): boolean {
       console.log(`[CORS] Permitiendo localhost en desarrollo: ${origin}`);
     }
     return true;
+  }
+
+  // En producción, permitir cualquier origen de Render (.onrender.com)
+  // Esto hace que la configuración sea más flexible y robusta
+  if (!isDevelopment()) {
+    try {
+      const url = new URL(origin);
+      const hostname = url.hostname.toLowerCase();
+      
+      // Permitir cualquier subdominio de onrender.com
+      if (hostname.endsWith('.onrender.com')) {
+        const renderPattern = /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.onrender\.com$/;
+        if (renderPattern.test(hostname)) {
+          // eslint-disable-next-line no-console
+          console.log(`[CORS] Permitiendo origen de Render: ${origin}`);
+          return true;
+        }
+      }
+    } catch {
+      // Si no es una URL válida, ignorar
+    }
   }
 
   return false;
