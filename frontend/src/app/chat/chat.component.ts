@@ -173,7 +173,7 @@ import { API_BASE, isDevelopment } from '../core/env';
             [(ngModel)]="draft"
             name="draft"
             (input)="onDraftInput()"
-            (keydown.enter)="!$event.shiftKey && send()"
+            (keydown.enter)="handleEnterKey($event)"
             class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 rounded-xl pr-12"
           />
         </tui-textfield>
@@ -466,6 +466,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.emitTyping(true);
     if (this.typingTimeout) clearTimeout(this.typingTimeout);
     this.typingTimeout = setTimeout(() => this.emitTyping(false), 1200);
+  }
+  
+  handleEnterKey(event: KeyboardEvent): void {
+    if (!event.shiftKey) {
+      event.preventDefault();
+      this.send();
+    }
   }
 
   private emitTyping(typing: boolean): void {
