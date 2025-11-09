@@ -20,10 +20,10 @@ import { AuthService } from '../core/auth.service';
     TuiTextfield,
   ],
   template: `
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 px-4 py-8 animate-in">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 animate-in">
     <div class="w-full max-w-md">
       <!-- Card principal con animación -->
-      <div class="card bg-white shadow-2xl border border-gray-200 animate-slide-up">
+      <div class="card bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up">
         <div class="card-body p-8">
           <!-- Logo y header -->
           <div class="flex flex-col items-center mb-6 space-y-3">
@@ -31,8 +31,8 @@ import { AuthService } from '../core/auth.service';
               TF
             </div>
             <div class="text-center">
-              <h1 class="text-2xl font-bold text-gray-900 mb-1">Crea tu cuenta</h1>
-              <p class="text-sm text-gray-700">Únete a TaskForge y comienza a organizarte</p>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Crea tu cuenta</h1>
+              <p class="text-sm text-gray-700 dark:text-gray-300">Únete a TaskForge y comienza a organizarte</p>
             </div>
           </div>
 
@@ -144,8 +144,8 @@ import { AuthService } from '../core/auth.service';
             <div class="form-control">
               <label class="label cursor-pointer gap-2 py-1">
                 <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" class="checkbox checkbox-sm checkbox-primary" required />
-                <span class="label-text text-sm text-gray-600">
-                  Acepto los <a href="#" class="link link-primary" (click)="$event.preventDefault()">términos y condiciones</a>
+                <span class="label-text text-sm text-gray-600 dark:text-gray-400">
+                  Acepto los <a href="#" class="link link-primary dark:text-blue-400" (click)="$event.preventDefault()">términos y condiciones</a>
                 </span>
               </label>
               <label class="label py-1" *ngIf="f.submitted && !acceptTerms">
@@ -178,7 +178,7 @@ import { AuthService } from '../core/auth.service';
 
           <!-- Separador -->
           <div class="divider my-6">
-            <span class="text-xs text-gray-400">¿Ya tienes cuenta?</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">¿Ya tienes cuenta?</span>
           </div>
 
           <!-- Enlace a login -->
@@ -187,7 +187,7 @@ import { AuthService } from '../core/auth.service';
               routerLink="/login"
               tuiButton
               type="button"
-              class="w-full"
+              class="w-full hover-lift"
               size="m"
               appearance="outline"
             >

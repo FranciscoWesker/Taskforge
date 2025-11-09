@@ -119,9 +119,9 @@ interface Board {
     <!-- Loading -->
     @if (loading) {
       <div class="flex items-center justify-center py-12">
-        <div class="text-center space-y-3">
-          <div class="inline-block w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p class="text-sm text-gray-700 dark:text-gray-300">Cargando tableros...</p>
+        <div class="text-center space-y-3 animate-fade-in">
+          <div class="spinner-lg mx-auto"></div>
+          <p class="text-sm text-gray-700 dark:text-gray-300 font-medium">Cargando tableros...</p>
         </div>
       </div>
     }
@@ -147,18 +147,19 @@ interface Board {
 
     <!-- Empty State (sin resultados de búsqueda) -->
     @if (!loading && !error && boards.length > 0 && filteredBoards.length === 0) {
-      <div class="text-center py-12">
-        <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 mx-auto flex items-center justify-center mb-4">
-          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-gray-400 dark:text-gray-500"></tui-icon>
+      <div class="empty-state animate-fade-in">
+        <div class="empty-state-icon">
+          <tui-icon icon="tuiIconGridLarge" class="text-4xl text-blue-600 dark:text-blue-400"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">No se encontraron tableros</h2>
-        <p class="text-gray-700 dark:text-gray-300 mb-6">Intenta ajustar tus filtros de búsqueda</p>
+        <h2 class="empty-state-title text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">No se encontraron tableros</h2>
+        <p class="empty-state-description text-gray-700 dark:text-gray-300 mb-6">Intenta ajustar tus filtros de búsqueda</p>
         <button
           tuiButton
           type="button"
           appearance="flat"
           size="m"
           (click)="clearFilters()"
+          class="hover-lift"
         >
           Limpiar filtros
         </button>
@@ -167,12 +168,12 @@ interface Board {
 
     <!-- Empty State (sin tableros) -->
     @if (!loading && !error && boards.length === 0) {
-      <div class="text-center py-12">
-        <div class="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 mx-auto flex items-center justify-center mb-4">
+      <div class="empty-state animate-fade-in">
+        <div class="empty-state-icon">
           <tui-icon icon="tuiIconGridLarge" class="text-4xl text-blue-600 dark:text-blue-400"></tui-icon>
         </div>
-        <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">No tienes tableros aún</h2>
-        <p class="text-gray-700 dark:text-gray-300 mb-6">Crea tu primer tablero para empezar a organizar tus tareas</p>
+        <h2 class="empty-state-title text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">No tienes tableros aún</h2>
+        <p class="empty-state-description text-gray-700 dark:text-gray-300 mb-6">Crea tu primer tablero para empezar a organizar tus tareas</p>
         <button
           tuiButton
           type="button"
@@ -180,6 +181,7 @@ interface Board {
           size="m"
           iconStart="tuiIconPlus"
           (click)="openCreateDialog()"
+          class="hover-glow"
         >
           Crear mi primer tablero
         </button>
@@ -191,7 +193,7 @@ interface Board {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (board of filteredBoards; track board.boardId) {
           <div 
-            class="card hover-elevate bg-white dark:bg-gray-800 shadow-md border border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 group rounded-lg overflow-hidden focus-visible-ring"
+            class="card-interactive bg-white dark:bg-gray-800 shadow-md border border-gray-300 dark:border-gray-700 group rounded-lg overflow-hidden focus-ring"
             role="article"
             [attr.aria-label]="'Tablero: ' + (board.name || 'Sin nombre')"
             tabindex="0"

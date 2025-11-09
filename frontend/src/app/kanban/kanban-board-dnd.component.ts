@@ -116,6 +116,20 @@ interface BoardLabel {
           </button>
         </div>
         <div class="flex flex-wrap gap-2">
+          <a
+            routerLink="/app/boards"
+            tuiButton
+            type="button"
+            appearance="flat"
+            size="s"
+            iconStart="tuiIconArrowLeft"
+            class="text-gray-700 dark:text-gray-300 flex-shrink-0 hover-lift"
+            title="Volver a la lista de tableros"
+            (click)="navigateToBoardsList()"
+          >
+            <span class="hidden sm:inline">Volver a tableros</span>
+            <span class="sm:hidden">Volver</span>
+          </a>
           <button 
             tuiButton 
             type="button" 
@@ -289,8 +303,8 @@ interface BoardLabel {
             Reset WIP
           </button>
           @if (wipSaving) {
-            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium flex items-center gap-1">
-              <span class="inline-block w-4 h-4 border-2 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium flex items-center gap-1 animate-fade-in">
+              <span class="spinner-sm"></span>
               Guardando…
             </span>
           }
@@ -4150,6 +4164,21 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
         this.wipSaving = false;
         }
     }
+    /**
+     * Navega a la lista de tableros, marcando que es una navegación explícita.
+     */
+    navigateToBoardsList(): void {
+        try {
+            // Marcar que el usuario navegó explícitamente a la lista de tableros
+            // Esto evita que el guard redirija al último tablero visitado
+            sessionStorage.setItem('tf-explicit-navigation-to-boards', 'true');
+            this.router.navigate(['/app/boards']);
+        } catch (err) {
+            // Si hay error con sessionStorage, navegar de todas formas
+            this.router.navigate(['/app/boards']);
+        }
+    }
+
     async renameBoard() {
         const current = this.boardName ?? '';
         const name = prompt('Nombre del tablero:', current);

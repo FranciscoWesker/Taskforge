@@ -4,8 +4,8 @@ import { AuthService } from './auth.service';
 
 /**
  * Guard que redirige al último tablero visitado cuando el usuario accede a /app/boards
- * sin un ID específico. Esto permite que al recargar la página, el usuario permanezca
- * en el mismo tablero en lugar de volver a la lista de tableros.
+ * sin un ID específico SOLO al recargar la página. Si el usuario navega explícitamente
+ * a la lista de tableros, se respeta su intención y no se redirige.
  */
 export const lastBoardRedirectGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const auth = inject(AuthService);
@@ -17,8 +17,6 @@ export const lastBoardRedirectGuard: CanActivateFn = (route: ActivatedRouteSnaps
   }
 
   // Verificar si estamos en la ruta /app/boards sin ID específico
-  // La ruta debe ser exactamente 'boards' sin parámetros
-  // En una ruta sin parámetros, route.params estará vacío y route.paramMap no tendrá 'id'
   const isBoardsListRoute = 
     route.routeConfig?.path === 'boards' && 
     Object.keys(route.params).length === 0 &&
@@ -26,6 +24,19 @@ export const lastBoardRedirectGuard: CanActivateFn = (route: ActivatedRouteSnaps
 
   if (isBoardsListRoute) {
     try {
+      // Verificar si el usuario navegó explícitamente a la lista de tableros
+      // Si hay una marca en sessionStorage, significa que el usuario hizo clic
+      // en "Volver a tableros" o navegó explícitamente, así que no redirigir
+      const explicitNavigation = sessionStorage.getItem('tf-explicit-navigation-to-boards');
+      
+      // Si el usuario navegó explícitamente, limpiar la marca y permitir acceso
+      if (explicitNavigation === 'true') {
+        sessionStorage.removeItem('tf-explicit-navigation-to-boards');
+        return true; // Permitir acceso a la lista de tableros
+      }
+
+      // Si no hay navegación explícita, es una recarga o entrada directa
+      // En este caso, redirigir al último tablero visitado si existe
       const lastBoardId = localStorage.getItem('tf-last-board');
 
       // Si hay un último tablero guardado y es un UUID válido, redirigir a él
@@ -34,7 +45,7 @@ export const lastBoardRedirectGuard: CanActivateFn = (route: ActivatedRouteSnaps
         return false; // Prevenir la carga del componente de lista
       }
     } catch (err) {
-      // Si hay error al acceder a localStorage, continuar normalmente
+      // Si hay error al acceder a localStorage/sessionStorage, continuar normalmente
       console.warn('Error al verificar último tablero:', err);
     }
   }

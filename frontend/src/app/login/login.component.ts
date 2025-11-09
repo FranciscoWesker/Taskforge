@@ -112,12 +112,12 @@ import { AuthService } from '../core/auth.service';
 
           <!-- Botón Google -->
           <div class="divider my-6">
-            <span class="text-xs text-gray-400">O continúa con</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">O continúa con</span>
           </div>
           <button
             tuiButton
             type="button"
-            class="w-full"
+            class="w-full hover-lift"
             size="m"
             appearance="outline"
             iconStart="tuiIconGoogle"
@@ -129,7 +129,7 @@ import { AuthService } from '../core/auth.service';
 
           <!-- Separador -->
           <div class="divider my-6">
-            <span class="text-xs text-gray-400">¿No tienes cuenta?</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">¿No tienes cuenta?</span>
           </div>
 
           <!-- Enlace a registro -->

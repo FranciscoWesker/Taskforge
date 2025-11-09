@@ -117,17 +117,6 @@ import { SocketService } from '../core/socket.service';
                 <span class="text-sm text-gray-800 dark:text-gray-200 font-medium">{{ userName }}</span>
                 <tui-avatar size="s">{{ userInitials }}</tui-avatar>
               </div>
-              <button
-                tuiButton
-                type="button"
-                appearance="flat"
-                size="s"
-                iconStart="tuiIconLogOut"
-                class="ml-2"
-                (click)="logout()"
-                aria-label="Cerrar sesión"
-                title="Cerrar sesión"
-              ></button>
             } @else {
               <a
                 routerLink="/login"
