@@ -179,7 +179,7 @@
   }
 
   .spinner-lg {
-    @apply w-8 h-8 border-3 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin;
+    @apply w-8 h-8 border-2 border-blue-600 dark:border-blue-400 border-t-transparent rounded-full animate-spin;
   }
 
   /* Skeleton loading mejorado */
