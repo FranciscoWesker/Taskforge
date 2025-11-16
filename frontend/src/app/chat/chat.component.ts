@@ -178,7 +178,7 @@ import { API_BASE, isDevelopment } from '../core/env';
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="flex items-center gap-2.5">
               <div class="h-9 w-9 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-sm">
-                <tui-icon icon="tuiIconStar" class="text-white text-sm"></tui-icon>
+                <tui-icon icon="tuiIconStarLarge" class="text-white text-sm"></tui-icon>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -249,7 +249,7 @@ import { API_BASE, isDevelopment } from '../core/env';
               @if (improvingMessage) {
                 <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               } @else {
-                <tui-icon icon="tuiIconStar" class="text-sm group-hover:scale-110 transition-transform"></tui-icon>
+                <tui-icon icon="tuiIconStarLarge" class="text-sm group-hover:scale-110 transition-transform"></tui-icon>
               }
             </button>
           }
@@ -260,7 +260,7 @@ import { API_BASE, isDevelopment } from '../core/env';
               class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 active:scale-95"
               title="Enviar (Enter)"
             >
-              <tui-icon icon="tuiIconArrowRight" class="text-sm"></tui-icon>
+              <tui-icon icon="tuiIconChevronRight" class="text-sm"></tui-icon>
             </button>
           }
         </div>
@@ -274,7 +274,7 @@ import { API_BASE, isDevelopment } from '../core/env';
           [disabled]="true"
           class="opacity-50 cursor-not-allowed"
         >
-          <tui-icon icon="tuiIconArrowRight"></tui-icon>
+          <tui-icon icon="tuiIconChevronRight"></tui-icon>
         </button>
       }
     </form>

@@ -95,25 +95,28 @@ interface BoardLabel {
     template: `
     <div class="mb-8 space-y-6 animate-in">
       <!-- Header del tablero -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-1">
-        <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2 min-w-0">
-            <span class="truncate">{{ boardName || 'Tablero Kanban' }}</span>
+      <div class="flex flex-col gap-4 px-1">
+        <!-- Título del tablero -->
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate flex-1">
+            {{ boardName || 'Tablero Kanban' }}
           </h1>
           <button 
             tuiButton 
             type="button" 
-            appearance="flat" 
+            appearance="outline" 
             size="s" 
             iconStart="tuiIconEdit"
             (click)="renameBoard()"
-            class="text-gray-600 dark:text-gray-400 flex-shrink-0"
+            class="flex-shrink-0 hover-lift border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm"
             title="Renombrar tablero"
           >
             <span class="hidden sm:inline">Renombrar</span>
             <span class="sm:hidden">Editar</span>
           </button>
         </div>
+        
+        <!-- Botones de acción -->
         <div class="flex flex-wrap gap-2">
           <a
             routerLink="/app/boards"
@@ -121,7 +124,7 @@ interface BoardLabel {
             type="button"
             appearance="flat"
             size="s"
-            iconStart="tuiIconArrowLeft"
+            iconStart="tuiIconChevronLeft"
             class="text-gray-700 dark:text-gray-300 flex-shrink-0 hover-lift"
             title="Volver a la lista de tableros"
             (click)="navigateToBoardsList()"
@@ -1574,7 +1577,7 @@ interface BoardLabel {
                     [disabled]="improvingDescription"
                     title="Mejorar descripción con IA"
                   >
-                    <tui-icon icon="tuiIconStar" class="text-xs"></tui-icon>
+                    <tui-icon icon="tuiIconStarLarge" class="text-xs"></tui-icon>
                     <span>{{ improvingDescription ? 'Mejorando...' : 'Mejorar con IA' }}</span>
                   </button>
                 }
@@ -1592,7 +1595,7 @@ interface BoardLabel {
               <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center gap-2 mb-3">
                   <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                    <tui-icon icon="tuiIconStar" class="text-white text-sm"></tui-icon>
+                    <tui-icon icon="tuiIconStarLarge" class="text-white text-sm"></tui-icon>
                   </div>
                   <div>
                     <label class="text-sm font-semibold text-gray-900 dark:text-gray-100">Asistente IA</label>
@@ -5335,7 +5338,7 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
             card_created: 'tuiIconPlus',
             card_updated: 'tuiIconEdit',
             card_deleted: 'tuiIconTrash',
-            card_moved: 'tuiIconArrowRight',
+            card_moved: 'tuiIconChevronRight',
             card_assigned: 'tuiIconUser',
             card_unassigned: 'tuiIconUserX',
             label_created: 'tuiIconTag',

@@ -25,7 +25,8 @@
     "socket.io": "^4.8.1"
   },
   "overrides": {
-    "debug": ">=2.6.9"
+    "debug": ">=2.6.9",
+    "js-yaml": ">=4.1.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
