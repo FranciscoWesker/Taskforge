@@ -20,180 +20,154 @@ import { AuthService } from '../core/auth.service';
     TuiTextfield,
   ],
   template: `
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 animate-in">
-    <div class="w-full max-w-md">
-      <!-- Card principal con animación -->
-      <div class="card bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up">
-        <div class="card-body p-8">
-          <!-- Logo y header -->
-          <div class="flex flex-col items-center mb-6 space-y-3">
-            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center text-2xl font-bold shadow-lg hover-lift">
-              TF
-            </div>
-            <div class="text-center">
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Crea tu cuenta</h1>
-              <p class="text-sm text-gray-700 dark:text-gray-300">Únete a TaskForge y comienza a organizarte</p>
-            </div>
-          </div>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 animate-in">
+    <div class="w-full max-w-[480px]">
+      <!-- Brand Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-500/30 mb-4">
+          <span class="text-xl font-bold tracking-tight">TF</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Create an account</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">Join TaskForge and start organizing your work</p>
+      </div>
 
-          <!-- Formulario -->
-          <form #f="ngForm" (ngSubmit)="onSubmit(f)" class="space-y-4">
-            <!-- Campo Nombre completo -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel>Nombre completo</label>
+      <!-- Main Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-8">
+          <form #f="ngForm" (ngSubmit)="onSubmit(f)" class="space-y-5">
+            <!-- Full Name Field -->
+            <div class="space-y-1.5">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiTextfield
-                  id="fullName"
                   type="text"
                   [(ngModel)]="fullName"
                   name="fullName"
                   required
                   minlength="3"
-                  placeholder="Tu nombre completo"
+                  placeholder="John Doe"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && (!fullName || fullName.length < 3)"
                 />
               </tui-textfield>
-              <label class="label py-1" *ngIf="f.submitted && (!fullName || fullName.length < 3)">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    El nombre es requerido (mínimo 3 caracteres)
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && (!fullName || fullName.length < 3)" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Name is required (min 3 chars)
+              </span>
             </div>
 
-
-            <!-- Campo Email -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel>Email</label>
+            <!-- Email Field -->
+            <div class="space-y-1.5">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email address</label>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiTextfield
-                  id="email"
                   type="email"
                   [(ngModel)]="email"
                   name="email"
                   required
                   email
-                  placeholder="tu@email.com"
+                  placeholder="name@company.com"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && (!email || f.controls['email']?.errors?.['email'])"
                 />
               </tui-textfield>
-              <label class="label py-1" *ngIf="f.submitted && (!email || f.controls['email']?.errors?.['email'])">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    Ingresa un email válido
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && (!email || f.controls['email']?.errors?.['email'])" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Please enter a valid email
+              </span>
             </div>
 
-            <!-- Campo Contraseña -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel>Contraseña</label>
+            <!-- Password Field -->
+            <div class="space-y-1.5">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Password</label>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiInputPassword
-                  id="password"
                   [(ngModel)]="password"
                   name="password"
                   required
                   minlength="6"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="••••••••"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && (!password || password.length < 6)"
                 />
               </tui-textfield>
-              <label class="label py-1" *ngIf="f.submitted && (!password || password.length < 6)">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    La contraseña debe tener al menos 6 caracteres
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && (!password || password.length < 6)" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Password must be at least 6 characters
+              </span>
             </div>
 
-            <!-- Campo Confirmar Contraseña -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel>Confirmar contraseña</label>
+            <!-- Confirm Password Field -->
+            <div class="space-y-1.5">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Confirm Password</label>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiInputPassword
-                  id="confirmPassword"
                   [(ngModel)]="confirmPassword"
                   name="confirmPassword"
                   required
-                  placeholder="Repite tu contraseña"
+                  placeholder="••••••••"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && password !== confirmPassword"
                 />
               </tui-textfield>
-              <label class="label py-1" *ngIf="f.submitted && password !== confirmPassword">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    Las contraseñas no coinciden
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && password !== confirmPassword" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Passwords do not match
+              </span>
             </div>
 
-            <!-- Términos y condiciones -->
-            <div class="form-control">
-              <label class="label cursor-pointer gap-2 py-1">
-                <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" class="checkbox checkbox-sm checkbox-primary" required />
-                <span class="label-text text-sm text-gray-600 dark:text-gray-400">
-                  Acepto los <a href="#" class="link link-primary dark:text-blue-400" (click)="$event.preventDefault()">términos y condiciones</a>
-                </span>
-              </label>
-              <label class="label py-1" *ngIf="f.submitted && !acceptTerms">
-                <span class="label-text-alt text-error animate-fade-in">Debes aceptar los términos</span>
-              </label>
+            <!-- Terms Checkbox -->
+            <div class="flex items-start gap-3 ml-1">
+              <div class="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="acceptTerms"
+                  name="acceptTerms"
+                  required
+                  class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-800 dark:ring-offset-slate-900"
+                />
+              </div>
+              <div class="text-sm">
+                <label class="font-medium text-slate-700 dark:text-slate-300">
+                  I accept the <a href="#" class="text-primary-600 hover:text-primary-700 dark:text-primary-400 hover:underline" (click)="$event.preventDefault()">Terms and Conditions</a>
+                </label>
+                <p *ngIf="f.submitted && !acceptTerms" class="text-xs text-error mt-1 animate-fade-in">
+                  You must accept the terms
+                </p>
+              </div>
             </div>
 
-            <!-- Botón de envío -->
+            <!-- Submit Button -->
             <button
               tuiButton
               type="submit"
-              class="w-full"
-              size="l"
+              class="w-full !rounded-xl !py-3 !text-base font-medium shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all"
               appearance="primary"
-                    [disabled]="loading || f.invalid || password !== confirmPassword || !acceptTerms"
+              [disabled]="loading || f.invalid || password !== confirmPassword || !acceptTerms"
             >
-              {{ loading ? 'Creando cuenta...' : 'Crear cuenta' }}
+              {{ loading ? 'Creating account...' : 'Create account' }}
             </button>
           </form>
 
-          <!-- Mensaje de error -->
-          <div class="mt-4" *ngIf="error" role="alert">
-            <div class="alert alert-error shadow-lg animate-slide-down">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-sm">{{ error }}</span>
-            </div>
+          <!-- Error Alert -->
+          <div *ngIf="error" class="mt-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 flex items-start gap-3 animate-slide-down">
+            <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-sm text-red-800 dark:text-red-200">{{ error }}</p>
           </div>
+        </div>
 
-          <!-- Separador -->
-          <div class="divider my-6">
-            <span class="text-xs text-gray-400 dark:text-gray-500">¿Ya tienes cuenta?</span>
-          </div>
-
-          <!-- Enlace a login -->
-          <div class="text-center">
-            <a
-              routerLink="/login"
-              tuiButton
-              type="button"
-              class="w-full hover-lift"
-              size="m"
-              appearance="outline"
-            >
-              Iniciar sesión
-            </a>
-          </div>
+        <!-- Footer -->
+        <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center">
+          <p class="text-sm text-slate-600 dark:text-slate-400">
+            Already have an account?
+            <a routerLink="/login" class="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 hover:underline transition-colors">Sign in</a>
+          </p>
         </div>
       </div>
     </div>
@@ -220,23 +194,23 @@ export class RegisterComponent implements OnInit {
     try {
       const last = localStorage.getItem('tf-last-email');
       if (last) this.email = last;
-    } catch {}
+    } catch { }
   }
 
   async onSubmit(form: any): Promise<void> {
     if (form.invalid || this.password !== this.confirmPassword || !this.acceptTerms) return;
-    
+
     this.error = null;
     this.loading = true;
-    
+
     try {
       await this.auth.register(this.email, this.password, this.fullName);
-      try { 
+      try {
         localStorage.setItem('tf-last-email', this.email);
         if (this.fullName) {
           localStorage.setItem('tf-full-name', this.fullName);
         }
-      } catch {}
+      } catch { }
       this.router.navigate(['/app']);
     } catch (err: any) {
       this.error = err || 'Error al crear la cuenta. Inténtalo de nuevo.';

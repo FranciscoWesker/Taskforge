@@ -5,73 +5,107 @@
 /**
  * Variables CSS personalizadas para TaskForge
  */
+/**
+ * TaskForge Design System
+ * Professional & Modern UI Variables
+ */
 :root {
-  /* Colores principales */
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
-  --secondary: #7c3aed;
-  --accent: #10b981;
-
-  /* Estados Kanban */
-  --kanban-todo: #3b82f6;
-  --kanban-doing: #f59e0b;
-  --kanban-done: #10b981;
-
-  /* Estados */
+  /* Primary Brand Colors */
+  --primary: #2563eb;       /* primary-600 */
+  --primary-hover: #1d4ed8; /* primary-700 */
+  --primary-light: #eff6ff; /* primary-50 */
+  
+  /* Semantic Colors */
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
   --info: #3b82f6;
 
-  /* Espaciado (sistema de 4px) */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
+  /* Neutral Tones */
+  --surface-ground: #f8fafc; /* slate-50 */
+  --surface-card: #ffffff;
+  --surface-overlay: #ffffff;
+  --text-main: #0f172a;      /* slate-900 */
+  --text-secondary: #64748b; /* slate-500 */
+  --border-color: #e2e8f0;   /* slate-200 */
 
-  /* Bordes */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
+  /* Spacing System (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
 
-  /* Sombras */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
 
-  /* Transiciones */
-  --transition-fast: 150ms ease-out;
-  --transition-base: 200ms ease-out;
-  --transition-slow: 300ms ease-out;
-  --transition-smooth: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 15px rgba(37, 99, 235, 0.2);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Base UI refinements */
+/* Dark Mode Overrides */
+.dark {
+  --surface-ground: #0f172a; /* slate-900 */
+  --surface-card: #1e293b;   /* slate-800 */
+  --surface-overlay: #1e293b;
+  --text-main: #f8fafc;      /* slate-50 */
+  --text-secondary: #94a3b8; /* slate-400 */
+  --border-color: #334155;   /* slate-700 */
+}
+
+/* Base UI Refinements */
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
-    font-size: 1rem; /* 16px base */
-    line-height: 1.5;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-50;
+    font-size: 0.9375rem; /* 15px base for better readability */
+    line-height: 1.6;
   }
 
-  a {
-    @apply text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline-offset-2 hover:underline;
-    transition: color var(--transition-fast);
+  /* Modern Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 dark:bg-slate-600;
+  }
+
+  /* Focus Styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-slate-900;
   }
 }
 

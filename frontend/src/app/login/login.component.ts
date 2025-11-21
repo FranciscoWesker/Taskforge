@@ -20,133 +20,116 @@ import { AuthService } from '../core/auth.service';
     TuiTextfield,
   ],
   template: `
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-8 sm:py-12 animate-in">
-    <div class="w-full max-w-md">
-      <!-- Card principal con animación -->
-      <div class="card bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up rounded-2xl overflow-hidden">
-        <div class="card-body p-6 sm:p-8 lg:p-10">
-          <!-- Logo y header -->
-          <div class="flex flex-col items-center mb-8 space-y-4">
-            <div class="h-16 w-16 sm:h-18 sm:w-18 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-lg hover-lift transition-transform">
-              TF
-            </div>
-            <div class="text-center space-y-2">
-              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">Bienvenido de nuevo</h1>
-              <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">Inicia sesión para continuar</p>
-            </div>
-          </div>
+  <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12 animate-in">
+    <div class="w-full max-w-[420px]">
+      <!-- Brand Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-500/30 mb-4">
+          <span class="text-xl font-bold tracking-tight">TF</span>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Welcome back</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-2 text-sm">Sign in to your account to continue</p>
+      </div>
 
-          <!-- Formulario -->
+      <!-- Main Card -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="p-8">
           <form #f="ngForm" (ngSubmit)="onSubmit(f)" class="space-y-5">
-            <!-- Campo Email -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel class="text-sm font-semibold">Correo electrónico</label>
+            <!-- Email Field -->
+            <div class="space-y-1.5">
+              <label class="text-sm font-medium text-slate-700 dark:text-slate-300 ml-1">Email address</label>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiTextfield
                   type="email"
-                  id="email"
                   [(ngModel)]="email"
                   name="email"
                   required
                   email
-                  placeholder="tu@email.com"
-                  class="text-base"
+                  placeholder="name@company.com"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && (!email || f.controls['email']?.errors?.['email'])"
                 />
               </tui-textfield>
-              <label class="label py-1.5" *ngIf="f.submitted && (!email || f.controls['email']?.errors?.['email'])">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1.5 text-xs sm:text-sm">
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    Ingresa un correo electrónico válido
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && (!email || f.controls['email']?.errors?.['email'])" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Please enter a valid email
+              </span>
             </div>
 
-            <!-- Campo Contraseña -->
-            <div class="form-control">
-              <tui-textfield>
-                <label tuiLabel class="text-sm font-semibold">Contraseña</label>
+            <!-- Password Field -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between ml-1">
+                <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                <a href="#" class="text-xs font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400" tabindex="-1">Forgot password?</a>
+              </div>
+              <tui-textfield class="!rounded-xl overflow-hidden">
                 <input
                   tuiInputPassword
-                  id="password"
                   [(ngModel)]="password"
                   name="password"
-                  placeholder="Ingresa tu contraseña"
-                  class="text-base"
+                  required
+                  placeholder="••••••••"
+                  class="!bg-slate-50 dark:!bg-slate-800/50"
                   [class.input-error]="f.submitted && (!password || password.length < 3)"
                 />
               </tui-textfield>
-              <label class="label py-1.5" *ngIf="f.submitted && (!password || password.length < 6)">
-                <span class="label-text-alt text-error animate-fade-in">
-                  <span class="inline-flex items-center gap-1.5 text-xs sm:text-sm">
-                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                    La contraseña debe tener al menos 6 caracteres
-                  </span>
-                </span>
-              </label>
+              <span *ngIf="f.submitted && (!password || password.length < 6)" class="text-xs text-error flex items-center gap-1 ml-1 animate-fade-in">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                Password must be at least 6 characters
+              </span>
             </div>
 
-            <!-- Botón de envío -->
+            <!-- Submit Button -->
             <button
               tuiButton
               type="submit"
-              class="w-full hover-glow shadow-md mt-6"
-              size="l"
+              class="w-full !rounded-xl !py-3 !text-base font-medium shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all"
               appearance="primary"
               [disabled]="loading || f.invalid"
             >
-              {{ loading ? 'Entrando...' : 'Entrar' }}
+              {{ loading ? 'Signing in...' : 'Sign in' }}
             </button>
           </form>
 
-          <!-- Mensaje de error -->
-          <div class="mt-5" *ngIf="error" role="alert">
-            <div class="alert alert-error shadow-lg animate-slide-down rounded-xl">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-              </svg>
-              <span class="text-sm">{{ error }}</span>
+          <!-- Error Alert -->
+          <div *ngIf="error" class="mt-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 flex items-start gap-3 animate-slide-down">
+            <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-sm text-red-800 dark:text-red-200">{{ error }}</p>
+          </div>
+
+          <!-- Divider -->
+          <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+            </div>
+            <div class="relative flex justify-center text-xs uppercase">
+              <span class="bg-white dark:bg-slate-900 px-2 text-slate-500">Or continue with</span>
             </div>
           </div>
 
-          <!-- Botón Google -->
-          <div class="divider my-6 sm:my-8">
-            <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">O continúa con</span>
-          </div>
+          <!-- Social Login -->
           <button
             tuiButton
             type="button"
-            class="w-full hover-lift shadow-sm"
-            size="m"
+            class="w-full !rounded-xl !bg-white dark:!bg-slate-800 !border-slate-200 dark:!border-slate-700 !text-slate-700 dark:!text-slate-200 hover:!bg-slate-50 dark:hover:!bg-slate-700/50"
             appearance="outline"
             iconStart="tuiIconGoogle"
             (click)="loginWithGoogle()"
             [disabled]="loading"
           >
-            Continuar con Google
+            Google
           </button>
+        </div>
 
-          <!-- Separador -->
-          <div class="divider my-6 sm:my-8">
-            <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">¿No tienes cuenta?</span>
-          </div>
-
-          <!-- Enlace a registro -->
-          <div class="text-center">
-            <a
-              routerLink="/register"
-              tuiButton
-              type="button"
-              class="w-full hover-lift"
-              size="m"
-              appearance="outline"
-            >
-              Crear nueva cuenta
-            </a>
-          </div>
+        <!-- Footer -->
+        <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center">
+          <p class="text-sm text-slate-600 dark:text-slate-400">
+            Don't have an account?
+            <a routerLink="/register" class="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 hover:underline transition-colors">Create account</a>
+          </p>
         </div>
       </div>
     </div>
@@ -170,17 +153,17 @@ export class LoginComponent implements OnInit {
     try {
       const last = localStorage.getItem('tf-last-email');
       if (last) this.email = last;
-    } catch {}
+    } catch { }
   }
 
   async onSubmit(form: any): Promise<void> {
     if (form.invalid) return;
     this.error = null;
     this.loading = true;
-    
+
     try {
       await this.auth.login(this.email, this.password);
-      try { localStorage.setItem('tf-last-email', this.email); } catch {}
+      try { localStorage.setItem('tf-last-email', this.email); } catch { }
       this.router.navigate(['/app']);
     } catch (err: any) {
       this.error = err || 'Error al iniciar sesión. Inténtalo de nuevo.';
@@ -192,7 +175,7 @@ export class LoginComponent implements OnInit {
   async loginWithGoogle(): Promise<void> {
     this.error = null;
     this.loading = true;
-    
+
     try {
       await this.auth.loginWithGoogle();
       this.router.navigate(['/app']);

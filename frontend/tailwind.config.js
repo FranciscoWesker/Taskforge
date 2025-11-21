@@ -6,36 +6,58 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // Paleta de colores mejorada para mejor contraste y legibilidad
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
       colors: {
-        // Grises mejorados con mejor contraste (WCAG AA: 4.5:1 mínimo)
-        // Reemplazo de text-gray-500 (demasiado claro) por text-gray-700
-        // Reemplazo de text-gray-400 por text-gray-600
-        gray: {
-          50: '#fafafa',
-          100: '#f5f5f5',
-          200: '#e5e5e5',
-          300: '#d4d4d4',
-          400: '#a3a3a3',  // Solo para elementos no críticos
-          500: '#737373',  // Texto secundario (contraste suficiente)
-          600: '#525252',  // Texto secundario mejorado
-          700: '#404040',  // Texto principal (alto contraste)
-          800: '#262626',  // Texto principal fuerte
-          900: '#171717',  // Texto principal muy fuerte
+        // Professional Slate Palette for UI foundation
+        slate: {
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
+          950: '#020617',
         },
-        // Azules mejorados
-        blue: {
+        // Refined Primary Blue
+        primary: {
           50: '#eff6ff',
           100: '#dbeafe',
           200: '#bfdbfe',
           300: '#93c5fd',
           400: '#60a5fa',
           500: '#3b82f6',
-          600: '#2563eb',  // Mejor contraste
+          600: '#2563eb',
           700: '#1d4ed8',
           800: '#1e40af',
           900: '#1e3a8a',
+          950: '#172554',
         },
+        // Semantic colors
+        success: '#10b981',
+        warning: '#f59e0b',
+        error: '#ef4444',
+        info: '#3b82f6',
+      },
+      boxShadow: {
+        'sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        'DEFAULT': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        'md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        'lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        'xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+        'glow': '0 0 15px rgba(59, 130, 246, 0.5)',
+      },
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
       },
     },
   },
