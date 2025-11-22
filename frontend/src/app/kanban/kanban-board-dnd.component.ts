@@ -3206,7 +3206,7 @@ interface BoardLabel {
                       ]; track priority.name) {
                         <div class="flex justify-between items-center p-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg transition-colors">
                           <div class="flex items-center gap-3">
-                            <div class="w-2 h-2 rounded-full" [class]="priority.bg.replace('bg-', 'bg-').replace('/20', '')"></div>
+                            <div class="w-2 h-2 rounded-full" [class]="priority.bg.replace('/20', '')"></div>
                             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ priority.name }}</span>
                           </div>
                           <span class="text-sm font-bold text-slate-900 dark:text-slate-100">{{ priority.value }}</span>
