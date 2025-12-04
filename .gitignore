@@ -88,3 +88,6 @@ UX_UI_DESIGN_GUIDE.md
 IMPLEMENTATION_SUMMARY.md
 *.md.guide
 *.md.summary
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
