@@ -27,7 +27,8 @@
   "overrides": {
     "debug": ">=2.6.9",
     "js-yaml": ">=4.1.1",
-    "body-parser": ">=2.2.1"
+    "body-parser": ">=2.2.1",
+    "jws": ">=3.2.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
