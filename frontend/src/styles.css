@@ -112,7 +112,7 @@
 /* Component helpers: preferir DaisyUI (.btn, .badge, .input, .card) */
 @layer components {
   .card-muted { @apply bg-base-200 rounded-lg p-3; }
-  .section-title { @apply text-sm font-medium text-gray-700; }
+  .section-title { @apply text-sm font-medium text-gray-700 dark:text-gray-300; }
   .btn-icon { @apply btn btn-ghost btn-sm h-9 w-9 p-0; }
   
   /* Skeleton loading state */
