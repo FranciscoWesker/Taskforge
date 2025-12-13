@@ -73,7 +73,7 @@ interface Board {
               [(ngModel)]="searchQuery"
               (ngModelChange)="applyFilters()"
               placeholder="Buscar tableros..."
-              class="w-full"
+              class="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400"
             />
           </tui-textfield>
         </div>
