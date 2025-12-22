@@ -4590,6 +4590,15 @@ export class KanbanBoardDndComponent implements OnInit, OnDestroy {
     }
 
     try {
+      // Esperar a que Firebase inicialice el estado de autenticación
+      // Esto previene errores al recargar la página
+      let attempts = 0;
+      const maxAttempts = 50; // 5 segundos máximo
+      while (!this.auth.currentUser() && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
       const userEmail = this.auth.getEmail();
       if (!userEmail) {
         this.alerts.open('No estás autenticado. Por favor, inicia sesión.', { label: 'Error', appearance: 'negative' }).subscribe();
